@@ -55,33 +55,33 @@ as shortcode-named SVG files.
 Here are the command line options:
 
 * **-h** -- prints the help message
-* **-m <PATH>** -- specifies manifest file path (default: **manifest**)
-* **-i <PATH>** -- specifies input image directory path; note that as build
+* **-m PATH** -- specifies manifest file path (default: **manifest**)
+* **-i PATH** -- specifies input image directory path; note that as build
   files are meant to be self-contained, this is relative to the manifest
   filepath (default: **in**)
-* **-o <PATH>** -- specifies output directory path; this is relative to the
+* **-o PATH** -- specifies output directory path; this is relative to the
   current directory (default: **out**)
-* **-f <PATH_EXPR>** -- specifies output filenaming for emoji; the following
+* **-f PATH_EXPR** -- specifies output filenaming for emoji; the following
   formatting codes are supported: **%c** for colormap, **%d** for source
   image's directory within input directory, **%f** for export format used,
   **%s** for shortcode, **%u** for unicode sequence, **%(property_name)** for
   emoji's property; (default: **%f/%s**)
-* **-F <FORMAT[,FORMAT...]>** -- specifies output formats; the following
-  formats are supported: **svg**, **png-<size>** (fe. **png-64**); (default:
+* **-F FORMAT[,FORMAT...]** -- specifies output formats; the following
+  formats are supported: **svg**, **png-SIZE** (fe. **png-64**); (default:
   **svg**)
-* **-e <FILTER>** -- only emoji matching the filter condition will be exported;
+* **-e FILTER** -- only emoji matching the filter condition will be exported;
   multiple filters can be used to narrow selection down but each requires a
   separate **-e** option; filters are specified as **property=val1[,val2...]**
   to match emoji with the property having the value (or one of listed values),
   __property=*__ to match emoji with the property being defined (regardless of
-  value), or **property=!** to match emoji with the property being undefined;
-* **-j <FILE>** -- export emoji metadata to a JSON file
-* **-J <FILE>** -- export emoji metadata to a JSON file in the format expected
+  value), or **property=!** to match emoji with the property being undefined
+* **-j FILE** -- export emoji metadata to a JSON file
+* **-J FILE** -- export emoji metadata to a JSON file in the format expected
   by Mutant Standard website code
 * **-c** -- disable ANSI color codes; use if you see garbage in the terminal
   instead of pretty colorified output
-* **-q <WIDTH>x<HEIGHT>** -- ensure source images have specified size
-* **-t <NUM>** -- number of worker threads (default: **1**)
+* **-q WIDTHxHEIGHT** -- ensure source images have specified size
+* **-t NUM** -- number of worker threads (default: **1**)
 
 Examples
 --------
