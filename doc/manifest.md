@@ -1,21 +1,18 @@
-Introduction
-============
+Manifests
+=========
 
-Orxporter *manifest* defines semantics of an emoji set. This does not include
-output settings, in order to allow the same *manifest* to be reused to create
+Introduction
+------------
+
+Orxporter manifest defines semantics of an emoji set. This does not include
+output settings, in order to allow the same manifest to be reused to create
 packages in different formats or with different directory structures.
 
-The *manifests* use a simple custom declarative language, which due to demand
+The manifests use a simple custom declarative language, which due to demand
 was designed to be light and readable. However, it was also designed to get
 the job done and nothing else. No significant effort has or will be made to
 formalise the language, to ensure it always parses correctly, or to catch
 errors.
-
-Quick start
-===========
-
-This is a quick introduction to the most important features of the language.
-The subsequent sections provide a more complete reference.
 
 Syntax
 ------
@@ -51,7 +48,7 @@ emoji
 Comments
 --------
 
-Commented lines start with _#_:
+Commented lines start with __#__:
 
 ```
 # This is a comment
@@ -60,7 +57,7 @@ Commented lines start with _#_:
 Variables
 ---------
 
-The dollar sign (_$_) is used for variable names. Thus *$cmaps_all* inserts the
+The dollar sign (__$__) is used for variable names. Thus **$cmaps_all** inserts the
 value of the previously defined variable **cmaps_all**. In order to
 disambiguate syntax, it is possible to wrap the variable name in parentheses.
 
@@ -71,7 +68,6 @@ This is how a variable is defined:
 
 ```
 define cmap_set_hmn h1 h2 h3 h4 h5
-
 ```
 
 Now, every occurence of **$cmap_set_hmn** will be replaced by **h1 h2 h3 h4 h5**.
@@ -111,16 +107,16 @@ mappings for this emoji design, but we could also be explicit:
 
 Orxporter will generate a separate emoji for each colormap. It is important
 (and mandatory) to ensure that the shortcodes and unicode sequences are unique.
-In our example we can see the formatting codes *%c* and *%u* used to insert the
+In our example we can see the formatting codes **%c** and **%u** used to insert the
 colormap's shortcode and unicode sequence respectively.
 
 Colormaps and palettes
 ----------------------
 
-Orxporter uses *colormaps* and *palettes* to allow the same design to be
+Orxporter uses colormaps and palettes to allow the same design to be
 reused in different color schemes as separate emoji.
 
-A *palette* is a list of named colors, and is defined like so:
+A palette is a list of named colors, and is defined like so:
 
 ```
 palette v1
@@ -135,13 +131,13 @@ palette v1
     shirt_shade_3   = $shirt_shade_3
 ```
 
-A *colormap* is a translation from one *palette* to another. It may have its own
+A colormap is a translation from one palette to another. It may have its own
 shortcode and unicode sequence, which can be refered to in an emoji definition
-via *%c* and *%u* formatting codes respectively. Its definition takes the
+via **%c** and **%u** formatting codes respectively. Its definition takes the
 following arguments:
 
-* _src_     -- source *palette*
-* _dst_     -- target *palette*
+* _src_     -- source palette
+* _dst_     -- target palette
 * _code_    -- shortcode
 * _unicode_ -- unicode sequence; use **!undefined** to explicitly omit assigning
 a value, otherwise orxporter will assume it was unintentional and throw an error
@@ -156,19 +152,116 @@ colormap v1
 ```
 
 When recoloring, orxporter will detect the presence of colors from the source
-*palette*, and replace them with corresponding colors from the target *palette*.
+palette, and replace them with corresponding colors from the target palette.
 
-Note that Mutant Standard currently uses **key** *palette* for its source
-images, thus that is the source for all its *colormaps*.
+Note that Mutant Standard currently uses **key** palette for its source
+images, thus that is the source for all its colormaps.
 
 Includes
 --------
 
-It is possible to import other *manifest* files, allowing modularity and reuse:
+It is possible to import other manifest files, allowing modularity and reuse:
 
 ```
 include colors/c_const.orx
 ```
 
-Imported *manifests* can also use the *include* instruction, but note that the
-pathnames are always relative to the original *manifest*.
+Imported manifests may also use the *include* instruction, but note that the
+pathnames are always relative to the original manifest.
+
+Formatting codes
+----------------
+
+The following formatting codes are supported:
+
+* **$var**, **$(var)** - insert the value of variable **var**
+* **%c** - insert the shortcode associated with current emoji's colormap
+* **%C** - if colormap is defined, insert underscore (**_**) followed by its
+  shortcode; else ignore
+* **%u** - insert the unicode sequence associated with current emoji's colormap
+* **%U** - same as %u, except if non-empty precede with ZWJ code
+* **%(param)** - insert the value of emoji's parameter **param**
+
+Unicode
+-------
+
+Unicode sequence values are written as space-separated codepoint values.
+Numbers prefixed with a hash sign **#** are parsed as hexadecimal:
+
+```
+emoji [...] unicode = #100666 #101337
+```
+
+To specify an empty (zero-length) sequence, pass an empty value (**!**):
+
+```
+colormap [...] unicode = !
+```
+
+To explicitly undefine a unicode sequence value for an emoji, pass
+**!undefined**. This will tell orxporter to omit this emoji (instead of
+throwing an error) when exporting unicode-named files:
+
+```
+emoji [...] unicode = !undefined
+```
+
+Classes
+=======
+
+A class is a set of emoji parameter values. Its purpose is to group emoji
+allowing their common parameter values to be changed in one place. A class is
+defined as such:
+
+```
+class paw
+    morph = paw
+    color = $cmaps_fur
+```
+
+Emoji may belong to one or more classes and thus inherit their parameter
+values. Note that in case of conflict, the values of classes listed later
+override those of classes listed earlier, which in turn get overridden by the
+explicit parameters of the *emoji* instruction:
+
+```
+emoji human_paw
+    class = paw
+    color = $cmaps_hmn
+```
+
+Finally, classes can inherit from other classes by passing their names before
+the list of key-value parameters:
+
+```
+class cat_paw paw cats
+    color = $cmaps_cat
+```
+
+Custom parameters
+=================
+
+It is possible to use custom key-value parameters. They can then be refered to
+using formatting codes, or exported along with any other metadata using the
+**-j** switch.
+
+Some of the undocumented parameters are used for the **-J** export switch for
+purposes of the Mutant Standard website.
+
+Licensing
+=========
+
+Orxporter will embed licensing metadata to each exported SVG and PNG file if
+defined using the *license* instruction:
+
+```
+license
+    svg = svg_license
+    png = png.json
+```
+
+The *svg* parameter must point to a file containing the desired string to be
+inserted inside each SVG file's *metadata* tag.
+
+The *png* parameter must point to a JSON file containing a single object with
+the desired EXIF tags to be written to each PNG file.
