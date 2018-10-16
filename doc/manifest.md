@@ -207,7 +207,7 @@ emoji [...] unicode = !undefined
 ```
 
 Classes
-=======
+-------
 
 A class is a set of emoji parameter values. Its purpose is to group emoji
 allowing their common parameter values to be changed in one place. A class is
@@ -239,7 +239,7 @@ class cat_paw paw cats
 ```
 
 Custom parameters
-=================
+-----------------
 
 It is possible to use custom key-value parameters. They can then be refered to
 using formatting codes, or exported along with any other metadata using the
@@ -249,7 +249,7 @@ Some of the undocumented parameters are used for the **-J** export switch for
 purposes of the Mutant Standard website.
 
 Licensing
-=========
+---------
 
 Orxporter will embed licensing metadata to each exported SVG and PNG file if
 defined using the *license* instruction:
