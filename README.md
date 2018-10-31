@@ -40,9 +40,8 @@ Features
 Prerequisites
 -------------
 
-* Python 3
-* ImageMagick or any other tool capable of converting SVG to PNG (only for
-  raster outputs)
+* Python 3.6+
+* Inkscape (only for raster outputs)
 
 Usage
 -----
@@ -140,4 +139,4 @@ orxport.py -f %d/%s
 Manifests
 ---------
 
-Please refer to **doc/manifest.md** for documentation regarding manifests.
+Please refer to **MANIFEST.md** for documentation regarding manifests.

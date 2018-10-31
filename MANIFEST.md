@@ -176,8 +176,7 @@ The following formatting codes are supported:
 
 * **$var**, **$(var)** - insert the value of variable **var**
 * **%c** - insert the shortcode associated with current emoji's colormap
-* **%C** - if colormap is defined, insert underscore (**_**) followed by its
-  shortcode; else ignore
+* **%C** - same as **%c**, but prepend with underscore (**_**) if not empty
 * **%u** - insert the unicode sequence associated with current emoji's colormap
 * **%U** - same as %u, except if non-empty precede with ZWJ code
 * **%(param)** - insert the value of emoji's parameter **param**
