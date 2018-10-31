@@ -200,7 +200,7 @@ class Manifest:
         final_expr = parse.subst_consts(expr, self.defines)
         try:
             head, args, kwargs = parse.parse_expr(final_expr)
-        except:
+        except Exception:
             raise ValueError('Syntax error')
         if head is None:
             return

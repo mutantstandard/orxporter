@@ -45,7 +45,7 @@ class ExportThread:
             out = open(path, 'w')
             out.write(final_svg)
             out.close()
-        except:
+        except Exception:
             raise Exception('Could not write to file: ' + path)
 
     def export_png(self, emoji_svg, size, path, license=None):
@@ -118,7 +118,7 @@ class ExportThread:
                 self.msg('* Loading source file: ' + srcpath, indent=4)
                 try:
                     emoji_svg = open(srcpath, 'r').read()
-                except:
+                except Exception:
                     raise ValueError('Could not load file: ' + srcpath)
                 if 'color' in emoji:
                     self.msg('* Converting colormap...', indent=4)
@@ -200,7 +200,7 @@ def export(m, filtered_emoji, input_path, formats, path, src_size=None,
         srcpath = os.path.join(m.homedir, input_path, e['src'])
         try:
             emoji_svg = open(srcpath, 'r').read()
-        except:
+        except Exception:
             raise ValueError('Could not load file: ' + srcpath)
         if src_size is not None:
             imgsize = svg.size(emoji_svg)
