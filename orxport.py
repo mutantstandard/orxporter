@@ -89,8 +89,8 @@ def main():
         log.out(f'{len(m.emoji)} emoji defined', 33, 4)
         filtered_emoji = [e for e in m.emoji if emoji.match(e, emoji_filter)]
         if emoji_filter:
-            log.out(f'{len(filtered_emoji)} / {len(m.emoji)} emoji match\
-                    filter', 34, 4)
+            log.out(f'{len(filtered_emoji)} / {len(m.emoji)} '
+                    f'emoji match filter', 34, 4)
         if json_out:
             jsonutils.write_emoji(filtered_emoji, json_out)
         elif web_out:
