@@ -230,7 +230,7 @@ class Manifest:
             try:
                 self.exec_expr(expr)
             except Exception as e:
-                raise Exception(f'In manifest file {filename} at line '
+                raise Exception(f'In manifest file `{filename}` at line '
                                 f'{line_num}:\n'
                                 f'`{expr.strip()}`\n'
                                 f'Error: {e}')

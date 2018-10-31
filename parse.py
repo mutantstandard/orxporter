@@ -54,7 +54,8 @@ def exps(stream):
         if expr and not line[0].isspace():
             yield expr, expr_line_num
             expr = ''
-            expr_line_num = line_num + 1
+        if not expr:
+            expr_line_num = line_num
         expr += line
     if expr:
         yield expr, expr_line_num
