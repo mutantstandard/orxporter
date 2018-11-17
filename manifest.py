@@ -106,6 +106,15 @@ class Manifest:
                     except ValueError:
                         raise ValueError('Expected a number: ' + char)
                 res['unicode'] = tuple(unistr)
+        if 'desc' in res:
+            if color:
+                try:
+                    color_desc = self.colormaps[color]['desc']
+                except KeyError:
+                    raise ValueError('Description not defined for colormap: ' +
+                                     color)
+                if color_desc:
+                    res['desc'] += f' ({color_desc})'
         return res
 
     def exec_class(self, args, kwargs):
