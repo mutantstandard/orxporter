@@ -28,6 +28,7 @@ OPTIONS:
 -c                      disable ANSI color codes
 -q WIDTHxHEIGHT         ensure source images have given size
 -t NUM                  number of worker threads (default: 1)
+--force-desc            ensure all emoji have a description
 
 OUTPUT FORMATS:
 svg
@@ -44,10 +45,11 @@ def main():
     web_out = None
     src_size = None
     num_threads = 1
+    force_desc = False
     try:
         opts, _ = getopt.getopt(sys.argv[1:],
                                 'hm:i:o:f:F:ce:j:J:q:t:',
-                                ['help'])
+                                ['help', 'force-desc'])
         for opt, arg in opts:
             if opt in ['-h', '--help']:
                 print(HELP)
@@ -79,6 +81,8 @@ def main():
                 num_threads = int(arg)
                 if num_threads <= 0:
                     raise ValueError
+            elif opt == '--force-desc':
+                force_desc = True
     except Exception:
         print(HELP)
         sys.exit(2)
@@ -91,6 +95,11 @@ def main():
         if emoji_filter:
             log.out(f'{len(filtered_emoji)} / {len(m.emoji)} '
                     f'emoji match filter', 34, 4)
+        if force_desc:
+            nondesc = [e.get('code', str(e)) for e in filtered_emoji if 'desc' not in e]
+            if nondesc:
+                raise ValueError('Emoji without a description: ' +
+                                 ', '.join(nondesc))
         if json_out:
             jsonutils.write_emoji(filtered_emoji, json_out)
         elif web_out:
