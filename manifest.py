@@ -115,6 +115,8 @@ class Manifest:
                                      color)
                 if color_desc:
                     res['desc'] += f' ({color_desc})'
+        if 'root' not in res and not color and 'morph' not in res and 'code' in res:
+            res['root'] = res['code']
         return res
 
     def exec_class(self, args, kwargs):
