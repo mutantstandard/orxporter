@@ -50,7 +50,7 @@ class ExportThread:
         except Exception:
             raise Exception('Could not write to file: ' + path)
 
-    def export_png(self, emoji_svg, size, path, license=None):
+    def export_png(self, emoji_svg, size, path):
         self.msg('* Saving svg to temporary file...', indent=4)
         tmp_name = '.tmp' + self.name + '.svg'
         try:
@@ -77,9 +77,6 @@ class ExportThread:
             raise Exception('Rasteriser returned error code: ' + str(r))
         self.msg('* Deleting temporary file...', indent=4)
         os.remove(tmp_name)
-        if license:
-            self.msg('* Writing license metadata...', indent=4)
-            png.license(path, license)
 
     def export_emoji(self, emoji, emoji_svg, f, path, license):
         final_path = format_path(path, emoji, f)
@@ -97,7 +94,7 @@ class ExportThread:
                 size = int(f[4:])
             except ValueError:
                 raise ValueError('Invalid format: ' + f)
-            self.export_png(emoji_svg, size, final_path, license.get('png'))
+            self.export_png(emoji_svg, size, final_path)
         else:
             raise ValueError('Invalid format: ' + f)
 
@@ -240,3 +237,15 @@ def export(m, filtered_emoji, input_path, formats, path, src_size,
     log.out(f'Waiting for all threads to finish...', 35)
     for t in threads:
         t.join()
+    # png license pass
+    if 'png' in m.license:
+        png_files = []
+        for e in filtered_emoji:
+            for f in formats:
+                if f.startswith('png-'):
+                    try:
+                        png_files.append(format_path(path, e, f))
+                    except SkipException:
+                        continue
+        log.out(f'Adding license metadata to {len(png_files)} png files...', 36)
+        png.license(png_files, m.license.get('png'))

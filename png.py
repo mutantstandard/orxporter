@@ -6,7 +6,13 @@ def license(path, license_data):
     for tag, val in license_data.items():
         cmd.append('-{}={}'.format(tag, val))
     cmd.append('-overwrite_original')
-    cmd.append(os.path.abspath(path))
+    if isinstance(path, str):
+        cmd.append(os.path.abspath(path))
+    elif isinstance(path, list):
+        for f in path:
+            cmd.append(os.path.abspath(f))
+    else:
+        raise ValueError('invalid path type')
     try:
         r = subprocess.run(cmd, stdout=subprocess.DEVNULL).returncode
     except Exception as e:
