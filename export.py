@@ -67,6 +67,9 @@ class ExportThread:
         elif self.renderer == 'rendersvg':
             cmd = ['rendersvg', '-w', str(size), '-h', str(size),
                     os.path.abspath(tmp_name), os.path.abspath(path)]
+        elif self.renderer == 'imagemagick':
+            cmd = ['convert', '-background', 'none', '-density', str(size / 32 * 128),
+                   '-resize', str(size) + 'x' + str(size), os.path.abspath(tmp_name), os.path.abspath(path)]
         else:
             raise AssertionError
         try:
