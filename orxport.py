@@ -101,7 +101,7 @@ def main():
         print(HELP)
         sys.exit(2)
     try:
-        if renderer not in ['inkscape', 'rendersvg']:
+        if renderer not in ['inkscape', 'rendersvg', 'imagemagick']:
             raise Exception('Invalid renderer: ' + renderer)
         log.out(f'Loading manifest file...', 36)
         m = manifest.Manifest(os.path.dirname(manifest_path),
