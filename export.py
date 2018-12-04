@@ -12,7 +12,8 @@ import svg
 import util
 
 class ExportThread:
-    def __init__(self, queue, name, total, m, input_path, formats, path):
+    def __init__(self, queue, name, total, m, input_path, formats, path,
+                 renderer):
         self.queue = queue
         self.name = name
         self.total = total
@@ -20,6 +21,7 @@ class ExportThread:
         self.input_path = input_path
         self.formats = formats
         self.path = path
+        self.renderer = renderer
         self.err = None
         self.kill_flag = False
         self.thread = threading.Thread(target=self.run)
@@ -49,8 +51,7 @@ class ExportThread:
             raise Exception('Could not write to file: ' + path)
 
     def export_png(self, emoji_svg, size, path, license=None):
-        self.msg('* Saving svg to temporary file because Inkscape has a bug '
-                 'since 2005...', indent=4)
+        self.msg('* Saving svg to temporary file...', indent=4)
         tmp_name = '.tmp' + self.name + '.svg'
         try:
             f = open(tmp_name, 'w')
@@ -59,9 +60,15 @@ class ExportThread:
         except IOError:
             raise Exception('Could not write to temporary file: ' + tmp_name)
         self.msg(f'* Exporting at {size}px to {path}...', indent=4)
-        cmd = ['inkscape', os.path.abspath(tmp_name),
-               '--export-png=' + os.path.abspath(path),
-               '-h', str(size), '-w', str(size)]
+        if self.renderer == 'inkscape':
+            cmd = ['inkscape', os.path.abspath(tmp_name),
+                   '--export-png=' + os.path.abspath(path),
+                   '-h', str(size), '-w', str(size)]
+        elif self.renderer == 'rendersvg':
+            cmd = ['rendersvg', '-w', str(size), '-h', str(size),
+                    os.path.abspath(tmp_name), os.path.abspath(path)]
+        else:
+            raise AssertionError
         try:
             r = subprocess.run(cmd, stdout=subprocess.DEVNULL).returncode
         except Exception as e:
@@ -180,8 +187,8 @@ def format_path(path, emoji, f):
         res = res.replace(match, repl)
     return res
 
-def export(m, filtered_emoji, input_path, formats, path, src_size=None,
-           num_threads=1):
+def export(m, filtered_emoji, input_path, formats, path, src_size,
+           num_threads, renderer):
     # 1st pass
     log.out('Performing sanity check...', 36)
     for i, e in enumerate(filtered_emoji):
@@ -218,7 +225,7 @@ def export(m, filtered_emoji, input_path, formats, path, src_size=None,
     for i in range(num_threads):
         log.out(f'Init thread {i}...', 35)
         threads.append(ExportThread(emoji_queue, str(i), len(filtered_emoji),
-                                    m, input_path, formats, path))
+                                    m, input_path, formats, path, renderer))
     while True:
         done = emoji_queue.empty()
         for t in threads:

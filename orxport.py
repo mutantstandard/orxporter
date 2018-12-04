@@ -29,10 +29,15 @@ OPTIONS:
 -q WIDTHxHEIGHT         ensure source images have given size
 -t NUM                  number of worker threads (default: 1)
 --force-desc            ensure all emoji have a description
+-r RENDERER             SVG renderer (default: inkscape)
 
 OUTPUT FORMATS:
 svg
-png-SIZE'''
+png-SIZE
+
+RENDERERS:
+inkscape
+rendersvg'''
 
 def main():
     manifest_path = 'manifest'
@@ -46,9 +51,10 @@ def main():
     src_size = None
     num_threads = 1
     force_desc = False
+    renderer = 'inkscape'
     try:
         opts, _ = getopt.getopt(sys.argv[1:],
-                                'hm:i:o:f:F:ce:j:J:q:t:',
+                                'hm:i:o:f:F:ce:j:J:q:t:r:',
                                 ['help', 'force-desc'])
         for opt, arg in opts:
             if opt in ['-h', '--help']:
@@ -83,10 +89,14 @@ def main():
                     raise ValueError
             elif opt == '--force-desc':
                 force_desc = True
+            elif opt == '-r':
+                renderer = arg
     except Exception:
         print(HELP)
         sys.exit(2)
     try:
+        if renderer not in ['inkscape', 'rendersvg']:
+            raise Exception('Invalid renderer: ' + renderer)
         log.out(f'Loading manifest file...', 36)
         m = manifest.Manifest(os.path.dirname(manifest_path),
                               os.path.basename(manifest_path))
@@ -107,7 +117,7 @@ def main():
         else:
             export.export(m, filtered_emoji, input_path, output_formats,
                           os.path.join(output_path, output_naming), src_size,
-                          num_threads)
+                          num_threads, renderer)
     except Exception as e:
         log.out(f'!!! {e}', 31)
         sys.exit(1)
