@@ -30,6 +30,7 @@ OPTIONS:
 -t NUM                  number of worker threads (default: 1)
 --force-desc            ensure all emoji have a description
 -r RENDERER             SVG renderer (default: inkscape)
+-b NUM                  maximum files per exiftool call (default: 1000)
 
 OUTPUT FORMATS:
 svg
@@ -52,9 +53,10 @@ def main():
     num_threads = 1
     force_desc = False
     renderer = 'inkscape'
+    max_batch = 1000
     try:
         opts, _ = getopt.getopt(sys.argv[1:],
-                                'hm:i:o:f:F:ce:j:J:q:t:r:',
+                                'hm:i:o:f:F:ce:j:J:q:t:r:b:',
                                 ['help', 'force-desc'])
         for opt, arg in opts:
             if opt in ['-h', '--help']:
@@ -91,6 +93,10 @@ def main():
                 force_desc = True
             elif opt == '-r':
                 renderer = arg
+            elif opt == '-b':
+                max_batch = int(arg)
+                if max_batch <= 0:
+                    raise ValueError
     except Exception:
         print(HELP)
         sys.exit(2)
@@ -117,7 +123,7 @@ def main():
         else:
             export.export(m, filtered_emoji, input_path, output_formats,
                           os.path.join(output_path, output_naming), src_size,
-                          num_threads, renderer)
+                          num_threads, renderer, max_batch)
     except Exception as e:
         log.out(f'!!! {e}', 31)
         sys.exit(1)

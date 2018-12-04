@@ -185,7 +185,7 @@ def format_path(path, emoji, f):
     return res
 
 def export(m, filtered_emoji, input_path, formats, path, src_size,
-           num_threads, renderer):
+           num_threads, renderer, max_batch):
     # 1st pass
     log.out('Performing sanity check...', 36)
     for i, e in enumerate(filtered_emoji):
@@ -248,4 +248,4 @@ def export(m, filtered_emoji, input_path, formats, path, src_size,
                     except SkipException:
                         continue
         log.out(f'Adding license metadata to {len(png_files)} png files...', 36)
-        png.license(png_files, m.license.get('png'))
+        png.license(png_files, m.license.get('png'), max_batch)
