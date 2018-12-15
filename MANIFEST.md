@@ -264,3 +264,12 @@ inserted inside each SVG file's *metadata* tag.
 
 The *png* parameter must point to a JSON file containing a single object with
 the desired EXIF tags to be written to each PNG file.
+
+Text descriptions
+-----------------
+
+Emoji and colormaps may define text descriptions using the **desc** property.
+Recolored emoji will have their text description appended with the description
+of the colormap.
+
+This feature is probably only useful in conjunction with the **-j** switch.

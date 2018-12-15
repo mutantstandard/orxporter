@@ -31,9 +31,10 @@ Features
 * Color mapping (recoloring)
 * Unicode metadata
 * SVG and arbitrary size PNG exports
-* JSON output of emoji set metadata
+* Supports renderers: inkscape, rendersvg and imagemagick
 * Output options including emoji filtering, customisable export directory
   structure and filenaming
+* JSON output of emoji set metadata
 * Embedding licensing metadata
 * Multithreading
 
@@ -41,7 +42,11 @@ Prerequisites
 -------------
 
 * Python 3.6+
-* Inkscape (only for raster outputs)
+* Inkscape (optional; for rasterisation)
+* ImageMagick (optional; for rasterisation)
+* [rendersvg](https://github.com/RazrFalcon/resvg/tree/master/tools/rendersvg)
+  (optional; for rasterisation)
+* exiftool (optional; for embedding licensing metadata)
 
 Usage
 -----
@@ -81,6 +86,13 @@ Here are the command line options:
   instead of pretty colorified output
 * **-q WIDTHxHEIGHT** -- ensure source images have specified size
 * **-t NUM** -- number of worker threads (default: **1**)
+* **--force-desc** -- ensure all emoji have description (**desc** property)
+* **-r RENDERER** -- selects rasteriser to use; the following rasterisers are
+  supported: **inkscape**, **rendersvg**, **imagemagick**; **rendersvg** is
+  recommended if speed is important; (default: **inkscape**)
+* **-b NUM** -- maximum number of file arguments per exiftool call; larger
+  numbers may accelerate metadata insertion but fail if the OS doesn't support
+  sufficiently long argument lists; (default: **1000**)
 
 Examples
 --------
