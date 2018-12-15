@@ -10,7 +10,7 @@ import jsonutils
 import log
 import manifest
 
-VERSION = '0.1.0'
+VERSION = '0.2.0'
 
 HELP = f'''orxporter {VERSION}
 USAGE: orxport.py [options...]
