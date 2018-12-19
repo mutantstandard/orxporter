@@ -12,48 +12,58 @@ import manifest
 
 VERSION = '0.2.0'
 
+RENDERERS = ['inkscape', 'rendersvg', 'imagemagick']
+
+DEF_MANIFEST = 'manifest'
+DEF_INPUT_PATH = 'in'
+DEF_OUTPUT_PATH = 'out'
+DEF_OUTPUT_NAMING = '%f/%s'
+DEF_OUTPUT_FORMATS = ['svg']
+DEF_NUM_THREADS = 1
+DEF_RENDERER = 'inkscape'
+DEF_MAX_BATCH = 1000
+
 HELP = f'''orxporter {VERSION}
 USAGE: orxport.py [options...]
 
 OPTIONS:
 -h                      prints this help message
--m PATH                 manifest file path (default: manifest)
--i PATH                 input directory path (default: in)
--o PATH                 output directory path (default: out)
--f PATH_EXPR            output naming system (default: %f/%s)
--F FORMAT[,FORMAT...]   output formats (default: svg)
+-m PATH                 manifest file path (default: {DEF_MANIFEST})
+-i PATH                 input directory path (default: {DEF_INPUT_PATH})
+-o PATH                 output directory path (default: {DEF_OUTPUT_PATH})
+-f PATH_EXPR            output naming system (default: {DEF_OUTPUT_NAMING})
+-F FORMAT[,FORMAT...]   output formats (default: {','.join(DEF_OUTPUT_FORMATS)})
 -e FILTER               emoji filter
 -j FILE                 export JSON replica of directory structure
 -J FILE                 export JSON metadata for mutstd website
 -c                      disable ANSI color codes
 -q WIDTHxHEIGHT         ensure source images have given size
--t NUM                  number of worker threads (default: 1)
+-t NUM                  number of worker threads (default: {DEF_NUM_THREADS})
 --force-desc            ensure all emoji have a description
--r RENDERER             SVG renderer (default: inkscape)
--b NUM                  maximum files per exiftool call (default: 1000)
+-r RENDERER             SVG renderer (default: {DEF_RENDERER})
+-b NUM                  maximum files per exiftool call (default: {DEF_MAX_BATCH})
 
 OUTPUT FORMATS:
 svg
 png-SIZE
 
 RENDERERS:
-inkscape
-rendersvg'''
+''' + '\n'.join(RENDERERS)
 
 def main():
-    manifest_path = 'manifest'
-    input_path = 'in'
-    output_path = 'out'
-    output_naming = '%f/%s'
-    output_formats = ['svg']
+    manifest_path = DEF_MANIFEST
+    input_path = DEF_INPUT_PATH
+    output_path = DEF_OUTPUT_PATH
+    output_naming = DEF_OUTPUT_NAMING
+    output_formats = DEF_OUTPUT_FORMATS
     emoji_filter = []
     json_out = None
     web_out = None
     src_size = None
-    num_threads = 1
+    num_threads = DEF_NUM_THREADS
     force_desc = False
-    renderer = 'inkscape'
-    max_batch = 1000
+    renderer = DEF_RENDERER
+    max_batch = DEF_MAX_BATCH
     try:
         opts, _ = getopt.getopt(sys.argv[1:],
                                 'hm:i:o:f:F:ce:j:J:q:t:r:b:',
@@ -101,7 +111,7 @@ def main():
         print(HELP)
         sys.exit(2)
     try:
-        if renderer not in ['inkscape', 'rendersvg', 'imagemagick']:
+        if renderer not in RENDERERS:
             raise Exception('Invalid renderer: ' + renderer)
         log.out(f'Loading manifest file...', 36)
         m = manifest.Manifest(os.path.dirname(manifest_path),
