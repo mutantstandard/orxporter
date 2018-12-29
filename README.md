@@ -152,3 +152,8 @@ Manifests
 ---------
 
 Please refer to **MANIFEST.md** for documentation regarding manifests.
+
+Contributors
+------------
+
+* AndrewMontagne - imagemagick support
