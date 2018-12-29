@@ -7,22 +7,24 @@ Introduction
 ------------
 
 Orxporter was created as a rewrite of scripts used to automate some of the
-workflow for Mutant Standard. Its purpose remains to be the primary build tool
-for Mutant Standard packages, and so its features remain largely constrained
-to a single use case.
+workflow for Mutant Standard. Its main purpose remains to be the primary build
+tool for Mutant Standard packages, and so its features are mainly focused on a
+single use case.
 
 That said, there has been interest in this tool, as it allows custom builds
 or modifications of Mutant Standard packages, and is generic enough to work
 for similar projects.
 
+We welcome suggestions, feature requests and collaboration in order to make
+orxporter more useful for independent emoji creators and end-users. We follow
+Mutant Standard's code of conduct - please refer to **CODE_OF_CONDUCT.md**.
+
 Disclaimer
 ----------
 
-Orxporter is an open-sourced insider tool, and was never meant to be used at
-large. There has been no significant effort to design, test, or follow any
-good practice. Bugs at edge cases are known about and ignored. As long as
-Mutant Standard is built properly according to Dzuk's wishes, it's unlikely
-any features will be added or bugs fixed.
+Orxporter is an open-sourced insider tool, and wasn't originally meant to be
+used at large. There has been no significant effort to design, test, or follow
+any good software development practice.
 
 Features
 --------
