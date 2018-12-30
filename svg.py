@@ -10,7 +10,7 @@ def ctrans(svg, pfrom, pto):
         cro += ';'
         res = re.sub(cr, cro, res, flags=re.IGNORECASE)
         if (cr[1], cr[3], cr[5]) == (cr[2], cr[4], cr[6]):
-            cr = cr[0:1] + cr[3] + cr[5] + ';'
+            cr = cr[0] + cr[1] + cr[3] + cr[5] + ';'
             res = re.sub(cr, cro, res, flags=re.IGNORECASE)
     return res
 
