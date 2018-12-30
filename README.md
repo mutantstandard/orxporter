@@ -75,8 +75,8 @@ Here are the command line options:
   **%s** for shortcode, **%u** for unicode sequence, **%(property_name)** for
   emoji's property; (default: **%f/%s**)
 * **-F FORMAT[,FORMAT...]** -- specifies output formats; the following
-  formats are supported: **svg**, **png-SIZE** (fe. **png-64**); (default:
-  **svg**)
+  formats are supported: **svg**, **png-SIZE** (fe. **png-64**), **flif-SIZE**,
+  **webp-SIZE**; (default: **svg**)
 * **-e FILTER** -- only emoji matching the filter condition will be exported;
   multiple filters can be used to narrow selection down but each requires a
   separate **-e** option; filters are specified as **property=val1[,val2...]**
