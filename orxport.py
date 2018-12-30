@@ -46,6 +46,8 @@ OPTIONS:
 OUTPUT FORMATS:
 svg
 png-SIZE
+flif-SIZE
+webp-SIZE
 
 RENDERERS:
 ''' + '\n'.join(RENDERERS)

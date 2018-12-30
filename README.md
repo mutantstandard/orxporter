@@ -49,6 +49,8 @@ Prerequisites
 * [rendersvg](https://github.com/RazrFalcon/resvg/tree/master/tools/rendersvg)
   (optional; for rasterisation)
 * exiftool (optional; for embedding licensing metadata)
+* [FLIF reference encoder/decoder](https://github.com/FLIF-hub/FLIF) (optional; for FLIF output)
+* [libwebp](https://developers.google.com/speed/webp/docs/precompiled) (optional; for WebP output)
 
 Usage
 -----
