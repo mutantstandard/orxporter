@@ -190,7 +190,7 @@ class ExportThread:
 
 
         # try to export WebP
-        cmd_webp = ['cwebp', '-lossless', os.path.abspath(tmp_png_name), '-o', os.path.abspath(path)]
+        cmd_webp = ['cwebp', '-lossless', '-quiet', os.path.abspath(tmp_png_name), '-o', os.path.abspath(path)]
 
         try:
             r = subprocess.run(cmd_webp, stdout=subprocess.DEVNULL).returncode

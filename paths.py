@@ -77,7 +77,7 @@ def format_path(path, emoji, format):
     # - uses format_resolve() to figure out what it is
     # - replaces what it found
     for match, fcode in set(re.findall(r'(%(\(.*\)|.))', res)):
-        repl = format_resolve(fcode, emoji, FilterException)
+        repl = format_resolve(fcode, emoji, format)
         res = res.replace(match, repl)
 
     return res
