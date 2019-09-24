@@ -5,6 +5,10 @@ import parse
 import util
 
 class Manifest:
+    """
+    Class representing all of the data within a manifest file.
+    """
+
     def __init__(self, homedir='.', filename=None):
         self.homedir = homedir
         self.classes = {}
@@ -18,26 +22,38 @@ class Manifest:
         if filename is not None:
             self.include(filename)
 
+
     def add_emoji(self, emoji):
+        """
+        Adds emoji to the manifest class. Will check for duplicate shortcodes
+        and codepoints and will throw an error if there are any.
+        """
+
         self.emoji.append(emoji)
+
         if 'code' in emoji:
             if emoji['code'] in self.shortcodes:
                 raise ValueError('Shortcode already in use: ' + emoji['code'])
             self.shortcodes[emoji['code']] = emoji
+
         if 'unicode' in emoji and '!' not in emoji['unicode']:
             if emoji['unicode'] in self.codepoints:
                 raise ValueError('Codepoint already in use: ' +
                                  util.uni_to_hex_hash(emoji['unicode']))
             self.codepoints[emoji['unicode']] = emoji
 
+
     def compile_emoji(self, kwargs, color=None):
+
         res = dict(kwargs)
+
         if not color and 'color' in res:
             del res['color']
         elif color:
             if color not in self.colormaps:
                 raise ValueError('Undefined colormap: ' + color)
             res['color'] = color
+
         for k, v in res.items():
             if '%c' in v:
                 if not color:
@@ -92,6 +108,7 @@ class Manifest:
                 res[k] = v[:idx] + res[prop] + v[end+1:]
                 idx += 1
                 v = res[k]
+
         if 'unicode' in res:
             if '!' in res['unicode']:
                 res['unicode'] = '!'
@@ -106,6 +123,7 @@ class Manifest:
                     except ValueError:
                         raise ValueError('Expected a number: ' + char)
                 res['unicode'] = tuple(unistr)
+
         if 'desc' in res:
             if color:
                 try:
@@ -115,9 +133,12 @@ class Manifest:
                                      color)
                 if color_desc:
                     res['desc'] += f' ({color_desc})'
+
         if 'root' not in res and not color and 'morph' not in res and 'code' in res:
             res['root'] = res['code']
+
         return res
+
 
     def exec_class(self, args, kwargs):
         if not args:
@@ -126,13 +147,16 @@ class Manifest:
             raise ValueError('Already defined: ' + args[0])
         if 'class' in kwargs:
             raise ValueError('Illegal recursion in class definition')
+
         res = {}
+
         for parent in args[1:]:
             if parent not in self.classes:
                 raise ValueError('Parent class is undefined: ' + parent)
             res.update(self.classes[parent])
         res.update(kwargs)
         self.classes[args[0]] = res
+
 
     def exec_colormap(self, args, kwargs):
         if not args:
@@ -151,6 +175,7 @@ class Manifest:
             raise ValueError('Undefined target palette: ' + kwargs['dst'])
         self.colormaps[args[0]] = kwargs
 
+
     def exec_define(self, args, kwargs):
         if kwargs:
             raise ValueError('kwargs not allowed in define expression')
@@ -159,6 +184,7 @@ class Manifest:
         if args[0] in self.defines:
             raise ValueError('Already defined: ' + args[0])
         self.defines[args[0]] = ' '.join(args[1:])
+
 
     def exec_emoji(self, args, kwargs):
         emoji_args = {}
@@ -175,12 +201,14 @@ class Manifest:
         else:
             self.add_emoji(self.compile_emoji(emoji_args))
 
+
     def exec_include(self, args, kwargs):
         if not args:
             raise Exception('Missing filename')
         if len(args) > 1:
             raise ValueError('Multiple filenames')
         self.include(args[0])
+
 
     def exec_license(self, args, kwargs):
         for k, v in kwargs.items():
@@ -198,6 +226,7 @@ class Manifest:
                 except ValueError:
                     raise ValueError('Failed to parse JSON in file: ' + path)
 
+
     def exec_palette(self, args, kwargs):
         if not args:
             raise ValueError('Missing id')
@@ -206,6 +235,7 @@ class Manifest:
         if args[0] in self.palettes:
             raise ValueError('Already defined: ' + args[0])
         self.palettes[args[0]] = kwargs
+
 
     def exec_expr(self, expr):
         final_expr = parse.subst_consts(expr, self.defines)
@@ -231,6 +261,7 @@ class Manifest:
             self.exec_palette(args, kwargs)
         else:
             raise ValueError('Unknown expression type: ' + head)
+
 
     def include(self, filename):
         try:

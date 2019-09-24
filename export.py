@@ -6,6 +6,7 @@ import subprocess
 import threading
 import time
 
+
 import log
 import png
 import svg
@@ -41,12 +42,15 @@ class ExportThread:
 
 
     def export_svg(self, emoji_svg, path, license=None):
+        """
+        SVG exporting function
+        """
         if license:
-            self.msg('* Writing license metadata...', indent=4)
             final_svg = svg.license(emoji_svg, license)
         else:
             final_svg = emoji_svg
-        self.msg('* Exporting to file: ' + path, indent=4)
+
+        # write SVG out to file
         try:
             out = open(path, 'w')
             out.write(final_svg)
@@ -57,7 +61,8 @@ class ExportThread:
 
 
     def export_png(self, emoji_svg, size, path):
-        self.msg('* Saving svg to temporary file...', indent=4)
+
+        # saving SVG to a temporary file
         tmp_name = '.tmp' + self.name + '.svg'
         try:
             f = open(tmp_name, 'w')
@@ -65,7 +70,8 @@ class ExportThread:
             f.close()
         except IOError:
             raise Exception('Could not write to temporary file: ' + tmp_name)
-        self.msg(f'* Exporting at {size}px to {path}...', indent=4)
+
+        # export the SVG to a PNG based on the user's renderer
         if self.renderer == 'inkscape':
             cmd = ['inkscape', os.path.abspath(tmp_name),
                    '--export-png=' + os.path.abspath(path),
@@ -84,21 +90,23 @@ class ExportThread:
             raise Exception('Rasteriser invocation failed: ' + str(e))
         if r:
             raise Exception('Rasteriser returned error code: ' + str(r))
-        self.msg('* Deleting temporary file...', indent=4)
+
+        # delete temporary files
         os.remove(tmp_name)
 
 
 
 
     def export_flif(self, emoji_svg, size, path):
+        """
+        FLIF Exporting function. Creates temporary PNGs first before converting to WebP.
+        """
 
         tmp_svg_name = '.tmp' + self.name + '.svg'
         tmp_png_name = '.tmp' + self.name + '.png'
 
 
         # try to write temporary SVG
-        self.msg('* Saving svg to temporary file...', indent=4)
-
         try:
             f = open(tmp_svg_name, 'w')
             f.write(emoji_svg)
@@ -108,9 +116,7 @@ class ExportThread:
             raise Exception('Could not write to temporary file: ' + tmp_svg_name)
 
 
-        # build PNG export command based on renderer
-        self.msg(f'* Exporting temporary png at {size}px', indent=4)
-
+        # export the SVG to a temporary PNG based on the user's renderer
         if self.renderer == 'inkscape':
             cmd_png = ['inkscape', os.path.abspath(tmp_svg_name),
                    '--export-png=' + os.path.abspath(tmp_png_name),
@@ -124,8 +130,6 @@ class ExportThread:
         else:
             raise AssertionError
 
-
-        # try to export temporary PNG
         try:
             r = subprocess.run(cmd_png, stdout=subprocess.DEVNULL).returncode
         except Exception as e:
@@ -135,8 +139,7 @@ class ExportThread:
 
 
         # try to export FLIF
-        cmd_flif = ['flif', '-e', '-Q100', os.path.abspath(tmp_png_name), os.path.abspath(path)]
-
+        cmd_flif = ['flif', '-e', '--overwrite', '-Q100', os.path.abspath(tmp_png_name), os.path.abspath(path)]
 
         try:
             r = subprocess.run(cmd_flif, stdout=subprocess.DEVNULL).returncode
@@ -148,8 +151,6 @@ class ExportThread:
 
 
         # delete temporary files
-
-        self.msg('* Deleting temporary files...', indent=4)
         os.remove(tmp_svg_name)
         os.remove(tmp_png_name)
 
@@ -159,14 +160,15 @@ class ExportThread:
 
 
     def export_webp(self, emoji_svg, size, path):
+        """
+        WebP Exporting function. Creates temporary PNGs first before converting to WebP.
+        """
 
         tmp_svg_name = '.tmp' + self.name + '.svg'
         tmp_png_name = '.tmp' + self.name + '.png'
 
 
-        # try to write temporary SVG
-        self.msg('* Saving svg to temporary file...', indent=4)
-
+        # try to write a temporary SVG
         try:
             f = open(tmp_svg_name, 'w')
             f.write(emoji_svg)
@@ -176,9 +178,7 @@ class ExportThread:
             raise Exception('Could not write to temporary file: ' + tmp_svg_name)
 
 
-        # build PNG export command based on renderer
-        self.msg(f'* Exporting temporary png at {size}px', indent=4)
-
+        # export the SVG to a temporary PNG based on the user's renderer
         if self.renderer == 'inkscape':
             cmd_png = ['inkscape', os.path.abspath(tmp_svg_name),
                    '--export-png=' + os.path.abspath(tmp_png_name),
@@ -193,7 +193,6 @@ class ExportThread:
             raise AssertionError
 
 
-        # try to export temporary PNG
         try:
             r = subprocess.run(cmd_png, stdout=subprocess.DEVNULL).returncode
         except Exception as e:
@@ -205,7 +204,6 @@ class ExportThread:
         # try to export WebP
         cmd_webp = ['cwebp', '-lossless', os.path.abspath(tmp_png_name), '-o', os.path.abspath(path)]
 
-
         try:
             r = subprocess.run(cmd_webp, stdout=subprocess.DEVNULL).returncode
         except Exception as e:
@@ -216,8 +214,6 @@ class ExportThread:
 
 
         # delete temporary files
-
-        self.msg('* Deleting temporary files...', indent=4)
         os.remove(tmp_svg_name)
         os.remove(tmp_png_name)
 
@@ -225,14 +221,21 @@ class ExportThread:
 
 
     def export_emoji(self, emoji, emoji_svg, f, path, license):
+        """
+        Runs a single export batch.
+        """
         final_path = format_path(path, emoji, f)
-        self.msg('* Export path is ' + final_path, indent=4)
+
+        # try to make the directory for this particular export batch.
         try:
             dirname = os.path.dirname(final_path)
             if dirname:
                 os.makedirs(dirname, exist_ok=True)
         except IOError:
             raise Exception('Could not create directory: ' + dirname)
+
+
+        # run a single export batch based on the file.
         if f == 'svg':
             self.export_svg(emoji_svg, final_path, license.get('svg'))
 
@@ -240,21 +243,21 @@ class ExportThread:
             try:
                 size = int(f[4:])
             except ValueError:
-                raise ValueError('Invalid format: ' + f)
+                raise ValueError(f"The end ('{f[4:]}') of a format you gave ('{f}') isn't a number. It must be a number.")
             self.export_png(emoji_svg, size, final_path)
 
         elif f.startswith('flif-'):
             try:
                 size = int(f[5:])
             except ValueError:
-                raise ValueError('Invalid format: ' + f)
+                raise ValueError(f"The end ('{f[5:]}') of a format you gave ('{f}') isn't a number. It must be a number.")
             self.export_flif(emoji_svg, size, final_path)
 
         elif f.startswith('webp-'):
             try:
                 size = int(f[5:])
             except ValueError:
-                raise ValueError('Invalid format: ' + f)
+                raise ValueError(f"The end ('{f[5:]}') of a format you gave ('{f}') isn't a number. It must be a number.")
             self.export_webp(emoji_svg, size, final_path)
 
         else:
@@ -269,34 +272,39 @@ class ExportThread:
                     i, emoji = self.queue.get_nowait()
                 except queue.Empty:
                     break
-                self.msg(f'[{i+1} / {self.total}] Exporting '
-                         f'{emoji.get("code", "<UNNAMED>")}...', 32)
+
+                #self.msg(f'[{i+1} / {self.total}] Exporting '
+                #         f'{emoji.get("code", "<UNNAMED>")}...', 32)
                 try:
                     format_path(self.path, emoji, 'svg')
                 except SkipException as ex:
-                    if str(ex):
-                        self.msg(f'Skipping: {ex}', 34, 4)
-                    else:
-                        self.msg('Skipping', 34, 4)
+                #    if str(ex):
+                #        self.msg(f'Skipping: {ex}', 34, 4)
+                #    else:
+                #        self.msg('Skipping', 34, 4)
                     continue
                 if 'src' not in emoji:
                     raise ValueError('Missing src attribute')
                 srcpath = os.path.join(self.m.homedir, self.input_path,
                                        emoji['src'])
-                self.msg('* Loading source file: ' + srcpath, indent=4)
+
+                # load the SVG source file
                 try:
                     emoji_svg = open(srcpath, 'r').read()
                 except Exception:
                     raise ValueError('Could not load file: ' + srcpath)
+
+                # convert colormaps (if applicable)
                 if 'color' in emoji:
-                    self.msg('* Converting colormap...', indent=4)
                     cmap = self.m.colormaps[emoji['color']]
                     pfrom = self.m.palettes[cmap['src']]
                     pto = self.m.palettes[cmap['dst']]
                     emoji_svg = svg.ctrans(emoji_svg, pfrom, pto)
+
+                # for each format in the emoji, export it as that
                 for f in self.formats:
-                    self.msg('-> ' + f, 35)
                     self.export_emoji(emoji, emoji_svg, f, self.path, self.m.license)
+
         except Exception as e:
             self.err = e
 
@@ -335,7 +343,7 @@ def format_resolve(code, emoji, f):
         if 'unicode' not in emoji:
             raise ValueError('Cannot resolve %u - no unicode codepoint defined')
         if '!' in emoji['unicode']:
-            raise SkipException('Cannot resolve %u (explicitly undefined)')
+            raise SkipException('Cannot resolve %u (unicode codepoint is explicitly undefined )')
         return util.uni_to_hex_filename(emoji['unicode'])
     raise ValueError('Cannot resolve format code: ' + code)
 
@@ -362,45 +370,71 @@ def format_path(path, emoji, f):
 
 def export(m, filtered_emoji, input_path, formats, path, src_size,
            num_threads, renderer, max_batch):
-    # 1st pass
-    log.out('Performing sanity check...', 36)
+    """
+    Runs the entire export process, includes preliminary checking and validation
+    of emoji metadata.
+    """
+
+
+    # verify emoji
+    # --------------------------------------------------------------------------
+    log.out('Checking emoji...', 36)
     for i, e in enumerate(filtered_emoji):
-        log.out(f'[{i+1} / {len(filtered_emoji)}] Checking '
-                f'{e.get("code", "<UNNAMED>")}...', 32)
+
+        code = e.get("code", "<UNNAMED>") # for possible info or error printouts
+
         try:
             format_path(path, e, 'svg')
         except SkipException as ex:
-            if str(ex):
-                log.out(f'Skipping: {ex})', 34, 4)
-            else:
-                log.out('Skipping', 34)
+            #if str(ex):
+            #    log.out(f'Skipping {code} - {ex}', 34, 4)
+            #else:
+            #    log.out(f'Skipping {code} (unknown reason)', 34)
             continue
+
         if 'src' not in e:
             raise ValueError('Missing src attribute')
         srcpath = os.path.join(m.homedir, input_path, e['src'])
+
         try:
             emoji_svg = open(srcpath, 'r').read()
         except Exception:
             raise ValueError('Could not load file: ' + srcpath)
+
         if src_size is not None:
             imgsize = svg.size(emoji_svg)
             if imgsize != src_size:
                 raise ValueError('Source image size is {}, expected {}'.format(
                     str(imgsize[0]) + 'x' + str(imgsize[1]),
                     str(src_size[0]) + 'x' + str(src_size[1])))
-    # 2nd pass
-    log.out('Exporting emoji...', 36)
+
+
+    # export emoji
+    # --------------------------------------------------------------------------
+    if num_threads > 1:
+        log.out(f"[{num_threads} threads]", 36)
+    else:
+        log.out(f"[{num_threads} thread]", 36)
+
+    # start a Queue object for emoji export
     emoji_queue = queue.Queue()
+
     for entry in enumerate(filtered_emoji):
         emoji_queue.put(entry)
-    log.show_threads = num_threads > 1
+
+    #log.show_threads = num_threads > 1
     threads = []
+
+    # initialise the amount of requested threads
     for i in range(num_threads):
-        log.out(f'Init thread {i}...', 35)
         threads.append(ExportThread(emoji_queue, str(i), len(filtered_emoji),
                                     m, input_path, formats, path, renderer))
+
+
     while True:
         done = emoji_queue.empty()
+        #print(emoji_queue.qsize())
+
         for t in threads:
             if t.err is not None:
                 for u in threads:
@@ -410,10 +444,16 @@ def export(m, filtered_emoji, input_path, formats, path, src_size,
         if done:
             break
         time.sleep(0.01)
-    log.out(f'Waiting for all threads to finish...', 35)
+
+
+    # waiting for threads to finish
     for t in threads:
         t.join()
+
+
+
     # png license pass
+    # --------------------------------------------------------------------------
     if 'png' in m.license:
         png_files = []
         for e in filtered_emoji:
@@ -423,5 +463,6 @@ def export(m, filtered_emoji, input_path, formats, path, src_size,
                         png_files.append(format_path(path, e, f))
                     except SkipException:
                         continue
-        log.out(f'Adding license metadata to {len(png_files)} png files...', 36)
+
+        log.out(f'Adding license metadata to png files...', 36)
         png.license(png_files, m.license.get('png'), max_batch)

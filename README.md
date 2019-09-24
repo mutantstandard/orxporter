@@ -1,10 +1,12 @@
-orxporter
+![Orxporter logo with 'orxporter' next to it, in white against a lime green background.](orxporter_logo.png)
 =========
 
 Emoji exporter used for Mutant Standard emoji set
 
 Introduction
 ------------
+
+Orxporter is a tool for batch export operations for SVG-based emoji sets, providing multi-format and multi-resolution batch rendering, automated recolouring tools, unicode and shortcode filename export, JSON metadata export and more.
 
 Orxporter was created as a rewrite of scripts used to automate some of the
 workflow for Mutant Standard. Its main purpose remains to be the primary build
@@ -31,26 +33,26 @@ Features
 
 * Declarative language for defining semantics of emoji set
 * Color mapping (recoloring)
-* Unicode metadata
-* SVG and arbitrary size PNG exports
-* Supports renderers: inkscape, rendersvg and imagemagick
+* Outputting emoji both as shortcode-named files (ie. 'ice_cream') and unicode codepoint-named files (ie. '1f368').
+* SVG, PNG, Lossless WebP and FLIF exports
+* Supports multiple SVG renderers: rendersvg, inkscape and imagemagick
 * Output options including emoji filtering, customisable export directory
   structure and filenaming
 * JSON output of emoji set metadata
-* Embedding licensing metadata
+* Embedding licensing metadata for both PNG and SVG
 * Multithreading
 
 Prerequisites
 -------------
 
 * Python 3.6+
-* Inkscape (optional; for rasterisation)
-* ImageMagick (optional; for rasterisation)
-* [rendersvg](https://github.com/RazrFalcon/resvg/tree/master/tools/rendersvg)
-  (optional; for rasterisation)
+* A rasteriser if you are going to rasterise your SVGs:
+    * [rendersvg](https://github.com/RazrFalcon/resvg/tree/master/tools/rendersvg) **(recommended rasteriser)**
+    * Inkscape
+    * ImageMagick
 * exiftool (optional; for embedding licensing metadata)
-* [FLIF reference encoder/decoder](https://github.com/FLIF-hub/FLIF) (optional; for FLIF output)
-* [libwebp](https://developers.google.com/speed/webp/docs/precompiled) (optional; for WebP output)
+* [FLIF](https://github.com/FLIF-hub/FLIF) (optional; for FLIF output)
+* [libwebp](https://developers.google.com/speed/webp/docs/precompiled) (optional; for Lossless WebP output)
 
 Usage
 -----
