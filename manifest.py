@@ -19,6 +19,8 @@ class Manifest:
         self.shortcodes = {}
         self.codepoints = {}
         self.license = {}
+
+        # get the actual data for this stuff via self.load_and_parse()
         if filename is not None:
             self.load_and_parse(filename)
 
