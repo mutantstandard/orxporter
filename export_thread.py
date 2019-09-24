@@ -4,7 +4,7 @@ import queue
 import subprocess
 import threading
 
-from exception import SkipException
+from exception import FilterException
 from paths import format_path
 import svg
 
@@ -205,6 +205,64 @@ class ExportThread:
         os.remove(tmp_svg_name)
         os.remove(tmp_png_name)
 
+    def export_avif(self, emoji_svg, size, path):
+        """
+        Lossless AVIF Exporting function. Creates temporary PNGs first before converting to AVIF.
+        """
+
+        tmp_svg_name = '.tmp' + self.name + '.svg'
+        tmp_png_name = '.tmp' + self.name + '.png'
+
+
+        # try to write a temporary SVG
+        try:
+            f = open(tmp_svg_name, 'w')
+            f.write(emoji_svg)
+            f.close()
+
+        except IOError:
+            raise Exception('Could not write to temporary file: ' + tmp_svg_name)
+
+
+        # export the SVG to a temporary PNG based on the user's renderer
+        if self.renderer == 'inkscape':
+            cmd_png = ['inkscape', os.path.abspath(tmp_svg_name),
+                   '--export-png=' + os.path.abspath(tmp_png_name),
+                   '-h', str(size), '-w', str(size)]
+        elif self.renderer == 'rendersvg':
+            cmd_png = ['rendersvg', '-w', str(size), '-h', str(size),
+                    os.path.abspath(tmp_svg_name), os.path.abspath(tmp_png_name)]
+        elif self.renderer == 'imagemagick':
+            cmd_png = ['convert', '-background', 'none', '-density', str(size / 32 * 128),
+                   '-resize', str(size) + 'x' + str(size), os.path.abspath(tmp_svg_name), os.path.abspath(tmp_png_name)]
+        else:
+            raise AssertionError
+
+
+        try:
+            r = subprocess.run(cmd_png, stdout=subprocess.DEVNULL).returncode
+        except Exception as e:
+            raise Exception('PNG rasteriser invocation failed: ' + str(e))
+        if r:
+            raise Exception('PNG rasteriser returned error code: ' + str(r))
+
+
+        # try to export AVIF
+        cmd_avif = ['avif', '-e', os.path.abspath(tmp_png_name), '-o', os.path.abspath(path), '--lossless']
+
+        try:
+            r = subprocess.run(cmd_avif, stdout=subprocess.DEVNULL).returncode
+        except Exception as e:
+            raise Exception('AVIF converter invocation failed: ' + str(e))
+        if r:
+            raise Exception('AVIF converter returned error code: ' + str(r))
+
+
+        # delete temporary files
+        os.remove(tmp_svg_name)
+        os.remove(tmp_png_name)
+
+
     def export_emoji(self, emoji, emoji_svg, f, path, license):
         """
         Runs a single export batch.
@@ -244,6 +302,14 @@ class ExportThread:
             except ValueError:
                 raise ValueError(f"The end ('{f[5:]}') of a format you gave ('{f}') isn't a number. It must be a number.")
             self.export_webp(emoji_svg, size, final_path)
+
+
+        elif f.startswith('avif-'):
+            try:
+                size = int(f[5:])
+            except ValueError:
+                raise ValueError(f"The end ('{f[5:]}') of a format you gave ('{f}') isn't a number. It must be a number.")
+            self.export_avif(emoji_svg, size, final_path)
 
         else:
             raise ValueError('Invalid format: ' + f)

@@ -32,7 +32,7 @@ Features
 * Declarative language for defining semantics of emoji set
 * Color mapping (recoloring)
 * Outputting emoji both as shortcode-named files (ie. 'ice_cream') and unicode codepoint-named files (ie. '1f368').
-* SVG, PNG, Lossless WebP and FLIF exports
+* SVG, PNG, Lossless WebP, Lossless AVIF and FLIF exports
 * Supports multiple SVG renderers: rendersvg, inkscape and imagemagick
 * Output options including emoji filtering, customisable export directory
   structure and filenaming
@@ -51,7 +51,7 @@ Prerequisites
 * exiftool (optional; for embedding licensing metadata)
 * [FLIF](https://github.com/FLIF-hub/FLIF) (optional; for FLIF output)
 * [libwebp](https://developers.google.com/speed/webp/docs/precompiled) (optional; for Lossless WebP output)
-
+* [go-avif](https://github.com/Kagami/go-avif) (optional; for AVIF output)
 Usage
 -----
 

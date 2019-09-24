@@ -68,6 +68,8 @@ def format_path(path, emoji, format):
         res = res + '.flif'
     elif format.startswith('webp-'):
         res = res + '.webp'
+    elif format.startswith('avif-'):
+        res = res + '.avif'
     else:
         raise ValueError('Invalid export format: ' + FilterException)
 
