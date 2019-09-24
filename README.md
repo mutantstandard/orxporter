@@ -157,7 +157,7 @@ orxport.py -f %d/%s
 Manifests
 ---------
 
-Please refer to **MANIFEST.md** for documentation regarding manifests.
+Take a look at [*the manifest documentation**](docs/manifest.md) for more info.
 
 Contributors
 ------------

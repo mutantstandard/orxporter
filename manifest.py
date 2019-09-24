@@ -6,7 +6,7 @@ import util
 
 class Manifest:
     """
-    Class representing all of the data within a manifest file.
+    Class representing all of the data within the input manifest.
     """
 
     def __init__(self, homedir='.', filename=None):
@@ -44,7 +44,9 @@ class Manifest:
 
 
     def compile_emoji(self, kwargs, color=None):
-
+        """
+        Takes the basic output of `exec_emoji`, validates it, and...?
+        """
         res = dict(kwargs)
 
         if not color and 'color' in res:
@@ -54,7 +56,15 @@ class Manifest:
                 raise ValueError('Undefined colormap: ' + color)
             res['color'] = color
 
+
+        # formatting code substitution
+        # (for parameter values)
+        #
+        # this is performed first before other checks and stuff are performed to
+        # the parameter contents.
         for k, v in res.items():
+
+            # CM shortcode insertion (basic)
             if '%c' in v:
                 if not color:
                     raise ValueError('%c without colormap')
@@ -63,6 +73,8 @@ class Manifest:
                 except KeyError:
                     raise ValueError('Shortcode not defined for colormap: ' +
                                      color)
+
+            # CM shortcode insertion (prepends and underscore if the shortcode isn't empty)
             if '%C' in v:
                 if not color:
                     raise ValueError('%C without colormap')
@@ -74,6 +86,8 @@ class Manifest:
                 if subst:
                     subst = '_' + subst
                 res[k] = v.replace('%C', subst)
+
+            # CM codepoint insertion (basic)
             if '%u' in v:
                 if not color:
                     raise ValueError('%u without colormap')
@@ -82,6 +96,8 @@ class Manifest:
                 except KeyError:
                     raise ValueError('Codepoint not defined for colormap: ' +
                                      color)
+
+            # CM codepoint insertion (prepend ZWJ if the shortcoode isn't empty)
             if '%U' in v:
                 if not color:
                     raise ValueError('%U without colormap')
@@ -94,6 +110,9 @@ class Manifest:
                     res[k] = v.replace('%U', '#200D ' + color_code)
                 else:
                     res[k] = v.replace('%U', '')
+
+            # param insertion
+            # %(<param>)
             idx = 0
             while idx < len(v):
                 idx = v.find('%(', idx)
@@ -109,22 +128,27 @@ class Manifest:
                 idx += 1
                 v = res[k]
 
+
         if 'unicode' in res:
+            # it's either explicitly empty, or it's not
             if '!' in res['unicode']:
                 res['unicode'] = '!'
             else:
-                unistr = []
-                for char in res['unicode'].split():
+                # attempt to interpret each part of the codepoint sequence as an int
+                codeseq_list = []
+                for codepoint in res['unicode'].split():
                     try:
-                        if char[0] == '#':
-                            unistr.append(int(char[1:], 16))
+                        if codepoint[0] == '#':
+                            codeseq_list.append(int(codepoint[1:], 16))
                         else:
-                            unistr.append(int(char))
+                            codeseq_list.append(int(codepoint))
                     except ValueError:
-                        raise ValueError('Expected a number: ' + char)
-                res['unicode'] = tuple(unistr)
+                        raise ValueError('Expected a number: ' + codepoint)
+                res['unicode'] = tuple(codeseq_list)
 
         if 'desc' in res:
+            # insert color modifier name at the end of the description.
+            # ie. 'thumbs up (dark skin tone)'
             if color:
                 try:
                     color_desc = self.colormaps[color]['desc']
@@ -134,13 +158,18 @@ class Manifest:
                 if color_desc:
                     res['desc'] += f' ({color_desc})'
 
+        # assume the shortcode is the same as the root if there are no modifiers going on.
         if 'root' not in res and not color and 'morph' not in res and 'code' in res:
             res['root'] = res['code']
 
         return res
 
 
+
     def exec_class(self, args, kwargs):
+        """
+        Executes an orx `class` statement.
+        """
         if not args:
             raise ValueError('Missing id')
         if args[0] in self.classes:
@@ -159,6 +188,9 @@ class Manifest:
 
 
     def exec_colormap(self, args, kwargs):
+        """
+        Executes an orx `colormap` statement.
+        """
         if not args:
             raise ValueError('Missing id')
         if len(args) > 1:
@@ -177,6 +209,9 @@ class Manifest:
 
 
     def exec_define(self, args, kwargs):
+        """
+        Executes an orx `define` statement.
+        """
         if kwargs:
             raise ValueError('kwargs not allowed in define expression')
         if len(args) < 2:
@@ -187,14 +222,23 @@ class Manifest:
 
 
     def exec_emoji(self, args, kwargs):
+        """
+        Executes an orx `emoji` statement.
+        """
         emoji_args = {}
+
         for c in kwargs.get('class', '').split():
             if c not in self.classes:
                 raise ValueError('Undefined class: ' + c)
             emoji_args.update(self.classes[c])
         emoji_args.update(kwargs)
+
         if 'src' not in emoji_args:
             raise ValueError('Missing src')
+
+        # if the emoji has a 'color' parameter, duplicate it based on
+        # the number of colourmaps are in that parameter, and attach
+        # those colormaps to the dupes.
         if 'color' in emoji_args:
             for color in emoji_args['color'].split():
                 self.add_emoji(self.compile_emoji(emoji_args, color))
@@ -203,6 +247,9 @@ class Manifest:
 
 
     def exec_include(self, args, kwargs):
+        """
+        Executes an orx `include` statement.
+        """
         if not args:
             raise Exception('Missing filename')
         if len(args) > 1:
@@ -211,6 +258,10 @@ class Manifest:
 
 
     def exec_license(self, args, kwargs):
+        """
+        Executes an orx `license` statement.
+        (Takes a license statement, verifies it and stores it in the manifest structure.)
+        """
         for k, v in kwargs.items():
             path = os.path.join(self.homedir, v)
             if k == 'svg':
@@ -228,6 +279,10 @@ class Manifest:
 
 
     def exec_palette(self, args, kwargs):
+        """
+        Executes an orx `palette` statement.
+        (Takes a palette statement, verifies it and stores it in the manifest structure.)
+        """
         if not args:
             raise ValueError('Missing id')
         if len(args) > 1:
@@ -238,6 +293,9 @@ class Manifest:
 
 
     def exec_expr(self, expr):
+        """
+        Executes an orx expression.
+        """
         final_expr = parse.subst_consts(expr, self.defines)
         try:
             head, args, kwargs = parse.parse_expr(final_expr)

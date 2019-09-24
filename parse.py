@@ -1,3 +1,4 @@
+
 def parse_expr(expr):
     t1 = expr.split('=')
     t2 = list(map(lambda t: t.strip().rsplit(maxsplit=1), t1[:-1]))

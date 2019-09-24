@@ -8,18 +8,13 @@ Orxporter manifest defines semantics of an emoji set. This does not include
 output settings, in order to allow the same manifest to be reused to create
 packages in different formats or with different directory structures.
 
-The manifests use a simple custom declarative language, which due to demand
-was designed to be light and readable. However, it was also designed to get
-the job done and nothing else. No significant effort has or will be made to
-formalise the language, to ensure it always parses correctly, or to catch
-errors.
+Because a set can contain thousands of emoji, orxporter uses a custom lightweight data serialisation format to contain your emoji metadata.
+
 
 Syntax
 ------
 
-An expression contains an instruction name, followed by parameters. Parameters
-are typically key-value pairs, but some instructions require a name argument
-which must be passed first. To explicitly pass an empty value, use **!**.
+An expression contains an **instruction keyword**, like 'emoji', 'colormap', etc., followed by parameters. Parameters are typically key-value pairs, but some instructions require a name argument which must be passed first. To explicitly pass an empty value, use **!**.
 
 ```
 colormap default
@@ -57,7 +52,7 @@ Commented lines start with __#__:
 Variables
 ---------
 
-The dollar sign (__$__) is used for variable names. Thus **$cmaps_all** inserts the
+The dollar sign (__$__) is used for variable names. So **$cmaps_all** inserts the
 value of the previously defined variable **cmaps_all**. In order to
 disambiguate syntax, it is possible to wrap the variable name in parentheses.
 
@@ -132,7 +127,7 @@ palette v1
 ```
 
 A colormap is a translation from one palette to another. It may have its own
-shortcode and unicode sequence, which can be refered to in an emoji definition
+shortcode and unicode sequence, which can be referred to in an emoji definition
 via **%c** and **%u** formatting codes respectively. Its definition takes the
 following arguments:
 
@@ -221,7 +216,7 @@ class paw
 Emoji may belong to one or more classes and thus inherit their parameter
 values. Note that in case of conflict, the values of classes listed later
 override those of classes listed earlier, which in turn get overridden by the
-explicit parameters of the *emoji* instruction:
+explicit parameters of the *emoji* keyword:
 
 ```
 emoji human_paw
@@ -251,7 +246,7 @@ Licensing
 ---------
 
 Orxporter will embed licensing metadata to each exported SVG and PNG file if
-defined using the *license* instruction:
+defined using the *license* keyword:
 
 ```
 license

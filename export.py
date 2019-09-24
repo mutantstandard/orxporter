@@ -266,8 +266,13 @@ class ExportThread:
 
 
     def run(self):
+        """
+        The process of a single export task in the queue.
+        """
         try:
             while not self.kill_flag:
+
+                # try to get an item from the queue.
                 try:
                     i, emoji = self.queue.get_nowait()
                 except queue.Empty:
@@ -411,6 +416,8 @@ def export(m, filtered_emoji, input_path, formats, path, src_size,
 
     # export emoji
     # --------------------------------------------------------------------------
+    log.out(f"Exporting emoji...", 36)
+
     if num_threads > 1:
         log.out(f"[{num_threads} threads]", 36)
     else:
@@ -422,7 +429,7 @@ def export(m, filtered_emoji, input_path, formats, path, src_size,
     for entry in enumerate(filtered_emoji):
         emoji_queue.put(entry)
 
-    #log.show_threads = num_threads > 1
+    # REMOVE: log.show_threads = num_threads > 1
     threads = []
 
     # initialise the amount of requested threads
