@@ -1,5 +1,17 @@
+"""
+The module for parsing the basics of an orx file.
+
+This just lifts the information from the syntax - this module is not responsible
+for processing the actual data (that's where manifest comes in).
+"""
+
 
 def parse_expr(expr):
+    """
+    Parse Expression.
+
+    Parses a single expression.
+    """
     t1 = expr.split('=')
     t2 = list(map(lambda t: t.strip().rsplit(maxsplit=1), t1[:-1]))
     lex = (t2[0][0] if t2 else expr).split()
@@ -12,7 +24,16 @@ def parse_expr(expr):
     kwargs = dict(zip(keys, vals))
     return head, args, kwargs
 
+
 def subst_consts(expr, consts):
+    """
+    Substitute Constants.
+
+    Finds all of the constants from `define` expressions and fills
+    in their actual value.
+
+    parse_expr() takes the result of this function.
+    """
     res = expr
     idx = 0
     while idx < len(res):
@@ -44,9 +65,17 @@ def subst_consts(expr, consts):
         idx += 1
     return res
 
-def exps(stream):
+
+def get_exprs(stream):
+    """
+    Get Expressions.
+
+    An iterator that detects and retrieves single expressions.
+    (whether they are single-line or multi-line expressions)
+    """
     expr = ''
     expr_line_num = 1
+
     for line_num, line in enumerate(stream, 1):
         if not line:
             continue
@@ -58,5 +87,9 @@ def exps(stream):
         if not expr:
             expr_line_num = line_num
         expr += line
+
     if expr:
         yield expr, expr_line_num
+        # expr: the expression itself.
+        # expr_line_num: the line number where that expression is
+        #    (for error messaging)

@@ -20,7 +20,7 @@ class Manifest:
         self.codepoints = {}
         self.license = {}
         if filename is not None:
-            self.include(filename)
+            self.load_and_parse(filename)
 
 
     def add_emoji(self, emoji):
@@ -187,6 +187,7 @@ class Manifest:
         self.classes[args[0]] = res
 
 
+
     def exec_colormap(self, args, kwargs):
         """
         Executes an orx `colormap` statement.
@@ -208,6 +209,7 @@ class Manifest:
         self.colormaps[args[0]] = kwargs
 
 
+
     def exec_define(self, args, kwargs):
         """
         Executes an orx `define` statement.
@@ -219,6 +221,7 @@ class Manifest:
         if args[0] in self.defines:
             raise ValueError('Already defined: ' + args[0])
         self.defines[args[0]] = ' '.join(args[1:])
+
 
 
     def exec_emoji(self, args, kwargs):
@@ -246,6 +249,7 @@ class Manifest:
             self.add_emoji(self.compile_emoji(emoji_args))
 
 
+
     def exec_include(self, args, kwargs):
         """
         Executes an orx `include` statement.
@@ -254,7 +258,8 @@ class Manifest:
             raise Exception('Missing filename')
         if len(args) > 1:
             raise ValueError('Multiple filenames')
-        self.include(args[0])
+        self.load_and_parse(args[0])
+
 
 
     def exec_license(self, args, kwargs):
@@ -264,6 +269,8 @@ class Manifest:
         """
         for k, v in kwargs.items():
             path = os.path.join(self.homedir, v)
+
+            # try to load the license files that were given.
             if k == 'svg':
                 try:
                     self.license['svg'] = open(path, 'r').read()
@@ -276,6 +283,7 @@ class Manifest:
                     raise Exception('Failed to load license file: ' + path)
                 except ValueError:
                     raise ValueError('Failed to parse JSON in file: ' + path)
+
 
 
     def exec_palette(self, args, kwargs):
@@ -292,15 +300,30 @@ class Manifest:
         self.palettes[args[0]] = kwargs
 
 
+
+
     def exec_expr(self, expr):
         """
         Executes an orx expression.
         """
+
+        # finds all of the constants from `define` expressions and fills
+        # in their actual value
         final_expr = parse.subst_consts(expr, self.defines)
+
+
+        # now parse all of the expressions
+        #
+        # head: the expression name ('emoji', 'define', 'color', etc.)
+        # args: the arguments without parameters
+        # kwargs: the arguments with parameters
         try:
             head, args, kwargs = parse.parse_expr(final_expr)
         except Exception:
             raise ValueError('Syntax error')
+
+        # execute each expression based on the head.
+        # (or do nothing if there's no head)
         if head is None:
             return
         elif head == 'class':
@@ -321,12 +344,19 @@ class Manifest:
             raise ValueError('Unknown expression type: ' + head)
 
 
-    def include(self, filename):
+    def load_and_parse(self, filename):
+        """
+        Loads and parses an orx file.
+        """
+
+        # try to get the orx file.
         try:
             m_file = open(os.path.join(self.homedir, filename), 'r')
         except OSError:
             raise Exception('Could not open manifest file: ' + filename)
-        for expr, line_num in parse.exps(m_file):
+
+        # parse the file.
+        for expr, line_num in parse.get_exprs(m_file):
             try:
                 self.exec_expr(expr)
             except Exception as e:
