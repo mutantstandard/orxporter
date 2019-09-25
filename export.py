@@ -15,8 +15,8 @@ import svg
 def export(m, filtered_emoji, input_path, formats, path, src_size,
            num_threads, renderer, max_batch):
     """
-    Runs the entire export process, includes preliminary checking and validation
-    of emoji metadata.
+    Runs the entire orxporter process, includes preliminary checking and
+    validation of emoji metadata and running the tasks associated with exporting.
     """
 
 
@@ -25,32 +25,31 @@ def export(m, filtered_emoji, input_path, formats, path, src_size,
     log.out('Checking emoji...', 36)
     for i, e in enumerate(filtered_emoji):
 
-        code = e.get("code", "<UNNAMED>") # for possible info or error printouts
+        short = e.get("code", "<UNNAMED>") # for possible info or error printouts
 
         try:
             format_path(path, e, 'svg')
         except FilterException as ex:
-            #if str(ex):
-            #    log.out(f'Skipping {code} - {ex}', 34, 4)
-            #else:
-            #    log.out(f'Skipping {code} (unknown reason)', 34)
-            continue
+            continue #skip if filtered out
 
         if 'src' not in e:
-            raise ValueError('Missing src attribute')
+            raise ValueError(f"The emoji '{short}' is missing an 'src' attribute. It needs to have one.")
         srcpath = os.path.join(m.homedir, input_path, e['src'])
 
         try:
             emoji_svg = open(srcpath, 'r').read()
         except Exception:
-            raise ValueError('Could not load file: ' + srcpath)
+            raise ValueError(f"This source image for emoji '{short}' could not be loaded: {srcpath}")
 
+        # the SVG size check (-q)
         if src_size is not None:
             imgsize = svg.size(emoji_svg)
             if imgsize != src_size:
-                raise ValueError('Source image size is {}, expected {}'.format(
-                    str(imgsize[0]) + 'x' + str(imgsize[1]),
-                    str(src_size[0]) + 'x' + str(src_size[1])))
+                raise ValueError("The source image size for emoji '{}' is not what was expected. It's suppoed to be {}, but it's actually {}.".format(
+                    short,
+                    str(src_size[0]) + 'x' + str(src_size[1]),
+                    str(imgsize[0]) + 'x' + str(imgsize[1])
+                    ))
 
 
     # export emoji
@@ -65,33 +64,36 @@ def export(m, filtered_emoji, input_path, formats, path, src_size,
     # start a Queue object for emoji export
     emoji_queue = queue.Queue()
 
+    # put the [filtered] emoji (plus the index, cuz enumerate()) into the queue.
     for entry in enumerate(filtered_emoji):
         emoji_queue.put(entry)
 
-    # REMOVE: log.show_threads = num_threads > 1
-    threads = []
-
     # initialise the amount of requested threads
+    threads = []
     for i in range(num_threads):
         threads.append(ExportThread(emoji_queue, str(i), len(filtered_emoji),
                                     m, input_path, formats, path, renderer))
 
-
+    # keeps checking if the export queue is done.
     while True:
         done = emoji_queue.empty()
 
+        # if the thread has an error, properly terminate it
+        # and then raise an error.
         for t in threads:
             if t.err is not None:
                 for u in threads:
                     u.kill()
                     u.join()
                 raise ValueError(f'Thread {t.name} failed: {t.err}')
+
         if done:
             break
-        time.sleep(0.01)
+
+        time.sleep(0.01) # wait a little before seeing if stuff is done again.
 
 
-    # waiting for threads to finish
+    # wait for threads to finish after they've all done their stuff.
     for t in threads:
         t.join()
 

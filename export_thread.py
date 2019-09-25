@@ -11,7 +11,8 @@ import svg
 
 class ExportThread:
     """
-    A single thread handling exporting tasks from the queue.
+    A class representing and managing a single thread that executes
+    exporting tasks from the export queue.
     """
     def __init__(self, queue, name, total, m, input_path, formats, path,
                  renderer):
@@ -24,20 +25,26 @@ class ExportThread:
         self.path = path
         self.renderer = renderer
         self.err = None
+        # this essentially tells self.run() to stop running if it is
         self.kill_flag = False
+        # the actual thread part of this thread
         self.thread = threading.Thread(target=self.run)
 
+
+        # start the thread part of this thread!
         self.thread.start()
+
 
     def kill(self):
         """
         Requests this thread to be teriminated by activating the self.kill_flag flag.
+        (This effectively stops self.run() from running)
         """
         self.kill_flag = True
 
     def join(self):
         """
-        Wait for this thread to finish (so then it can be merged).
+        Wait for this thread to finish and merge it.
         """
         self.thread.join()
 
@@ -324,30 +331,36 @@ class ExportThread:
 
     def run(self):
         """
-        The process of getting and executing a single export task in the queue.
+        The process of getting and executing a single export task in
+        the queue.
+
+        This is what the actual thread part of this class is tasked
+        with working on.
         """
         try:
+            # basically: do stuff as long as it's not requested to
+            # be killed by the class
             while not self.kill_flag:
+
                 # try to get an item from the queue.
                 try:
                     i, emoji = self.queue.get_nowait()
                 except queue.Empty:
                     break
 
-                #self.msg(f'[{i+1} / {self.total}] Exporting '
-                #         f'{emoji.get("code", "<UNNAMED>")}...', 32)
+                # try to compose the file path of the emoji.
+                # (this func can throw a FilterException, hence why it's caught here.)
                 try:
                     format_path(self.path, emoji, 'svg')
-                except SkipException as ex:
-                #    if str(ex):
-                #        self.msg(f'Skipping: {ex}', 34, 4)
-                #    else:
-                #        self.msg('Skipping', 34, 4)
-                    continue
+                except FilterException as ex:
+                    continue # this emoji is being skipped and not actually worked on.
+
                 if 'src' not in emoji:
                     raise ValueError('Missing src attribute')
+
                 srcpath = os.path.join(self.m.homedir, self.input_path,
                                        emoji['src'])
+
 
                 # load the SVG source file
                 try:
