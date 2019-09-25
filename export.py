@@ -6,7 +6,7 @@ from export_thread import ExportThread
 from exception import FilterException
 from paths import format_path, format_resolve
 import log
-import png
+import exif
 import svg
 
 
@@ -25,7 +25,7 @@ def export(m, filtered_emoji, input_path, formats, path, src_size,
     log.out('Checking emoji...', 36)
     for i, e in enumerate(filtered_emoji):
 
-        short = e.get("code", "<UNNAMED>") # for possible info or error printouts
+        short = e.get("code", "<UNNAMED>") # to provide info on possible error printouts
 
         try:
             format_path(path, e, 'svg')
@@ -43,7 +43,7 @@ def export(m, filtered_emoji, input_path, formats, path, src_size,
 
         # the SVG size check (-q)
         if src_size is not None:
-            imgsize = svg.size(emoji_svg)
+            imgsize = svg.get_viewbox_size(emoji_svg)
             if imgsize != src_size:
                 raise ValueError("The source image size for emoji '{}' is not what was expected. It's suppoed to be {}, but it's actually {}.".format(
                     short,
@@ -112,4 +112,4 @@ def export(m, filtered_emoji, input_path, formats, path, src_size,
                         continue
 
         log.out(f'Adding license metadata to png files...', 36)
-        png.license(png_files, m.license.get('png'), max_batch)
+        exif.add_license(png_files, m.license.get('png'), max_batch)

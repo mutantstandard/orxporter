@@ -58,7 +58,7 @@ class ExportThread:
         SVG exporting function
         """
         if license:
-            final_svg = svg.license(emoji_svg, license)
+            final_svg = svg.add_license(emoji_svg, license)
         else:
             final_svg = emoji_svg
 
@@ -373,7 +373,7 @@ class ExportThread:
                     cmap = self.m.colormaps[emoji['color']]
                     pfrom = self.m.palettes[cmap['src']]
                     pto = self.m.palettes[cmap['dst']]
-                    emoji_svg = svg.ctrans(emoji_svg, pfrom, pto)
+                    emoji_svg = svg.translate_color(emoji_svg, pfrom, pto)
 
                 # for each format in the emoji, export it as that
                 for f in self.formats:

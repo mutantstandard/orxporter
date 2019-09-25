@@ -1,7 +1,12 @@
 import os
 import subprocess
 
-def license(path, license_data, max_batch=1000):
+def add_license(path, license_data, max_batch=1000):
+    """
+    Adds EXIF license metadata to an image file in batches.
+
+    (This is done in batches because exiftool is far more performant this way than if metadata was added to individual images)
+    """
     cmd = ['exiftool']
     for tag, val in license_data.items():
         cmd.append('-{}={}'.format(tag, val))

@@ -20,7 +20,7 @@ class Manifest:
         self.codepoints = {}
         self.license = {}
 
-        # get the actual data for this stuff via self.load_and_parse()
+        # get the actual data for this stuff
         if filename is not None:
             self.load_and_parse(filename)
 
@@ -47,13 +47,19 @@ class Manifest:
 
     def compile_emoji(self, kwargs, color=None):
         """
-        Takes the basic output of `exec_emoji`, validates it, and...?
+        Takes the basic output of `exec_emoji`, validates it, and returns a completed, compiled emoji object.
+
+        kwargs: parameters from the manifest
+        color: an attached colour for recolouring. (This is given by exec_emoji())
         """
         res = dict(kwargs)
 
+
+        # if the input doesn't have colour, then the output doesnt
         if not color and 'color' in res:
             del res['color']
         elif color:
+            # make sure whatever colour this emoji has is in the manifest.
             if color not in self.colormaps:
                 raise ValueError('Undefined colormap: ' + color)
             res['color'] = color
@@ -170,7 +176,7 @@ class Manifest:
 
     def exec_class(self, args, kwargs):
         """
-        Executes an orx `class` statement.
+        Executes an orx manifest `class` statement.
         """
         if not args:
             raise ValueError('Missing id')
@@ -192,7 +198,7 @@ class Manifest:
 
     def exec_colormap(self, args, kwargs):
         """
-        Executes an orx `colormap` statement.
+        Executes an orx manifest `colormap` statement.
         """
         if not args:
             raise ValueError('Missing id')
@@ -214,7 +220,7 @@ class Manifest:
 
     def exec_define(self, args, kwargs):
         """
-        Executes an orx `define` statement.
+        Executes an orx manifest `define` statement.
         """
         if kwargs:
             raise ValueError('kwargs not allowed in define expression')
@@ -228,7 +234,7 @@ class Manifest:
 
     def exec_emoji(self, args, kwargs):
         """
-        Executes an orx `emoji` statement.
+        Executes an orx manifest `emoji` statement.
         """
         emoji_args = {}
 
@@ -254,7 +260,7 @@ class Manifest:
 
     def exec_include(self, args, kwargs):
         """
-        Executes an orx `include` statement.
+        Executes an orx manifest `include` statement.
         """
         if not args:
             raise Exception('Missing filename')
@@ -266,7 +272,7 @@ class Manifest:
 
     def exec_license(self, args, kwargs):
         """
-        Executes an orx `license` statement.
+        Executes an orx manifest `license` statement.
         (Takes a license statement, verifies it and stores it in the manifest structure.)
         """
         for k, v in kwargs.items():
@@ -290,7 +296,7 @@ class Manifest:
 
     def exec_palette(self, args, kwargs):
         """
-        Executes an orx `palette` statement.
+        Executes an orx manifest `palette` statement.
         (Takes a palette statement, verifies it and stores it in the manifest structure.)
         """
         if not args:
@@ -306,7 +312,7 @@ class Manifest:
 
     def exec_expr(self, expr):
         """
-        Executes an orx expression.
+        Executes an orx manifest expression.
         """
 
         # finds all of the constants from `define` expressions and fills
@@ -348,10 +354,10 @@ class Manifest:
 
     def load_and_parse(self, filename):
         """
-        Loads and parses an orx file.
+        Loads and parses an orx manifest file.
         """
 
-        # try to get the orx file.
+        # try to get the orx manifest file.
         try:
             m_file = open(os.path.join(self.homedir, filename), 'r')
         except OSError:

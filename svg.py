@@ -14,13 +14,13 @@ def ctrans(svg, pfrom, pto):
             res = re.sub(cr, cro, res, flags=re.IGNORECASE)
     return res
 
-def license(svg, license_data):
+def add_license(svg, license_data):
     svgidx = svg.index('<svg')
     insidx = svg.index('>', svgidx) + 1
     metastr = '\n<metadata>\n' + license_data + '</metadata>\n'
     return svg[:insidx] + metastr + svg[insidx:]
 
-def size(svg):
+def get_viewbox_size(svg):
     try:
         x1, y1, x2, y2 = list(map(
             int, svg[svg.index('viewBox'):].split('"', 2)[1].split()))
