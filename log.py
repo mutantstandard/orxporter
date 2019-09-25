@@ -1,3 +1,5 @@
+from progress.bar import IncrementalBar
+
 def to_color(s, c):
     return f'\x1b[{c}m{s}\x1b[0m' if use_color else s
 
@@ -14,3 +16,9 @@ def out(s='', color=37, indent=0, thread_name=None):
 use_color = True
 show_threads = True
 thread_color = 34
+
+
+# stuff for progress bars
+export_task_count = 0
+filtered_export_task_count = 0
+bar = IncrementalBar()

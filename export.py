@@ -51,15 +51,19 @@ def export(m, filtered_emoji, input_path, formats, path, src_size,
                     str(imgsize[0]) + 'x' + str(imgsize[1])
                     ))
 
+    log.out('done!', 33, 4)
+
 
     # export emoji
     # --------------------------------------------------------------------------
-    log.out(f"Exporting emoji...", 36)
-
+    # declare some specs of this export.
+    log.out("Exporting emoji...", 36)
+    log.out(f"- {', '.join(formats)}")
+    log.out(f"- to '{path}'")
     if num_threads > 1:
-        log.out(f"[{num_threads} threads]", 36)
+        log.out(f"- {num_threads} threads")
     else:
-        log.out(f"[{num_threads} thread]", 36)
+        log.out(f"- {num_threads} thread")
 
     # start a Queue object for emoji export
     emoji_queue = queue.Queue()
@@ -74,9 +78,13 @@ def export(m, filtered_emoji, input_path, formats, path, src_size,
         threads.append(ExportThread(emoji_queue, str(i), len(filtered_emoji),
                                     m, input_path, formats, path, renderer))
 
+
     # keeps checking if the export queue is done.
+    log.bar.max = len(filtered_emoji)
     while True:
         done = emoji_queue.empty()
+
+        log.bar.goto(log.export_task_count)
 
         # if the thread has an error, properly terminate it
         # and then raise an error.
@@ -92,8 +100,17 @@ def export(m, filtered_emoji, input_path, formats, path, src_size,
 
         time.sleep(0.01) # wait a little before seeing if stuff is done again.
 
+    # finish the stuff
+    # - cleanup
+    # - wait for threads to finish after they've all done their stuff.
+    log.bar.finish()
+    if log.filtered_export_task_count > 0:
+        log.out(f"{log.filtered_export_task_count} emoji have been implicitly or explicitly filtered out of this export task.")
 
-    # wait for threads to finish after they've all done their stuff.
+
+    log.export_task_count = 0
+    log.filtered_export_task_count = 0
+
     for t in threads:
         t.join()
 

@@ -7,7 +7,7 @@ import threading
 from exception import FilterException
 from paths import format_path
 import svg
-
+import log
 
 class ExportThread:
     """
@@ -353,6 +353,7 @@ class ExportThread:
                 try:
                     format_path(self.path, emoji, 'svg')
                 except FilterException as ex:
+                    log.filtered_export_task_count += 1
                     continue # this emoji is being skipped and not actually worked on.
 
                 if 'src' not in emoji:
@@ -378,6 +379,9 @@ class ExportThread:
                 # for each format in the emoji, export it as that
                 for f in self.formats:
                     self.export_emoji(emoji, emoji_svg, f, self.path, self.m.license)
+
+                # tell the progress bar that this task has been completed.
+                log.export_task_count += 1
 
         except Exception as e:
             self.err = e
