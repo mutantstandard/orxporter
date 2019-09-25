@@ -23,7 +23,7 @@ for similar projects.
 
 We welcome suggestions, feature requests and collaboration in order to make
 orxporter more useful for independent emoji creators and end-users. We follow
-Mutant Standard's code of conduct - please refer to **CODE_OF_CONDUCT.md**.
+Mutant Standard's [code of conduct](docs/code_of_conduct.md).
 
 
 Features

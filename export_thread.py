@@ -11,7 +11,7 @@ import svg
 
 class ExportThread:
     """
-    A single thread handling exporting tasks.
+    A single thread handling exporting tasks from the queue.
     """
     def __init__(self, queue, name, total, m, input_path, formats, path,
                  renderer):
@@ -26,12 +26,19 @@ class ExportThread:
         self.err = None
         self.kill_flag = False
         self.thread = threading.Thread(target=self.run)
+
         self.thread.start()
 
     def kill(self):
+        """
+        Requests this thread to be teriminated by activating the self.kill_flag flag.
+        """
         self.kill_flag = True
 
     def join(self):
+        """
+        Wait for this thread to finish (so then it can be merged).
+        """
         self.thread.join()
 
     def msg(self, s, color=37, indent=0):
@@ -262,7 +269,6 @@ class ExportThread:
         os.remove(tmp_svg_name)
         os.remove(tmp_png_name)
 
-
     def export_emoji(self, emoji, emoji_svg, f, path, license):
         """
         Runs a single export batch.
@@ -322,7 +328,6 @@ class ExportThread:
         """
         try:
             while not self.kill_flag:
-
                 # try to get an item from the queue.
                 try:
                     i, emoji = self.queue.get_nowait()
