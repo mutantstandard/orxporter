@@ -51,7 +51,7 @@ def export(m, filtered_emoji, input_path, formats, path, src_size,
                     str(imgsize[0]) + 'x' + str(imgsize[1])
                     ))
 
-    log.out('done!', 33, 4)
+    log.out('- done!', 32)
 
 
     # export emoji
@@ -103,9 +103,9 @@ def export(m, filtered_emoji, input_path, formats, path, src_size,
     # finish the stuff
     # - cleanup
     # - wait for threads to finish after they've all done their stuff.
-    log.bar.finish()
+    log.out(' done!', 32)
     if log.filtered_export_task_count > 0:
-        log.out(f"{log.filtered_export_task_count} emoji have been implicitly or explicitly filtered out of this export task.")
+        log.out(f"- {log.filtered_export_task_count} emoji have been implicitly or explicitly filtered out of this export task.", 34)
 
 
     log.export_task_count = 0

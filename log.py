@@ -22,3 +22,4 @@ thread_color = 34
 export_task_count = 0
 filtered_export_task_count = 0
 bar = IncrementalBar()
+bar.suffix = "%(index)d / %(max)d (%(elapsed_td)s)"

@@ -112,17 +112,26 @@ def main():
     except Exception:
         print(HELP)
         sys.exit(2)
+
+
     try:
+        log.out(f'o∆∆o', 32) #hello
+
         if renderer not in RENDERERS:
             raise Exception('Invalid renderer: ' + renderer)
+
         log.out(f'Loading manifest file...', 36)
+
         m = manifest.Manifest(os.path.dirname(manifest_path),
                               os.path.basename(manifest_path))
-        log.out(f'{len(m.emoji)} emoji defined', 33, 4)
+
+        log.out(f'- {len(m.emoji)} emoji defined', 32)
+
         filtered_emoji = [e for e in m.emoji if emoji.match(e, emoji_filter)]
+
         if emoji_filter:
-            log.out(f'{len(filtered_emoji)} / {len(m.emoji)} '
-                    f'emoji match filter', 34, 4)
+            log.out(f'- {len(filtered_emoji)} / {len(m.emoji)} emoji match filter', 34)
+
         if force_desc:
             nondesc = [e.get('code', str(e)) for e in filtered_emoji if 'desc' not in e]
             if nondesc:
@@ -139,7 +148,8 @@ def main():
     except Exception as e:
         log.out(f'!!! {e}', 31)
         sys.exit(1)
-    log.out('All done', 36)
+
+    log.out('All done! ^∆∆^\n', 32) # goodbye
 
 if __name__ == '__main__':
     main()
