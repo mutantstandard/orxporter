@@ -10,7 +10,7 @@ import jsonutils
 import log
 import manifest
 
-VERSION = '0.2.0'
+VERSION = '0.2.1'
 
 RENDERERS = ['inkscape', 'rendersvg', 'imagemagick']
 
@@ -24,33 +24,61 @@ DEF_RENDERER = 'inkscape'
 DEF_MAX_BATCH = 1000
 
 HELP = f'''orxporter {VERSION}
+by Mutant Standard
+(mutant.tech)
+
 USAGE: orxport.py [options...]
 
-OPTIONS:
--h                      prints this help message
--m PATH                 manifest file path (default: {DEF_MANIFEST})
--i PATH                 input directory path (default: {DEF_INPUT_PATH})
--o PATH                 output directory path (default: {DEF_OUTPUT_PATH})
--f PATH_EXPR            output naming system (default: {DEF_OUTPUT_NAMING})
--F FORMAT[,FORMAT...]   output formats (default: {','.join(DEF_OUTPUT_FORMATS)})
--e FILTER               emoji filter
--j FILE                 export JSON replica of directory structure
--J FILE                 export JSON metadata for mutstd website
+HELP:
+----------------------------------------------------
+-h      Prints this help message.
+
+Also look at /docs for full documentation.
+
+
+INPUT:
+----------------------------------------------------
+-i      Input images (default: {DEF_INPUT_PATH})
+-m      Manifest file (default: {DEF_MANIFEST})
+-o      Output directory (default: {DEF_OUTPUT_PATH})
+
+
+IMAGE BUILD:
+----------------------------------------------------
+-F      Format (default: {DEF_OUTPUT_FORMATS[0]})
+        comma separated with no spaces (ie. 'SVGinOT,CBx,sbixOT')
+        - svg
+        - png-SIZE
+        - flif-SIZE
+        - webp-SIZE
+        - avif-SIZE
+
+-f      Directory/filename naming system for output (default: {DEF_OUTPUT_NAMING})
+        See the documentation for how this works.
+
+-t      Number of threads working on export tasks (default: {DEF_NUM_THREADS})
+
+-r      SVG renderer (default: {DEF_RENDERER})
+        - rendersvg
+        - imagemagick
+        - inkscape
+
+
+JSON BUILD:
+----------------------------------------------------
+-j <FILE>               export JSON replica of directory structure
+-J <FILE>               export JSON metadata for mutstd website
+
+
+OTHER OPTIONS:
+----------------------------------------------------
+-e <FILTER>             emoji filter
 -c                      disable ANSI color codes
--q WIDTHxHEIGHT         ensure source images have given size
--t NUM                  number of worker threads (default: {DEF_NUM_THREADS})
---force-desc            ensure all emoji have a description
--r RENDERER             SVG renderer (default: {DEF_RENDERER})
--b NUM                  maximum files per exiftool call (default: {DEF_MAX_BATCH})
-
-OUTPUT FORMATS:
-svg
-png-SIZE
-flif-SIZE
-webp-SIZE
-
-RENDERERS:
-''' + '\n'.join(RENDERERS)
+-q <WIDTHxHEIGHT>       ensure source images have certain size
+--force-desc            ensure all emoji have a text description
+-b <NUM>                maximum files per exiftool call (default: {DEF_MAX_BATCH})
+--verbose               verbose printing
+'''
 
 def main():
     manifest_path = DEF_MANIFEST
@@ -66,10 +94,11 @@ def main():
     force_desc = False
     renderer = DEF_RENDERER
     max_batch = DEF_MAX_BATCH
+    verbose = False
     try:
         opts, _ = getopt.getopt(sys.argv[1:],
                                 'hm:i:o:f:F:ce:j:J:q:t:r:b:',
-                                ['help', 'force-desc'])
+                                ['help', 'force-desc', 'verbose'])
         for opt, arg in opts:
             if opt in ['-h', '--help']:
                 print(HELP)
@@ -109,6 +138,8 @@ def main():
                 max_batch = int(arg)
                 if max_batch <= 0:
                     raise ValueError
+            elif opt == '--verbose':
+                verbose = True
     except Exception:
         print(HELP)
         sys.exit(2)
@@ -118,24 +149,23 @@ def main():
         log.out(f'o∆∆o', 32) #hello
 
         if renderer not in RENDERERS:
-            raise Exception('Invalid renderer: ' + renderer)
+            raise Exception(f"{renderer} is not a renderer you can use in orxporter.")
+
 
         log.out(f'Loading manifest file...', 36)
-
         m = manifest.Manifest(os.path.dirname(manifest_path),
                               os.path.basename(manifest_path))
 
-        log.out(f'- {len(m.emoji)} emoji defined', 32)
+        log.out(f'- {len(m.emoji)} emoji defined.', 32)
 
         filtered_emoji = [e for e in m.emoji if emoji.match(e, emoji_filter)]
-
         if emoji_filter:
-            log.out(f'- {len(filtered_emoji)} / {len(m.emoji)} emoji match filter', 34)
+            log.out(f'- {len(filtered_emoji)} / {len(m.emoji)} emoji match the filter you gave.', 34)
 
         if force_desc:
             nondesc = [e.get('code', str(e)) for e in filtered_emoji if 'desc' not in e]
             if nondesc:
-                raise ValueError('Emoji without a description: ' +
+                raise ValueError('You have emoji without a description: ' +
                                  ', '.join(nondesc))
         if json_out:
             jsonutils.write_emoji(filtered_emoji, json_out)
@@ -144,9 +174,11 @@ def main():
         else:
             export.export(m, filtered_emoji, input_path, output_formats,
                           os.path.join(output_path, output_naming), src_size,
-                          num_threads, renderer, max_batch)
+                          num_threads, renderer, max_batch, verbose)
+
     except Exception as e:
-        log.out(f'!!! {e}', 31)
+        log.out(f'\n!!! {e}', 31)
+        raise e  ######################## TEMP
         sys.exit(1)
 
     log.out('All done! ^∆∆^\n', 32) # goodbye

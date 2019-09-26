@@ -348,13 +348,8 @@ class ExportThread:
                 except queue.Empty:
                     break
 
-                # try to compose the file path of the emoji.
-                # (this func can throw a FilterException, hence why it's caught here.)
-                try:
-                    format_path(self.path, emoji, 'svg')
-                except FilterException as ex:
-                    log.filtered_export_task_count += 1
-                    continue # this emoji is being skipped and not actually worked on.
+                # compose the file path of the emoji.
+                format_path(self.path, emoji, 'svg')
 
                 if 'src' not in emoji:
                     raise ValueError('Missing src attribute')

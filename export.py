@@ -13,16 +13,20 @@ import svg
 
 
 def export(m, filtered_emoji, input_path, formats, path, src_size,
-           num_threads, renderer, max_batch):
+           num_threads, renderer, max_batch, verbose):
     """
     Runs the entire orxporter process, includes preliminary checking and
     validation of emoji metadata and running the tasks associated with exporting.
     """
 
-
     # verify emoji
     # --------------------------------------------------------------------------
     log.out('Checking emoji...', 36)
+
+    #print(filtered_emoji)
+
+    exporting_emoji = []
+    skipped_emoji_count = 0
     for i, e in enumerate(filtered_emoji):
 
         short = e.get("code", "<UNNAMED>") # to provide info on possible error printouts
@@ -30,6 +34,9 @@ def export(m, filtered_emoji, input_path, formats, path, src_size,
         try:
             format_path(path, e, 'svg')
         except FilterException as ex:
+            if verbose:
+                log.out(f"- - Skipped emoji: {short} - {ex}", 34)
+            skipped_emoji_count += 1
             continue #skip if filtered out
 
         if 'src' not in e:
@@ -51,6 +58,14 @@ def export(m, filtered_emoji, input_path, formats, path, src_size,
                     str(imgsize[0]) + 'x' + str(imgsize[1])
                     ))
 
+        # add the emoji to exporting_emoji if it's passed all the tests.
+        exporting_emoji.append(e)
+
+    if skipped_emoji_count > 0:
+        log.out(f"- {skipped_emoji_count} / {len(filtered_emoji)} emoji have been skipped, leaving {len(exporting_emoji)} emoji to export.", 34)
+
+        if not verbose:
+            log.out(f"- use the --verbose flag to see what those emoji are and why they were skipped.", 34)
     log.out('- done!', 32)
 
 
@@ -69,18 +84,18 @@ def export(m, filtered_emoji, input_path, formats, path, src_size,
     emoji_queue = queue.Queue()
 
     # put the [filtered] emoji (plus the index, cuz enumerate()) into the queue.
-    for entry in enumerate(filtered_emoji):
+    for entry in enumerate(exporting_emoji):
         emoji_queue.put(entry)
 
     # initialise the amount of requested threads
     threads = []
     for i in range(num_threads):
-        threads.append(ExportThread(emoji_queue, str(i), len(filtered_emoji),
+        threads.append(ExportThread(emoji_queue, str(i), len(exporting_emoji),
                                     m, input_path, formats, path, renderer))
 
 
     # keeps checking if the export queue is done.
-    log.bar.max = len(filtered_emoji)
+    log.bar.max = len(exporting_emoji)
     while True:
         done = emoji_queue.empty()
 
@@ -126,12 +141,14 @@ def export(m, filtered_emoji, input_path, formats, path, src_size,
 
     if pngs and 'png' in m.license:
         png_files = []
-        for e in filtered_emoji:
+        for e in exporting_emoji:
             for f in formats:
                 if f.startswith('png-'):
                     try:
                         png_files.append(format_path(path, e, f))
                     except FilterException:
+                        if verbose:
+                            log.out(f"- Filtered emoji: {short}", 34)
                         continue
 
         log.out(f'Adding license metadata to png files...', 36)
