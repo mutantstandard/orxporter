@@ -101,24 +101,30 @@ def export(m, filtered_emoji, input_path, formats, path, src_size,
         time.sleep(0.01) # wait a little before seeing if stuff is done again.
 
     # finish the stuff
-    # - cleanup
-    # - wait for threads to finish after they've all done their stuff.
+    # - join the threads
+    # - then do one last bar update, finish and clean it up.
+
+    for t in threads:
+        t.join()
+
+    log.bar.goto(log.export_task_count)
     log.out(' done!', 32)
     if log.filtered_export_task_count > 0:
         log.out(f"- {log.filtered_export_task_count} emoji have been implicitly or explicitly filtered out of this export task.", 34)
 
-
     log.export_task_count = 0
     log.filtered_export_task_count = 0
-
-    for t in threads:
-        t.join()
 
 
 
     # png license pass
     # --------------------------------------------------------------------------
-    if 'png' in m.license:
+    pngs = False
+    for f in formats:
+        if f.startswith("png-"):
+            pngs = True
+
+    if pngs and 'png' in m.license:
         png_files = []
         for e in filtered_emoji:
             for f in formats:
