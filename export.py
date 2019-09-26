@@ -132,14 +132,14 @@ def export(m, filtered_emoji, input_path, formats, path, src_size,
 
 
 
-    # png license pass
+    # exif license pass
+    # (currently only just applies to PNGs)
     # --------------------------------------------------------------------------
     pngs = False
     for f in formats:
         if f.startswith("png-"):
             pngs = True
 
-    if pngs and 'png' in m.license:
         png_files = []
         for e in exporting_emoji:
             for f in formats:
@@ -148,8 +148,8 @@ def export(m, filtered_emoji, input_path, formats, path, src_size,
                         png_files.append(format_path(path, e, f))
                     except FilterException:
                         if verbose:
-                            log.out(f"- Filtered emoji: {short}", 34)
+                            log.out(f"- Filtered emoji: {e['short']}", 34)
                         continue
 
         log.out(f'Adding license metadata to png files...', 36)
-        exif.add_license(png_files, m.license.get('png'), max_batch)
+        exif.add_license(png_files, m.license.get('exif'), max_batch)

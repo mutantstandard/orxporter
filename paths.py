@@ -34,17 +34,17 @@ def format_resolve(code, emoji, format):
 
     # (%s) the emoji's shortcode
     if code == 's':
-        if 'code' not in emoji:
+        if 'short' not in emoji:
             raise ValueError('Cannot resolve %s - no shortcode')
-        return emoji['code']
+        return emoji['short']
 
     # (%u) the emoji's unicode codepoint
     if code == 'u':
-        if 'unicode' not in emoji:
+        if 'code' not in emoji:
             raise ValueError('Cannot resolve %u - no unicode codepoint defined')
-        if '!' in emoji['unicode']:
+        if '!' in emoji['code']:
             raise FilterException('Cannot resolve %u (unicode codepoint is explicitly undefined )')
-        return util.uni_to_hex_filename(emoji['unicode'])
+        return util.uni_to_hex_filename(emoji['code'])
 
     raise ValueError('Cannot resolve format code: ' + code)
 

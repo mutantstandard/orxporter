@@ -130,7 +130,7 @@ orxport.py -F svg,png-32,png-128,png-512 -f %f/%u -t 8 -q 32x32
 Export only dark_elf emoji as a 256x256 PNG file:
 
 ```
-orxport.py -F png-256 -e code=dark_elf
+orxport.py -F png-256 -e short=dark_elf
 ```
 
 Export only emoji with v2 color modifier:

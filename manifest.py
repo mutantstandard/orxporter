@@ -33,16 +33,16 @@ class Manifest:
 
         self.emoji.append(emoji)
 
-        if 'code' in emoji:
-            if emoji['code'] in self.shortcodes:
-                raise ValueError('Shortcode already in use: ' + emoji['code'])
-            self.shortcodes[emoji['code']] = emoji
+        if 'short' in emoji:
+            if emoji['short'] in self.shortcodes:
+                raise ValueError('Shortcode already in use: ' + emoji['short'])
+            self.shortcodes[emoji['short']] = emoji
 
-        if 'unicode' in emoji and '!' not in emoji['unicode']:
-            if emoji['unicode'] in self.codepoints:
+        if 'code' in emoji and '!' not in emoji['code']:
+            if emoji['code'] in self.codepoints:
                 raise ValueError('Codepoint already in use: ' +
-                                 util.uni_to_hex_hash(emoji['unicode']))
-            self.codepoints[emoji['unicode']] = emoji
+                                 util.uni_to_hex_hash(emoji['code']))
+            self.codepoints[emoji['code']] = emoji
 
 
     def compile_emoji(self, kwargs, color=None):
@@ -65,7 +65,7 @@ class Manifest:
             res['color'] = color
 
 
-        # formatting code substitution
+        # formatting shortcode substitution
         # (for parameter values)
         #
         # this is performed first before other checks and stuff are performed to
@@ -77,7 +77,7 @@ class Manifest:
                 if not color:
                     raise ValueError('%c without colormap')
                 try:
-                    res[k] = v.replace('%c', self.colormaps[color]['code'])
+                    res[k] = v.replace('%c', self.colormaps[color]['short'])
                 except KeyError:
                     raise ValueError('Shortcode not defined for colormap: ' +
                                      color)
@@ -87,7 +87,7 @@ class Manifest:
                 if not color:
                     raise ValueError('%C without colormap')
                 try:
-                    subst = self.colormaps[color]['code']
+                    subst = self.colormaps[color]['short']
                 except KeyError:
                     raise ValueError('Shortcode not defined for colormap: ' +
                                      color)
@@ -100,7 +100,7 @@ class Manifest:
                 if not color:
                     raise ValueError('%u without colormap')
                 try:
-                    res[k] = v.replace('%u', self.colormaps[color]['unicode'])
+                    res[k] = v.replace('%u', self.colormaps[color]['code'])
                 except KeyError:
                     raise ValueError('Codepoint not defined for colormap: ' +
                                      color)
@@ -110,7 +110,7 @@ class Manifest:
                 if not color:
                     raise ValueError('%U without colormap')
                 try:
-                    color_code = self.colormaps[color]['unicode']
+                    color_code = self.colormaps[color]['code']
                 except KeyError:
                     raise ValueError('Codepoint not defined for colormap: ' +
                                      color)
@@ -137,14 +137,14 @@ class Manifest:
                 v = res[k]
 
 
-        if 'unicode' in res:
+        if 'code' in res:
             # it's either explicitly empty, or it's not
-            if '!' in res['unicode']:
-                res['unicode'] = '!'
+            if '!' in res['code']:
+                res['code'] = '!'
             else:
                 # attempt to interpret each part of the codepoint sequence as an int
                 codeseq_list = []
-                for codepoint in res['unicode'].split():
+                for codepoint in res['code'].split():
                     try:
                         if codepoint[0] == '#':
                             codeseq_list.append(int(codepoint[1:], 16))
@@ -152,7 +152,7 @@ class Manifest:
                             codeseq_list.append(int(codepoint))
                     except ValueError:
                         raise ValueError('Expected a number: ' + codepoint)
-                res['unicode'] = tuple(codeseq_list)
+                res['code'] = tuple(codeseq_list)
 
         if 'desc' in res:
             # insert color modifier name at the end of the description.
@@ -167,8 +167,8 @@ class Manifest:
                     res['desc'] += f' ({color_desc})'
 
         # assume the shortcode is the same as the root if there are no modifiers going on.
-        if 'root' not in res and not color and 'morph' not in res and 'code' in res:
-            res['root'] = res['code']
+        if 'root' not in res and not color and 'morph' not in res and 'short' in res:
+            res['root'] = res['short']
 
         return res
 
@@ -284,9 +284,9 @@ class Manifest:
                     self.license['svg'] = open(path, 'r').read()
                 except OSError:
                     raise Exception('Failed to load license file: ' + path)
-            elif k == 'png':
+            elif k == 'exif':
                 try:
-                    self.license['png'] = json.load(open(path, 'r'))
+                    self.license['exif'] = json.load(open(path, 'r'))
                 except OSError:
                     raise Exception('Failed to load license file: ' + path)
                 except ValueError:
