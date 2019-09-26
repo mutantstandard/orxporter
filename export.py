@@ -23,7 +23,6 @@ def export(m, filtered_emoji, input_path, formats, path, src_size,
     # --------------------------------------------------------------------------
     log.out('Checking emoji...', 36)
 
-    #print(filtered_emoji)
 
     exporting_emoji = []
     skipped_emoji_count = 0
@@ -62,11 +61,13 @@ def export(m, filtered_emoji, input_path, formats, path, src_size,
         exporting_emoji.append(e)
 
     if skipped_emoji_count > 0:
-        log.out(f"- {skipped_emoji_count} / {len(filtered_emoji)} emoji have been skipped, leaving {len(exporting_emoji)} emoji to export.", 34)
+        log.out(f"- {skipped_emoji_count} emoji have been skipped, leaving {len(exporting_emoji)} emoji to export.", 34)
 
         if not verbose:
             log.out(f"- use the --verbose flag to see what those emoji are and why they were skipped.", 34)
     log.out('- done!', 32)
+
+
 
 
     # export emoji
@@ -123,7 +124,8 @@ def export(m, filtered_emoji, input_path, formats, path, src_size,
         t.join()
 
     log.bar.goto(log.export_task_count)
-    log.out(' done!', 32)
+    log.bar.finish()
+    log.out('- done!', 32)
     if log.filtered_export_task_count > 0:
         log.out(f"- {log.filtered_export_task_count} emoji have been implicitly or explicitly filtered out of this export task.", 34)
 
@@ -135,12 +137,7 @@ def export(m, filtered_emoji, input_path, formats, path, src_size,
     # exif license pass
     # (currently only just applies to PNGs)
     # --------------------------------------------------------------------------
-    pngs = False
-    for f in formats:
-        if f.startswith("png-"):
-            pngs = True
-
-    if pngs and 'exif' in m.license:
+    if 'exif' in m.license:
         png_files = []
         for e in exporting_emoji:
             for f in formats:
@@ -151,6 +148,6 @@ def export(m, filtered_emoji, input_path, formats, path, src_size,
                         if verbose:
                             log.out(f"- Filtered emoji: {e['short']}", 34)
                         continue
-
-        log.out(f'Adding license metadata to png files...', 36)
-        exif.add_license(png_files, m.license.get('exif'), max_batch)
+        if png_files:
+            log.out(f'Adding license metadata to png files...', 36)
+            exif.add_license(png_files, m.license.get('exif'), max_batch)

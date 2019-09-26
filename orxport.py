@@ -87,6 +87,7 @@ def main():
     output_naming = DEF_OUTPUT_NAMING
     output_formats = DEF_OUTPUT_FORMATS
     emoji_filter = []
+    emoji_filter_text = "" # for error messaging only
     json_out = None
     web_out = None
     src_size = None
@@ -119,6 +120,7 @@ def main():
                 k, v = arg.split('=')
                 v = v.split(',')
                 emoji_filter.append((k, v))
+                emoji_filter_text = arg
             elif opt == '-j':
                 json_out = arg
             elif opt == '-J':
@@ -160,7 +162,10 @@ def main():
 
         filtered_emoji = [e for e in m.emoji if emoji.match(e, emoji_filter)]
         if emoji_filter:
-            log.out(f'- {len(filtered_emoji)} / {len(m.emoji)} emoji match the filter you gave.', 34)
+            if filtered_emoji: # if more than 0
+                log.out(f'- {len(filtered_emoji)} / {len(m.emoji)} emoji match the filter you gave.', 34)
+            else:
+                raise ValueError(f"Your filter ('{emoji_filter_text}') returned no results.")
 
         if force_desc:
             nondesc = [e.get('code', str(e)) for e in filtered_emoji if 'desc' not in e]
@@ -177,8 +182,8 @@ def main():
                           num_threads, renderer, max_batch, verbose)
 
     except Exception as e:
-        log.out(f'\n!!! {e}', 31)
-        raise e  ######################## TEMP
+        log.out(f'x∆∆x {e}\n', 31)
+        #raise e  ######################## TEMP, for developer stuff
         sys.exit(1)
 
     log.out('All done! ^∆∆^\n', 32) # goodbye
