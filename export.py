@@ -140,6 +140,7 @@ def export(m, filtered_emoji, input_path, formats, path, src_size,
         if f.startswith("png-"):
             pngs = True
 
+    if pngs and 'exif' in m.license:
         png_files = []
         for e in exporting_emoji:
             for f in formats:
