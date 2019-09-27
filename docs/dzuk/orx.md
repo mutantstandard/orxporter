@@ -1,0 +1,152 @@
+# orx
+
+Because emoji sets can involve hundreds or thousands of images, we needed a format to contain emoji metadata in a way that doesn't create too much whitespace and was really quick to type. Unfortunately existing formats like JSON and YAML were not suitable for this. So orxporter uses it's own format.
+
+
+## Structure of an orx file
+
+orx files are very simple.
+
+Everything in orx consists of an expression beginning with a keyword that declares what type of expression it is. You can't nest expressions.
+
+
+```
+fish  # rest of expression
+
+```
+
+Depending on what kind of expression it is, the expression name can have values attached to it, or not
+It can also have named values attached to it, or not.
+
+Named values within an expression are simply noted with a '=' between the value name and the value itself.
+
+Unnamed values are simply typed after the expression name without any symbols or punctuation.
+
+```
+# no unnamed values, only named values
+fish   param1 = meh    param2 = meh     
+
+# JSON equivalent
+{"fish": {"param1": "meh", "param2": "meh"}}
+```
+
+```
+# multiple unnamed values but no named values
+rabbit  meh more_meh even_more_meh
+
+# JSON equivalent
+{"rabbit": ["meh", "more_meh", "even_more_meh"]}
+```
+
+```
+# both unnamed and named values
+goose meh   param1 = meh    param 2 = meh
+
+# JSON equivalent
+{"rabbit": ["meh"], {"param1": "meh", "parah2": "meh"}}
+```
+
+So in this case, 'thing' denotes the beginning of an expression and the params next to it are parameters of 'thing'.
+
+You can also write expressions with named values like this..
+
+```
+
+fish
+    param1 = meh
+    param2 = meh     
+
+goose meh   
+    param1 = meh
+    param2 = meh
+
+```
+
+Comments are single-line only and are marked with '#':
+
+```
+# ignored!!! Q_Q
+```
+
+---
+## Values
+
+Variable types are pretty implicit in orxporter - unless it's a custom parameter, a particular type will be expected.
+
+```
+
+# string
+
+string1 = weed
+string2 = this is also perfectly valid, you don't need quotation marks
+
+
+# hexadecimal number sequence
+# (eg. for Unicode codepoint sequences)
+
+hex = #101691
+list_of_hex = #1f3f3 #200d #1f308
+
+```
+
+
+
+
+
+
+---
+
+## Shared expressions
+
+The expression keywords mostly are unique to whether you are writing a manifest or a parameters file. So you should read the docs for those too.
+
+There are two consistent expression keywords across any type of orx file:
+
+
+## `include`
+
+Attach the contents of one orx file to the one with this statement.
+
+```
+include second_file.orx
+### this pulls the contents of 'second_file.orx' and attaches it to this position.
+```
+
+
+## `define`
+
+Define data that can be referenced elsewhere.
+You reference it later with a $ followed by it's name (`$name`), or like `$(name)`, if you're inserting it within a string.
+
+```
+define <name> <value>
+```
+
+You can use it to add single values...
+
+```
+define zwj #200d
+define food_path food_drink_herbs
+
+emoji
+    short = plate
+    src = $(food_path)/food/plate.svg
+    code = #1F37D $vs16
+    cat = food_drink_herbs
+    desc = plate with a knife and fork
+```
+
+or use it to contain a list of values...
+
+
+```
+define cmap_set_hmn h1 h2 h3 h4 h5
+```
+
+or reference things that have been defined!
+
+```
+define cmaps_hmn $cmap_def $cmap_set_shared $cmap_set_hmn
+```
+
+The orx interpreter reads things sequentially; so you can't reference something before it's defined.

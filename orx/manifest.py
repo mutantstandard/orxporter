@@ -1,10 +1,11 @@
 import json
 import os
 
-import parse
+from orx.orx import Orx
+import orx.parse
 import util
 
-class Manifest:
+class Manifest(Orx):
     """
     Class representing all of the data within the input manifest.
     """
@@ -218,20 +219,6 @@ class Manifest:
 
 
 
-    def exec_define(self, args, kwargs):
-        """
-        Executes an orx manifest `define` statement.
-        """
-        if kwargs:
-            raise ValueError('kwargs not allowed in define expression')
-        if len(args) < 2:
-            raise ValueError('Missing argument')
-        if args[0] in self.defines:
-            raise ValueError('Already defined: ' + args[0])
-        self.defines[args[0]] = ' '.join(args[1:])
-
-
-
     def exec_emoji(self, args, kwargs):
         """
         Executes an orx manifest `emoji` statement.
@@ -256,17 +243,6 @@ class Manifest:
         else:
             self.add_emoji(self.compile_emoji(emoji_args))
 
-
-
-    def exec_include(self, args, kwargs):
-        """
-        Executes an orx manifest `include` statement.
-        """
-        if not args:
-            raise Exception('Missing filename')
-        if len(args) > 1:
-            raise ValueError('Multiple filenames')
-        self.load_and_parse(args[0])
 
 
 
@@ -317,7 +293,7 @@ class Manifest:
 
         # finds all of the constants from `define` expressions and fills
         # in their actual value
-        final_expr = parse.subst_consts(expr, self.defines)
+        final_expr = orx.parse.subst_consts(expr, self.defines)
 
 
         # now parse all of the expressions
@@ -326,7 +302,7 @@ class Manifest:
         # args: the arguments without parameters
         # kwargs: the arguments with parameters
         try:
-            head, args, kwargs = parse.parse_expr(final_expr)
+            head, args, kwargs = orx.parse.parse_expr(final_expr)
         except Exception:
             raise ValueError('Syntax error')
 
@@ -334,42 +310,20 @@ class Manifest:
         # (or do nothing if there's no head)
         if head is None:
             return
+        elif head == 'define':
+            self.exec_define(args, kwargs)
+        elif head == 'include':
+            self.exec_include(args, kwargs)
+
         elif head == 'class':
             self.exec_class(args, kwargs)
         elif head == 'colormap':
             self.exec_colormap(args, kwargs)
-        elif head == 'define':
-            self.exec_define(args, kwargs)
         elif head == 'emoji':
             self.exec_emoji(args, kwargs)
-        elif head == 'include':
-            self.exec_include(args, kwargs)
         elif head == 'license':
             self.exec_license(args, kwargs)
         elif head == 'palette':
             self.exec_palette(args, kwargs)
         else:
             raise ValueError('Unknown expression type: ' + head)
-
-
-    def load_and_parse(self, filename):
-        """
-        Loads and parses an orx manifest file.
-        """
-
-        # try to get the orx manifest file.
-        try:
-            m_file = open(os.path.join(self.homedir, filename), 'r')
-        except OSError:
-            raise Exception('Could not open manifest file: ' + filename)
-
-        # parse the file.
-        for expr, line_num in parse.get_exprs(m_file):
-            try:
-                self.exec_expr(expr)
-            except Exception as e:
-                raise Exception(f'In manifest file `{filename}` at line '
-                                f'{line_num}:\n'
-                                f'`{expr.strip()}`\n'
-                                f'Error: {e}')
-        m_file.close()

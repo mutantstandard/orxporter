@@ -8,15 +8,16 @@ import emoji
 import export
 import jsonutils
 import log
-import manifest
+import orx.manifest
 
 VERSION = '0.2.1'
 
 RENDERERS = ['inkscape', 'rendersvg', 'imagemagick']
 
-DEF_MANIFEST = 'manifest'
-DEF_INPUT_PATH = 'in'
-DEF_OUTPUT_PATH = 'out'
+DEF_MANIFEST = 'manifest.orx'
+DEF_PARAMS = 'parameters.orx'
+DEF_INPUT = 'in'
+DEF_OUTPUT = 'out'
 DEF_OUTPUT_NAMING = '%f/%s'
 DEF_OUTPUT_FORMATS = ['svg']
 DEF_NUM_THREADS = 1
@@ -38,9 +39,9 @@ Also look at /docs for full documentation.
 
 INPUT:
 ----------------------------------------------------
--i      Input images (default: {DEF_INPUT_PATH})
+-i      Input images (default: {DEF_INPUT})
 -m      Manifest file (default: {DEF_MANIFEST})
--o      Output directory (default: {DEF_OUTPUT_PATH})
+-o      Output directory (default: {DEF_OUTPUT})
 
 
 IMAGE BUILD:
@@ -56,12 +57,15 @@ IMAGE BUILD:
 -f      Directory/filename naming system for output (default: {DEF_OUTPUT_NAMING})
         See the documentation for how this works.
 
--t      Number of threads working on export tasks (default: {DEF_NUM_THREADS})
-
 -r      SVG renderer (default: {DEF_RENDERER})
         - rendersvg
         - imagemagick
         - inkscape
+
+-p      Parameters file
+        You can attach a parameters file instead of doing the three flags above.
+
+-t      Number of threads working on export tasks (default: {DEF_NUM_THREADS})
 
 
 JSON BUILD:
@@ -73,19 +77,26 @@ JSON BUILD:
 OTHER OPTIONS:
 ----------------------------------------------------
 -e <FILTER>             emoji filter
--c                      disable ANSI color codes
 -q <WIDTHxHEIGHT>       ensure source images have certain size
---force-desc            ensure all emoji have a text description
 -b <NUM>                maximum files per exiftool call (default: {DEF_MAX_BATCH})
+--force-desc            ensure all emoji have a text description
+
+TERMINAL OPTIONS:
+----------------------------------------------------
+-c                      disable ANSI color codes
 --verbose               verbose printing
 '''
 
 def main():
+    input_path = DEF_INPUT
     manifest_path = DEF_MANIFEST
-    input_path = DEF_INPUT_PATH
-    output_path = DEF_OUTPUT_PATH
-    output_naming = DEF_OUTPUT_NAMING
-    output_formats = DEF_OUTPUT_FORMATS
+
+    output_path = None
+    output_naming = None
+    output_formats = None
+    renderer = None
+    params_path = None
+
     emoji_filter = []
     emoji_filter_text = "" # for error messaging only
     json_out = None
@@ -93,59 +104,77 @@ def main():
     src_size = None
     num_threads = DEF_NUM_THREADS
     force_desc = False
-    renderer = DEF_RENDERER
     max_batch = DEF_MAX_BATCH
     verbose = False
     try:
         opts, _ = getopt.getopt(sys.argv[1:],
-                                'hm:i:o:f:F:ce:j:J:q:t:r:b:',
+                                'hm:i:o:f:F:ce:j:J:q:t:r:b:p:',
                                 ['help', 'force-desc', 'verbose'])
+
+
         for opt, arg in opts:
             if opt in ['-h', '--help']:
                 print(HELP)
                 sys.exit()
+
+            # basics
             elif opt == '-m':
                 manifest_path = arg
             elif opt == '-i':
                 input_path = arg
             elif opt == '-o':
                 output_path = arg
-            elif opt == '-f':
-                output_naming = arg
+
+            # images
             elif opt == '-F':
                 output_formats = arg.split(',')
-            elif opt == '-c':
-                log.use_color = False
+            elif opt == '-f':
+                output_naming = arg
+            elif opt == '-r':
+                renderer = arg
+            elif opt == '-p':
+                params_path = arg
+            elif opt == '-t':
+                num_threads = int(arg)
+                if num_threads <= 0:
+                    raise ValueError
+
+            # JSON
+            elif opt == '-j':
+                json_out = arg
+            elif opt == '-J':
+                json_web_out = arg
+
+            # other emoji stuff
             elif opt == '-e':
                 k, v = arg.split('=')
                 v = v.split(',')
                 emoji_filter.append((k, v))
                 emoji_filter_text = arg
-            elif opt == '-j':
-                json_out = arg
-            elif opt == '-J':
-                json_web_out = arg
             elif opt == '-q':
                 t1, t2 = arg.split('x')
                 src_size = int(t1), int(t2)
-            elif opt == '-t':
-                num_threads = int(arg)
-                if num_threads <= 0:
-                    raise ValueError
-            elif opt == '--force-desc':
-                force_desc = True
-            elif opt == '-r':
-                renderer = arg
             elif opt == '-b':
                 max_batch = int(arg)
                 if max_batch <= 0:
                     raise ValueError
+            elif opt == '--force-desc':
+                force_desc = True
+
+            # terminal stuff
+            elif opt == '-c':
+                log.use_color = False
             elif opt == '--verbose':
                 verbose = True
-    except Exception:
-        print(HELP)
+
+    except Exception as e:
+        log.out(f'x∆∆x {e}\n', 31)
         sys.exit(2)
 
+
+
+# try to get all of the basic stuff and do the main execution
+# -----------------------------------------------------------
 
     try:
         log.out(f'o∆∆o', 32) #hello
@@ -157,7 +186,7 @@ def main():
         # create a Manifest
         # ie. parse the manifest file and get the information we need from it
         log.out(f'Loading manifest file...', 36)
-        m = manifest.Manifest(os.path.dirname(manifest_path),
+        m = orx.manifest.Manifest(os.path.dirname(manifest_path),
                               os.path.basename(manifest_path))
         log.out(f'- {len(m.emoji)} emoji defined.', 32)
 
@@ -193,7 +222,7 @@ def main():
     # Where all the exceptions eventually go~
     except Exception as e:
         log.out(f'x∆∆x {e}\n', 31)
-        #raise e  ######################## TEMP, for developer stuff
+        raise e  ######################## TEMP, for developer stuff
         sys.exit(1)
 
     # yay! finished!
