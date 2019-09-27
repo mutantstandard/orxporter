@@ -81,56 +81,70 @@ def export(m, filtered_emoji, input_path, formats, path, src_size,
     else:
         log.out(f"- {num_threads} thread")
 
-    # start a Queue object for emoji export
-    emoji_queue = queue.Queue()
+    try:
+        # start a Queue object for emoji export
+        emoji_queue = queue.Queue()
 
-    # put the [filtered] emoji (plus the index, cuz enumerate()) into the queue.
-    for entry in enumerate(exporting_emoji):
-        emoji_queue.put(entry)
+        # put the [filtered] emoji (plus the index, cuz enumerate()) into the queue.
+        for entry in enumerate(exporting_emoji):
+            emoji_queue.put(entry)
 
-    # initialise the amount of requested threads
-    threads = []
-    for i in range(num_threads):
-        threads.append(ExportThread(emoji_queue, str(i), len(exporting_emoji),
-                                    m, input_path, formats, path, renderer))
+        # initialise the amount of requested threads
+        threads = []
+        for i in range(num_threads):
+            threads.append(ExportThread(emoji_queue, str(i), len(exporting_emoji),
+                                        m, input_path, formats, path, renderer))
 
 
-    # keeps checking if the export queue is done.
-    log.bar.max = len(exporting_emoji)
-    while True:
-        done = emoji_queue.empty()
+        # keeps checking if the export queue is done.
+        log.bar.max = len(exporting_emoji)
+        while True:
+            done = emoji_queue.empty()
+
+            log.bar.goto(log.export_task_count)
+
+            # if the thread has an error, properly terminate it
+            # and then raise an error.
+            for t in threads:
+                if t.err is not None:
+                    for u in threads:
+                        u.kill()
+                        u.join()
+                    raise ValueError(f'Thread {t.name} failed: {t.err}')
+
+            if done:
+                break
+
+            time.sleep(0.01) # wait a little before seeing if stuff is done again.
+
+        # finish the stuff
+        # - join the threads
+        # - then finish the terminal stuff
+        for t in threads:
+            t.join()
+
 
         log.bar.goto(log.export_task_count)
+        log.bar.finish()
 
-        # if the thread has an error, properly terminate it
-        # and then raise an error.
-        for t in threads:
-            if t.err is not None:
-                for u in threads:
-                    u.kill()
-                    u.join()
-                raise ValueError(f'Thread {t.name} failed: {t.err}')
 
-        if done:
-            break
+    except KeyboardInterrupt:
+        log.bar.finish()
+        log.out('>∆∆< Cancelled!', 93)
+        log.out('Stopping threads and tidying up...', 93)
 
-        time.sleep(0.01) # wait a little before seeing if stuff is done again.
+        if threads:
+            for t in threads:
+                t.join()
 
-    # finish the stuff
-    # - join the threads
-    # - then do one last bar update, finish and clean it up.
 
-    for t in threads:
-        t.join()
-
-    log.bar.goto(log.export_task_count)
-    log.bar.finish()
     log.out('- done!', 32)
     if log.filtered_export_task_count > 0:
         log.out(f"- {log.filtered_export_task_count} emoji have been implicitly or explicitly filtered out of this export task.", 34)
 
     log.export_task_count = 0
     log.filtered_export_task_count = 0
+
 
 
 

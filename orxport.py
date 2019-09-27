@@ -150,16 +150,18 @@ def main():
     try:
         log.out(f'o∆∆o', 32) #hello
 
+        # validate basic input that can't be checked while in progress
         if renderer not in RENDERERS:
             raise Exception(f"{renderer} is not a renderer you can use in orxporter.")
 
-
+        # create a Manifest
+        # ie. parse the manifest file and get the information we need from it
         log.out(f'Loading manifest file...', 36)
         m = manifest.Manifest(os.path.dirname(manifest_path),
                               os.path.basename(manifest_path))
-
         log.out(f'- {len(m.emoji)} emoji defined.', 32)
 
+        # filter emoji (if any filter is present)
         filtered_emoji = [e for e in m.emoji if emoji.match(e, emoji_filter)]
         if emoji_filter:
             if filtered_emoji: # if more than 0
@@ -167,11 +169,14 @@ def main():
             else:
                 raise ValueError(f"Your filter ('{emoji_filter_text}') returned no results.")
 
+        # ensure that descriptions are present if --force-desc flag is there
         if force_desc:
             nondesc = [e.get('code', str(e)) for e in filtered_emoji if 'desc' not in e]
             if nondesc:
                 raise ValueError('You have emoji without a description: ' +
                                  ', '.join(nondesc))
+
+        # JSON out or image out
         if json_out:
             jsonutils.write_emoji(filtered_emoji, json_out)
         elif web_out:
@@ -181,11 +186,17 @@ def main():
                           os.path.join(output_path, output_naming), src_size,
                           num_threads, renderer, max_batch, verbose)
 
+    except KeyboardInterrupt as e:
+        log.out(f'\n>∆∆< Cancelled!\n{e}', 93)
+        sys.exit(1)
+
+    # Where all the exceptions eventually go~
     except Exception as e:
         log.out(f'x∆∆x {e}\n', 31)
         #raise e  ######################## TEMP, for developer stuff
         sys.exit(1)
 
+    # yay! finished!
     log.out('All done! ^∆∆^\n', 32) # goodbye
 
 if __name__ == '__main__':
