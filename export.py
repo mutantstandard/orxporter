@@ -128,14 +128,17 @@ def export(m, filtered_emoji, input_path, formats, path, src_size,
         log.bar.finish()
 
 
-    except KeyboardInterrupt:
+    except (KeyboardInterrupt, SystemExit):
+        # make sure all those threads are tidied before exiting the program.
+        # also make sure the bar is finished so it doesnt eat the cursor.
         log.bar.finish()
-        log.out('>∆∆< Cancelled!', 93)
-        log.out('Stopping threads and tidying up...', 93)
-
+        log.out(f'Stopping threads and tidying up...', 93)
         if threads:
             for t in threads:
+                t.kill()
                 t.join()
+
+        raise
 
 
     log.out('- done!', 32)

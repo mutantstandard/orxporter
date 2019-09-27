@@ -89,7 +89,7 @@ def main():
     emoji_filter = []
     emoji_filter_text = "" # for error messaging only
     json_out = None
-    web_out = None
+    json_web_out = None
     src_size = None
     num_threads = DEF_NUM_THREADS
     force_desc = False
@@ -124,7 +124,7 @@ def main():
             elif opt == '-j':
                 json_out = arg
             elif opt == '-J':
-                web_out = arg
+                json_web_out = arg
             elif opt == '-q':
                 t1, t2 = arg.split('x')
                 src_size = int(t1), int(t2)
@@ -179,15 +179,15 @@ def main():
         # JSON out or image out
         if json_out:
             jsonutils.write_emoji(filtered_emoji, json_out)
-        elif web_out:
-            jsonutils.write_web(filtered_emoji, web_out)
+        elif json_web_out:
+            jsonutils.write_web(filtered_emoji, json_web_out)
         else:
             export.export(m, filtered_emoji, input_path, output_formats,
                           os.path.join(output_path, output_naming), src_size,
                           num_threads, renderer, max_batch, verbose)
 
-    except KeyboardInterrupt as e:
-        log.out(f'\n>∆∆< Cancelled!\n{e}', 93)
+    except (KeyboardInterrupt, SystemExit) as e:
+        log.out(f'>∆∆< Cancelled!\n{e}', 93)
         sys.exit(1)
 
     # Where all the exceptions eventually go~
