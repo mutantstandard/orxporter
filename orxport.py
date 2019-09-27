@@ -66,6 +66,7 @@ IMAGE BUILD:
 
 -p      Parameters file
         You can attach a parameters file instead of doing the three flags above.
+        Adding this will overwrite anything entered in the previous three flags.
 
 -t      Number of threads working on export tasks (default: {DEF_NUM_THREADS})
 
@@ -74,6 +75,8 @@ JSON BUILD:
 ----------------------------------------------------
 -j <FILE>               export JSON replica of directory structure
 -J <FILE>               export JSON metadata for mutstd website
+
+Using JSON flags will override any image build flags.
 
 
 OTHER OPTIONS:
@@ -181,9 +184,13 @@ def main():
     try:
         log.out(f'o∆∆o', 32) #hello
 
+
         # validate basic input that can't be checked while in progress
         if renderer not in RENDERERS:
             raise Exception(f"{renderer} is not a renderer you can use in orxporter.")
+
+
+
 
         # create a Manifest
         # ie. parse the manifest file and get the information we need from it
@@ -207,13 +214,17 @@ def main():
                 raise ValueError('You have emoji without a description: ' +
                                  ', '.join(nondesc))
 
-        # create a Manifest
+
+
+
+        # Parameters
         # ie. parse the manifest file and get the information we need from it
         if params_path:
             log.out(f'Loading parameters file...', 36)
             p = orx.params.Parameters(os.path.dirname(params_path),
                                   os.path.basename(params_path))
             log.out(f'- done!', 32)
+
 
         # JSON out or image out
         if json_out:
