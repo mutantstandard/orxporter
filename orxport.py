@@ -8,9 +8,11 @@ import emoji
 import export
 import jsonutils
 import log
-import orx.manifest
 
-VERSION = '0.2.1'
+import orx.manifest
+import orx.params
+
+VERSION = '0.3.0'
 
 RENDERERS = ['inkscape', 'rendersvg', 'imagemagick']
 
@@ -90,11 +92,11 @@ TERMINAL OPTIONS:
 def main():
     input_path = DEF_INPUT
     manifest_path = DEF_MANIFEST
+    output_path = DEF_OUTPUT
 
-    output_path = None
-    output_naming = None
-    output_formats = None
-    renderer = None
+    output_naming = DEF_OUTPUT_NAMING
+    output_formats = DEF_OUTPUT_FORMATS
+    renderer = DEF_RENDERER
     params_path = None
 
     emoji_filter = []
@@ -204,6 +206,14 @@ def main():
             if nondesc:
                 raise ValueError('You have emoji without a description: ' +
                                  ', '.join(nondesc))
+
+        # create a Manifest
+        # ie. parse the manifest file and get the information we need from it
+        if params_path:
+            log.out(f'Loading parameters file...', 36)
+            p = orx.params.Parameters(os.path.dirname(params_path),
+                                  os.path.basename(params_path))
+            log.out(f'- done!', 32)
 
         # JSON out or image out
         if json_out:

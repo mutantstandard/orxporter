@@ -10,27 +10,27 @@ class Parameters(Orx):
     """
 
     def __init__(self, homedir='.', filename=None):
-        self.dests = {}
+        self.homedir = homedir
+        self.defines = {}
+        self.dests = []
 
         # get the actual data for this stuff
         if filename is not None:
             self.load_and_parse(filename)
-
+            
 
     def exec_dest(self, args, kwargs):
         """
         Executes an orx parameters `dest` statement.
         """
 
-        if not args:
-            raise ValueError('Missing id')
-        if args[0] in self.classes:
-            raise ValueError('Already defined: ' + args[0])
-        if 'class' in kwargs:
-            raise ValueError('Illegal recursion in class definition')
-
         res = dict(kwargs)
-        return res
+
+        for k, v in res.items():
+            if k == "format":
+                res[k] = v.split(" ")
+
+        self.dests.append(res)
 
 
     def exec_expr(self, expr):

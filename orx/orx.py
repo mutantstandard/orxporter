@@ -11,6 +11,9 @@ class Orx:
     """
 
     def __init__(self, homedir='.', filename=None):
+        self.homedir = homedir
+        self.defines = {}
+
         # get the actual data for this stuff
         if filename is not None:
             self.load_and_parse(filename)
