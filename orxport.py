@@ -16,12 +16,15 @@ VERSION = '0.3.0'
 
 RENDERERS = ['inkscape', 'rendersvg', 'imagemagick']
 
-DEF_MANIFEST = 'manifest.orx'
-DEF_PARAMS = 'parameters.orx'
 DEF_INPUT = 'in'
+DEF_MANIFEST = 'manifest.orx'
 DEF_OUTPUT = 'out'
+
 DEF_OUTPUT_NAMING = '%f/%s'
 DEF_OUTPUT_FORMATS = ['svg']
+DEF_LICENSE = True
+DEF_PARAMS = 'parameters.orx'
+
 DEF_NUM_THREADS = 1
 DEF_RENDERER = 'inkscape'
 DEF_MAX_BATCH = 1000
@@ -64,9 +67,11 @@ IMAGE BUILD:
         - imagemagick
         - inkscape
 
+-l      Do not embed license metadata given in manifest
+
 -p      Parameters file
-        You can attach a parameters file instead of doing the three flags above.
-        Adding this will overwrite anything entered in the previous three flags.
+        You can attach a parameters file instead of doing the 4 flags above.
+        Adding this will overwrite anything entered in the previous 4 flags.
 
 -t      Number of threads working on export tasks (default: {DEF_NUM_THREADS})
 
@@ -100,6 +105,7 @@ def main():
     output_naming = DEF_OUTPUT_NAMING
     output_formats = DEF_OUTPUT_FORMATS
     renderer = DEF_RENDERER
+    license = DEF_LICENSE
     params_path = None
 
     emoji_filter = []
@@ -113,7 +119,7 @@ def main():
     verbose = False
     try:
         opts, _ = getopt.getopt(sys.argv[1:],
-                                'hm:i:o:f:F:ce:j:J:q:t:r:b:p:',
+                                'hm:i:o:f:F:ce:j:J:q:t:r:b:p:l:',
                                 ['help', 'force-desc', 'verbose'])
 
 
@@ -137,6 +143,8 @@ def main():
                 output_naming = arg
             elif opt == '-r':
                 renderer = arg
+            elif opt == 'l':
+                license = False
             elif opt == '-p':
                 params_path = arg
             elif opt == '-t':
@@ -217,24 +225,38 @@ def main():
 
 
 
-        # Parameters
-        # ie. parse the manifest file and get the information we need from it
-        if params_path:
-            log.out(f'Loading parameters file...', 36)
-            p = orx.params.Parameters(os.path.dirname(params_path),
-                                  os.path.basename(params_path))
-            log.out(f'- done!', 32)
-
-
         # JSON out or image out
         if json_out:
             jsonutils.write_emoji(filtered_emoji, json_out)
         elif json_web_out:
             jsonutils.write_web(filtered_emoji, json_web_out)
         else:
+
+            if params_path:
+                log.out(f'Loading image export parameters...', 36)
+                p = orx.params.Parameters(os.path.dirname(params_path),
+                                      os.path.basename(params_path))
+            else:
+                # convert the non-parameter flags into an orx expression to be turned into a parameters object.
+                log.out(f'Compiling image export parameters...', 36)
+                license_text=""
+                if license == True:
+                    license_text = "yes"
+                else:
+                    license_text = "no"
+                makeshift_params = f"dest  structure = {output_naming}   format = {' '.join(output_formats)}   license = {license_text}"
+                p = orx.params.Parameters(string = makeshift_params)
+
+            log.out(f'- {len(p.dests)} destination(s) defined.', 32)
+
             export.export(m, filtered_emoji, input_path, output_formats,
                           os.path.join(output_path, output_naming), src_size,
                           num_threads, renderer, max_batch, verbose)
+
+
+
+
+
 
     except (KeyboardInterrupt, SystemExit) as e:
         log.out(f'>∆∆< Cancelled!\n{e}', 93)

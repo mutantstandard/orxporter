@@ -43,24 +43,24 @@ class Orx:
         self.load_and_parse(args[0])
 
 
+
     def load_and_parse(self, filename):
         """
         Loads and parses an orx manifest file.
         """
 
-        # try to get the orx manifest file.
         try:
-            m_file = open(os.path.join(self.homedir, filename), 'r')
+            file = open(os.path.join(self.homedir, filename), 'r')
         except OSError:
-            raise Exception('Could not open manifest file: ' + filename)
+            raise Exception('Could not open orx file: ' + filename)
 
-        # parse the file.
-        for expr, line_num in orx.parse.get_exprs(m_file):
+        for expr, line_num in orx.parse.get_exprs(file):
             try:
                 self.exec_expr(expr)
             except Exception as e:
-                raise Exception(f'In manifest file `{filename}` at line '
+                raise Exception(f'In orx file `{filename}` at line '
                                 f'{line_num}:\n'
                                 f'`{expr.strip()}`\n'
                                 f'Error: {e}')
-        m_file.close()
+
+        file.close()

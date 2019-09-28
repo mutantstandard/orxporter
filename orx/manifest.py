@@ -10,7 +10,7 @@ class Manifest(Orx):
     Class representing all of the data within the input manifest.
     """
 
-    def __init__(self, homedir='.', filename=None):
+    def __init__(self, homedir='.', filename=None, string=None):
         self.homedir = homedir
         self.classes = {}
         self.colormaps = {}

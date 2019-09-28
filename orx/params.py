@@ -9,7 +9,7 @@ class Parameters(Orx):
     Class representing all of the data within the input parameters.
     """
 
-    def __init__(self, homedir='.', filename=None):
+    def __init__(self, homedir='.', filename=None, string=None):
         self.homedir = homedir
         self.defines = {}
         self.dests = []
@@ -17,20 +17,35 @@ class Parameters(Orx):
         # get the actual data for this stuff
         if filename is not None:
             self.load_and_parse(filename)
-            
+        elif string is not None:
+            self.single_line_parse(string)
+        #print(self.dests)
+
 
     def exec_dest(self, args, kwargs):
         """
         Executes an orx parameters `dest` statement.
         """
 
-        res = dict(kwargs)
+        if 'structure' not in kwargs:
+            raise ValueError("Missing structure value")
+        if 'format' not in kwargs:
+            raise ValueError("Missing format value(s)")
+        if 'license' not in kwargs:
+            raise ValueError("Missing license value(s)")
+            # TODO: Just fall back to 'yes'
 
-        for k, v in res.items():
+        for k, v in kwargs.items():
             if k == "format":
-                res[k] = v.split(" ")
+                for format in v.split(" "):
+                    res = {}
+                    res["structure"] = kwargs["structure"]
+                    res["license"] = kwargs["license"]
+                    res["format"] = format
 
-        self.dests.append(res)
+                    self.dests.append(res)
+
+
 
 
     def exec_expr(self, expr):
@@ -70,26 +85,8 @@ class Parameters(Orx):
             raise ValueError('Unknown expression type: ' + head)
 
 
-
-
-    def load_and_parse(self, filename):
-        """
-        Loads and parses an orx parameters file.
-        """
-
-        # try to get the orx manifest file.
+    def single_line_parse(self, string):
         try:
-            m_file = open(os.path.join(self.homedir, filename), 'r')
-        except OSError:
-            raise Exception('Could not open parameters file: ' + filename)
-
-        # parse the file.
-        for expr, line_num in orx.parse.get_exprs(m_file):
-            try:
-                self.exec_expr(expr)
-            except Exception as e:
-                raise Exception(f'In manifest file `{filename}` at line '
-                                f'{line_num}:\n'
-                                f'`{expr.strip()}`\n'
-                                f'Error: {e}')
-        m_file.close()
+            self.exec_expr(string)
+        except Exception as e:
+            raise Exception(f'In the given orx string, there was an error. {e}')

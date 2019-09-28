@@ -15,8 +15,7 @@ fish  # rest of expression
 
 ```
 
-Depending on what kind of expression it is, the expression name can have values attached to it, or not
-It can also have named values attached to it, or not.
+Depending on what kind of expression it is, the expression name can have values attached to it, or not. It can also have named values attached to it, or not.
 
 Named values within an expression are simply noted with a '=' between the value name and the value itself.
 
@@ -27,7 +26,7 @@ Unnamed values are simply typed after the expression name without any symbols or
 fish   param1 = meh    param2 = meh     
 
 # JSON equivalent
-{"fish": {"param1": "meh", "param2": "meh"}}
+{"fish": [], {"param1": "meh", "param2": "meh"}}
 ```
 
 ```
@@ -35,7 +34,7 @@ fish   param1 = meh    param2 = meh
 rabbit  meh more_meh even_more_meh
 
 # JSON equivalent
-{"rabbit": ["meh", "more_meh", "even_more_meh"]}
+{"rabbit": ["meh", "more_meh", "even_more_meh"], {}}
 ```
 
 ```
@@ -46,9 +45,9 @@ goose meh   param1 = meh    param 2 = meh
 {"rabbit": ["meh"], {"param1": "meh", "parah2": "meh"}}
 ```
 
-So in this case, 'thing' denotes the beginning of an expression and the params next to it are parameters of 'thing'.
 
-You can also write expressions with named values like this..
+
+You can also indent your named values like this...
 
 ```
 
@@ -116,7 +115,7 @@ include second_file.orx
 ## `define`
 
 Define data that can be referenced elsewhere.
-You reference it later with a $ followed by it's name (`$name`), or like `$(name)`, if you're inserting it within a string.
+You reference it later with a $ followed by it's name (`$name`), or like `$(name)`. The latter is good to know if you want to insert a variable within a string.
 
 ```
 define <name> <value>
@@ -125,7 +124,7 @@ define <name> <value>
 You can use it to add single values...
 
 ```
-define zwj #200d
+define vs16 #fe0f
 define food_path food_drink_herbs
 
 emoji
