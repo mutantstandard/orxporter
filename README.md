@@ -51,6 +51,9 @@ Mutant Standard's [code of conduct](docs/code_of_conduct.md).
 - [libwebp](https://developers.google.com/speed/webp/docs/precompiled) (optional; for Lossless WebP output)
 - [go-avif](https://github.com/Kagami/go-avif) (optional; for AVIF output)
 
+Install the compatible `progress` package by running the following in your shell:
+
+`pip install -r requirements.txt`
 
 # How to use
 
