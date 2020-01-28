@@ -8,25 +8,20 @@ Orxporter manifest defines semantics of an emoji set. This does not include
 output settings, in order to allow the same manifest to be reused to create
 packages in different formats or with different directory structures.
 
-The manifests use a simple custom declarative language, which due to demand
-was designed to be light and readable. However, it was also designed to get
-the job done and nothing else. No significant effort has or will be made to
-formalise the language, to ensure it always parses correctly, or to catch
-errors.
+Because a set can contain thousands of emoji, orxporter uses a custom lightweight data serialisation format to contain your emoji metadata.
+
 
 Syntax
 ------
 
-An expression contains an instruction name, followed by parameters. Parameters
-are typically key-value pairs, but some instructions require a name argument
-which must be passed first. To explicitly pass an empty value, use **!**.
+An expression contains an **instruction keyword**, like 'emoji', 'colormap', etc., followed by parameters. Parameters are typically key-value pairs, but some instructions require a name argument which must be passed first. To explicitly pass an empty value, use **!**.
 
 ```
 colormap default
     src     = key
     dst     = y1
-    code    = !
-    unicode = !
+    short    = !
+    code = !
 ```
 
 Each statement starts at the beginning of a line. Whitespace (spaces, tabs etc)
@@ -34,14 +29,14 @@ at the beginning of a line imply continuation of a statement. These two
 statements are identical:
 
 ```
-emoji code=dark_elf src=dark_elf.svg unicode=!undefined cat=people
+emoji short=dark_elf src=dark_elf.svg code=!undefined cat=people
 ```
 
 ```
 emoji
-    code    = dark_elf
+    short    = dark_elf
     src     = dark_elf.svg
-    unicode = !undefined
+    code = !undefined
     cat     = people
 ```
 
@@ -57,7 +52,7 @@ Commented lines start with __#__:
 Variables
 ---------
 
-The dollar sign (__$__) is used for variable names. Thus **$cmaps_all** inserts the
+The dollar sign (__$__) is used for variable names. So **$cmaps_all** inserts the
 value of the previously defined variable **cmaps_all**. In order to
 disambiguate syntax, it is possible to wrap the variable name in parentheses.
 
@@ -84,18 +79,18 @@ Emoji definitions
 Emoji are defined using _emoji_ instruction. The most important parameters are:
 
 * _src_     -- source image file
-* _code_    -- shortcode (optional)
-* _unicode_ -- unicode sequence (optional)
+* _short_    -- shortcode (optional)
+* _code_ -- unicode codepoint sequence (optional)
 * _color_   -- list of color mappings to use (optional)
 
 Let's look at an example:
 
 ```
 emoji
-    code    = facepalm%c
+    short    = facepalm%c
     src     = $(semi_body_path)/facepalm.svg
     color   = $cmaps_all
-    unicode = #1F926 %u
+    code = #1F926 %u
 ```
 
 We are using **cmaps_all** (which we have already defined) as the list of color
@@ -132,14 +127,14 @@ palette v1
 ```
 
 A colormap is a translation from one palette to another. It may have its own
-shortcode and unicode sequence, which can be refered to in an emoji definition
+shortcode and unicode sequence, which can be referred to in an emoji definition
 via **%c** and **%u** formatting codes respectively. Its definition takes the
 following arguments:
 
 * _src_     -- source palette
 * _dst_     -- target palette
-* _code_    -- shortcode
-* _unicode_ -- unicode sequence; use **!undefined** to explicitly omit assigning
+* _short_    -- shortcode
+* _code_ -- unicode sequence; use **!undefined** to explicitly omit assigning
 a value, otherwise orxporter will assume it was unintentional and throw an error
 whenever a value is expected
 
@@ -147,8 +142,8 @@ whenever a value is expected
 colormap v1
     src     = key
     dst     = v1
-    code    = _v1
-    unicode = !undefined
+    short    = _v1
+    code = !undefined
 ```
 
 When recoloring, orxporter will detect the presence of colors from the source
@@ -188,13 +183,13 @@ Unicode sequence values are written as space-separated codepoint values.
 Numbers prefixed with a hash sign **#** are parsed as hexadecimal:
 
 ```
-emoji [...] unicode = #100666 #101337
+emoji [...] code = #100666 #101337
 ```
 
 To specify an empty (zero-length) sequence, pass an empty value (**!**):
 
 ```
-colormap [...] unicode = !
+colormap [...] code = !
 ```
 
 To explicitly undefine a unicode sequence value for an emoji, pass
@@ -202,7 +197,7 @@ To explicitly undefine a unicode sequence value for an emoji, pass
 throwing an error) when exporting unicode-named files:
 
 ```
-emoji [...] unicode = !undefined
+emoji [...] code = !undefined
 ```
 
 Classes
@@ -221,7 +216,7 @@ class paw
 Emoji may belong to one or more classes and thus inherit their parameter
 values. Note that in case of conflict, the values of classes listed later
 override those of classes listed earlier, which in turn get overridden by the
-explicit parameters of the *emoji* instruction:
+explicit parameters of the *emoji* keyword:
 
 ```
 emoji human_paw
@@ -251,18 +246,18 @@ Licensing
 ---------
 
 Orxporter will embed licensing metadata to each exported SVG and PNG file if
-defined using the *license* instruction:
+defined using the *license* keyword:
 
 ```
 license
     svg = svg_license
-    png = png.json
+    exif = exif.json
 ```
 
 The *svg* parameter must point to a file containing the desired string to be
 inserted inside each SVG file's *metadata* tag.
 
-The *png* parameter must point to a JSON file containing a single object with
+The *exif* parameter must point to a JSON file containing a single object with
 the desired EXIF tags to be written to each PNG file.
 
 Text descriptions
