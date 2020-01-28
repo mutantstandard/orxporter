@@ -51,7 +51,7 @@ def export(m, filtered_emoji, input_path, formats, path, src_size,
         if src_size is not None:
             imgsize = svg.get_viewbox_size(emoji_svg)
             if imgsize != src_size:
-                raise ValueError("The source image size for emoji '{}' is not what was expected. It's suppoed to be {}, but it's actually {}.".format(
+                raise ValueError(f"The source image size for emoji '{}' is not what was expected. It's supposed to be {}, but it's actually {}.".format(
                     short,
                     str(src_size[0]) + 'x' + str(src_size[1]),
                     str(imgsize[0]) + 'x' + str(imgsize[1])

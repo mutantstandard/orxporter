@@ -39,9 +39,15 @@ class Parameters(Orx):
             if k == "format":
                 for format in v.split(" "):
                     res = {}
+                    
                     res["structure"] = kwargs["structure"]
-                    res["license"] = kwargs["license"]
                     res["format"] = format
+
+                    if kwargs["license"] == "yes":
+                        res["license"] = True
+                    else:
+                        res["license"] = False
+
 
                     self.dests.append(res)
 
