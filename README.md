@@ -4,7 +4,11 @@ Emoji exporter used for Mutant Standard emoji set
 
 # Introduction
 
-orxporter is a rich toolkit for organising and exporting an SVG-based emoji set. It has a system for storing emoji metadata and making large batch export operations with that metadata, including multi-format and multi-resolution batch rendering, automated recolouring tools, unicode and shortcode filename export, EXIF metadata embedding, JSON metadata export and more.
+orxporter is a rich toolkit for organising and exporting an SVG-based emoji set. 
+It has a system for storing emoji metadata and making large batch export operations 
+with that metadata, including multi-format and multi-resolution batch rendering, 
+automated recolouring tools, unicode and shortcode filename export, EXIF metadata 
+embedding, JSON metadata export and more.
 
 
 # Disclaimer
@@ -51,6 +55,9 @@ Mutant Standard's [code of conduct](docs/code_of_conduct.md).
 - [libwebp](https://developers.google.com/speed/webp/docs/precompiled) (optional; for Lossless WebP output)
 - [go-avif](https://github.com/Kagami/go-avif) (optional; for AVIF output)
 
+Install the compatible `progress` package by running the following in your shell:
+
+`pip install -r requirements.txt`
 
 # How to use
 
