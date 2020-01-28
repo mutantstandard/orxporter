@@ -4,10 +4,10 @@ Emoji exporter used for Mutant Standard emoji set
 
 # Introduction
 
-orxporter is a rich toolkit for organising and exporting an SVG-based emoji set. 
-It has a system for storing emoji metadata and making large batch export operations 
-with that metadata, including multi-format and multi-resolution batch rendering, 
-automated recolouring tools, unicode and shortcode filename export, EXIF metadata 
+orxporter is a rich toolkit for organising and exporting an SVG-based emoji set.
+It has a system for storing emoji metadata and making large batch export operations
+with that metadata, including multi-format and multi-resolution batch rendering,
+automated recolouring tools, unicode and shortcode filename export, EXIF metadata
 embedding, JSON metadata export and more.
 
 
