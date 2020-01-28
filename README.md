@@ -66,5 +66,8 @@ A longer guide with simpler language for those who are less techincally inclined
 
 # Contributors
 
-
 * AndrewMontagne - imagemagick support
+
+# License
+
+orxporter is licensed under the [Cooperative Non-Violent License (CNPL) v4](license.txt).
