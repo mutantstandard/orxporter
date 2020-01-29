@@ -7,9 +7,11 @@
 
 ### Requires extra software to install:
 
-- `webp` Lossless WebP (requires [cwebp]())
-- `avif` Lossless AVIF (requires [go-avif]())
-- `flif` FLIF (requires [flif]())
+- `webp` Lossless WebP (requires cwebp)
+- `avif` Lossless AVIF (requires go-avif)
+- `flif` FLIF (requires flif)
+
+*(check the [readme](../../readme.md) for all the information on dependencies)*
 
 Crushed PNGs and Optimised SVGs are the same formats as PNG and SVG, but their data is arranged in such a way to create a smaller file size, they require an extra processing stage, and they need the dependencies listed.
 
