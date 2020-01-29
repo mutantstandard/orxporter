@@ -50,10 +50,10 @@ Mutant Standard's [code of conduct](docs/code_of_conduct.md).
     - [rendersvg](https://github.com/RazrFalcon/resvg/tree/master/tools/rendersvg) **(recommended rasteriser)**
     - Inkscape
     - ImageMagick
-- exiftool (optional; for embedding licensing metadata)
-- [FLIF](https://github.com/FLIF-hub/FLIF) (optional; for FLIF output)
-- [libwebp](https://developers.google.com/speed/webp/docs/precompiled) (optional; for Lossless WebP output)
-- [go-avif](https://github.com/Kagami/go-avif) (optional; for AVIF output)
+- exiftool (Optional; for embedding EXIF license metadata)
+- [FLIF](https://github.com/FLIF-hub/FLIF) (Optional; for FLIF output)
+- [libwebp](https://developers.google.com/speed/webp/docs/precompiled) (Optional; for Lossless WebP output)
+- [go-avif](https://github.com/Kagami/go-avif) (Optional; for AVIF output) (Experimental; does not currently produce truly lossless images. We're trying to figure out why that is.)
 
 Install the compatible `progress` package by running the following in your shell:
 
