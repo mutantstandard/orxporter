@@ -8,7 +8,7 @@
 You can put multiple formats in this flag in a comma-separated list like this:
 
 ````
--F svgo-69,flif-420,pngc-666,png-128
+-F svg-69,flif-420,png-666,png-128
 ````
 
 ## Directory and filename structure (`-f`) (optional)

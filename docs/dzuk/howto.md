@@ -7,9 +7,11 @@ The folder where the source images are located.
 
 Where forc outputs to.
 
-# [Manifest](manifest.md) (`-m`)
+# Manifest (`-m`)
 
 A file where you set all of your emoji metadata.
+
+Documentation on manifests coming soon.
 
 
 # Filter (`-e`) (optional)

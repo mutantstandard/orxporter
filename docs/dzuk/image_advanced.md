@@ -15,22 +15,22 @@ Parameters is an [orx file](orx.md), like the Manifest file, but it's a lot simp
 
 dest
     structure = code_%f/%u
-	format = pngc-32 pngc-128 pngc-512 webp-32 webp-128
+	format = png-32 png-128 webp-32 webp-128
     license = yes
 
 dest
     structure = short_%f/%s
-	format = pngc-32 pngc-128 pngc-512 webp-32 webp-128
+	format = png-32 png-128 webp-32 webp-128
     license = yes
 
 dest
     structure = masto/ms_%s
-	format = pngc-128
+	format = png-128
     license = yes
 
 dest
     structure = font_sources/%f/ms_%s
-	format = svg pngc-32 pngc-128
+	format = svg png-32 png-128
     license = no
 
 ```
