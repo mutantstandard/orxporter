@@ -195,7 +195,7 @@ def main():
 
         # validate basic input that can't be checked while in progress
         if renderer not in RENDERERS:
-            raise Exception(f"{renderer} is not a renderer you can use in orxporter.")
+            raise Exception(f"There's a mistake in your command arguments. '{renderer}' is not a renderer you can use in orxporter.")
 
 
 

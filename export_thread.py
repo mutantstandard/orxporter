@@ -74,34 +74,35 @@ class ExportThread:
         if f == 'svg':
             export_task.to_svg(emoji_svg, final_path, license.get('svg'))
 
+
+
         elif f.startswith('png-'):
             try:
                 size = int(f[4:])
             except ValueError:
                 raise ValueError(f"The end ('{f[4:]}') of a format you gave ('{f}') isn't a number. It must be a number.")
-            export_task.to_png(emoji_svg, final_path, self.renderer, size, self.name)
+            export_task.to_raster(emoji_svg, final_path, self.renderer, "png", size, self.name)
 
         elif f.startswith('flif-'):
             try:
                 size = int(f[5:])
             except ValueError:
                 raise ValueError(f"The end ('{f[5:]}') of a format you gave ('{f}') isn't a number. It must be a number.")
-            export_task.to_flif(emoji_svg, final_path, self.renderer, size, self.name)
+            export_task.to_raster(emoji_svg, final_path, self.renderer, "flif", size, self.name)
 
         elif f.startswith('webp-'):
             try:
                 size = int(f[5:])
             except ValueError:
                 raise ValueError(f"The end ('{f[5:]}') of a format you gave ('{f}') isn't a number. It must be a number.")
-            export_task.to_webp(emoji_svg, final_path, self.renderer, size, self.name)
-
+            export_task.to_raster(emoji_svg, final_path, self.renderer, "webp", size, self.name)
 
         elif f.startswith('avif-'):
             try:
                 size = int(f[5:])
             except ValueError:
                 raise ValueError(f"The end ('{f[5:]}') of a format you gave ('{f}') isn't a number. It must be a number.")
-            export_task.to_avif(emoji_svg, final_path, self.renderer, size, self.name)
+            export_task.to_raster(emoji_svg, final_path, self.renderer, "avif", size, self.name)
 
         else:
             raise ValueError('Invalid format: ' + f)
