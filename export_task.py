@@ -30,7 +30,10 @@ def to_svg(emoji_svg, out_path, license=None):
 
 
 def to_raster(emoji_svg, out_path, renderer, format, size, name):
-
+    """
+    Raster exporting function. Can export to any of orxporter's supported raster formats.
+    Creates and deletes temporary SVG files. Might also create and delete temporary PNG files depending on the format.
+    """
     tmp_svg_path = '.tmp' + name + '.svg'
     tmp_png_path = '.tmp' + name + '.png'
 
