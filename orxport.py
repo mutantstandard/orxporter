@@ -52,7 +52,7 @@ INPUT:
 IMAGE BUILD:
 ----------------------------------------------------
 -F      Format (default: {DEF_OUTPUT_FORMATS[0]})
-        comma separated with no spaces (ie. 'SVGinOT,CBx,sbixOT')
+        comma separated with no spaces (ie. 'svg,png-64,flif-128')
         - svg
         - png-SIZE
         - flif-SIZE
