@@ -4,7 +4,7 @@ import time
 
 from export_thread import ExportThread
 from exception import FilterException
-from paths import format_path, format_resolve
+from dest_paths import format_path, format_resolve
 import log
 import exif
 import svg
@@ -40,22 +40,33 @@ def export(m, filtered_emoji, input_path, formats, path, src_size,
 
         if 'src' not in e:
             raise ValueError(f"The emoji '{short}' is missing an 'src' attribute. It needs to have one.")
-        srcpath = os.path.join(m.homedir, input_path, e['src'])
 
+
+
+        # try to see if this exists
+        srcpath = os.path.join(m.homedir, input_path, e['src'])
         try:
             emoji_svg = open(srcpath, 'r').read()
         except Exception:
             raise ValueError(f"This source image for emoji '{short}' could not be loaded: {srcpath}")
 
+
+
         # the SVG size check (-q)
         if src_size is not None:
-            imgsize = svg.get_viewbox_size(emoji_svg)
-            if imgsize != src_size:
-                raise ValueError("The source image size for emoji '{}' is not what was expected. It's supposed to be {}, but it's actually {}.".format(
-                    short,
-                    str(src_size[0]) + 'x' + str(src_size[1]),
-                    str(imgsize[0]) + 'x' + str(imgsize[1])
-                    ))
+            img_size = svg.get_viewbox_size(emoji_svg)
+
+            if img_size != src_size:
+                raise ValueError("""The source image size for emoji '{}' is not what
+                                was expected. It's supposed to be {}, but it's actually
+                                {}.""".format(
+                                    short,
+                                    str(src_size[0]) + 'x' + str(src_size[1]),
+                                    str(img_size[0]) + 'x' + str(img_size[1])
+                                    ))
+
+
+
 
         # add the emoji to exporting_emoji if it's passed all the tests.
         exporting_emoji.append(e)
@@ -74,8 +85,9 @@ def export(m, filtered_emoji, input_path, formats, path, src_size,
     # --------------------------------------------------------------------------
     # declare some specs of this export.
     log.out("Exporting emoji...", 36)
-    log.out(f"- {', '.join(formats)}")
-    log.out(f"- to '{path}'")
+    log.out(f"- {', '.join(formats)}") # print formats
+    log.out(f"- to '{path}'") # print out path
+
     if num_threads > 1:
         log.out(f"- {num_threads} threads")
     else:
