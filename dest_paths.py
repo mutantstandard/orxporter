@@ -3,6 +3,7 @@ import re
 
 from exception import FilterException
 import util
+import log
 
 def format_resolve(code, emoji, format):
     """

@@ -3,6 +3,7 @@ import os
 from dest_paths import format_path, format_resolve
 from exception import FilterException
 import svg
+import log
 
 def emoji(m, filtered_emoji, input_path, formats, path, src_size,
            num_threads, renderer, max_batch, verbose):
@@ -32,10 +33,11 @@ def emoji(m, filtered_emoji, input_path, formats, path, src_size,
 
     for i, e in enumerate(filtered_emoji):
 
-        short = e.get("code", "<UNNAMED>") # to provide info on possible error printouts
+        short = e.get("short", "<UNNAMED>") # to provide info on possible error printouts
 
         try:
             format_path(path, e, 'svg')
+
         except FilterException as ex:
             if verbose:
                 log.out(f"- - Skipped emoji: {short} - {ex}", 34)

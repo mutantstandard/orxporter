@@ -13,7 +13,8 @@ orxporter uses svgcleaner with the following command:
 
 `svgcleaner <in file> <out file> --remove-metadata=no --quiet`
 
-In Mutant Standard tests, optimised SVGs are 30-40% smaller than normal SVGs. Unless you're doing something in particular, it's probably worth using Optimise SVGs by default instead of SVGs in your workflow.
+In Mutant Standard tests, optimised SVGs are 30-40% smaller than normal SVGs.
+However, svgcleaner is not perfect and can create some unexpected inconsistencies from the original version, so if you use this, you should check your input for flaws.
 
 
 ### Raster
@@ -43,5 +44,6 @@ orxporter uses oxipng with the following command:
 
 `oxipng <in file> --out, <out file> --quiet`
 
-In Mutant Standard tests, Crushed PNGs have a file size reduction of about 25% compared to normal PNGs, but only on larger sizes (128px upwards).
-At 32px, crushing PNGs only has an average file size reduction of 3%.
+In Mutant Standard tests, Crushed PNGs have a file size reduction of about 25% compared to normal PNGs, but only on larger sizes (128px upwards). At 32px, crushing PNGs only has an average file size reduction of 3%.
+
+Unlike Optimised SVGs, crushing PNGs is basically flawless in our experience.

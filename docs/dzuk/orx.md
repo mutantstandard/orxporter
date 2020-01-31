@@ -7,19 +7,21 @@ Because emoji sets can involve hundreds or thousands of images, we needed a form
 
 orx files are very simple.
 
-Everything in orx consists of an expression beginning with a keyword that declares what type of expression it is. You can't nest expressions.
+Everything in orx consists of an expression beginning with a **instruction keyword** that declares what type of expression it is. You can't nest expressions.
 
 
 ```
-fish  # rest of expression
+fish   param1 = meh    param2 = meh  
+# 'fish' is the instruction keyword
 
 ```
 
-Depending on what kind of expression it is, the expression name can have values attached to it, or not. It can also have named values attached to it, or not.
+Depending on what kind of expression it is, the instruction keyword can have certain types of values attached to it.
 
-Named values within an expression are simply noted with a '=' between the value name and the value itself.
+There are two types of values - named values and unnamed values.
 
-Unnamed values are simply typed after the expression name without any symbols or punctuation.
+- **Named values** within an expression are simply noted with a '=' between the value name and the value itself.
+- **Unnamed values** are simply typed after the expression name without any symbols or punctuation.
 
 ```
 # no unnamed values, only named values
@@ -97,9 +99,9 @@ list_of_hex = #1f3f3 #200d #1f308
 
 ## Shared expressions
 
-The expression keywords mostly are unique to whether you are writing a manifest or a parameters file. So you should read the docs for those too.
+The instruction keywords mostly are unique to whether you are writing a manifest or a parameters file. So you should read the docs for those too.
 
-There are two consistent expression keywords across any type of orx file:
+There are two consistent instruction keywords across any type of orx file:
 
 
 ## `include`
@@ -115,11 +117,14 @@ include second_file.orx
 ## `define`
 
 Define data that can be referenced elsewhere.
-You reference it later with a $ followed by it's name (`$name`), or like `$(name)`. The latter is good to know if you want to insert a variable within a string.
 
 ```
 define <name> <value>
 ```
+
+You reference it later with a $ followed by it's name (`$name`), or like `$(name)`. The latter is good to know if you want to insert a variable within a string.
+
+
 
 You can use it to add single values...
 
@@ -142,7 +147,7 @@ or use it to contain a list of values...
 define cmap_set_hmn h1 h2 h3 h4 h5
 ```
 
-or reference things that have been defined!
+or reference things that have already been defined in a new way!
 
 ```
 define cmaps_hmn $cmap_def $cmap_set_shared $cmap_set_hmn

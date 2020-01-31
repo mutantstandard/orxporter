@@ -29,7 +29,6 @@ Mutant Standard's [code of conduct](docs/code_of_conduct.md).
 
 # Features
 
-
 - Declarative language for defining semantics of emoji set
 - Color mapping (recoloring)
 - Outputting emoji both as shortcode-named files (ie. 'ice_cream') and unicode codepoint-named files (ie. '1f368')
@@ -42,8 +41,9 @@ Mutant Standard's [code of conduct](docs/code_of_conduct.md).
 - SVG and EXIF licensing metadata embedding
 - Multithreading
 
-# Prerequisites
 
+
+# Prerequisites
 
 - Python 3.6+
 - [progress](https://github.com/verigak/progress)

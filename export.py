@@ -1,12 +1,13 @@
 import os
 import queue
 import time
+import sys
 
 import check
 from exception import FilterException
-import exif
 from export_thread import ExportThread
 from dest_paths import format_path
+import image_proc
 import log
 
 
@@ -38,6 +39,9 @@ def export(m, filtered_emoji, input_path, formats, path, src_size,
     log.out('- done!', 32)
 
 
+    # If there's no emoji to export, tell the program to quit.
+    if len(exporting_emoji) == 0:
+        raise SystemExit('>∆∆< It looks like you have no emoji to export!')
 
 
     # export emoji
@@ -126,17 +130,19 @@ def export(m, filtered_emoji, input_path, formats, path, src_size,
     # (currently only just applies to PNGs)
     # --------------------------------------------------------------------------
     if 'exif' in m.license:
-        png_files = []
+        exif_compatible_images = []
+
         for e in exporting_emoji:
             for f in formats:
-                # png, pngc or avif
-                if f.startswith('png') or f.startswith('avif-'):
+                if f.split("-")[0] in ["png", "pngc", "avif"]:
+
                     try:
-                        png_files.append(format_path(path, e, f))
+                        exif_compatible_images.append(format_path(path, e, f))
                     except FilterException:
                         if verbose:
-                            log.out(f"- Filtered emoji: {e['short']}", 34)
+                            log.out(f"- Emoji filtered from metadata: {e['short']}", 34)
                         continue
-        if png_files:
-            log.out(f'Adding license metadata to png files...', 36)
-            exif.add_license(png_files, m.license.get('exif'), max_batch)
+
+        if exif_compatible_images:
+            log.out(f'Adding EXIF metadata to all compatible raster files...', 36)
+            image_proc.batch_add_exif_metadata(exif_compatible_images, m.license.get('exif'), max_batch)

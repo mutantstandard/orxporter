@@ -6,7 +6,7 @@ import subprocess
 
 def render_svg(svg_in, png_out, renderer, size):
     """
-    Export a given SVG to a PNG based on the user's renderer choice.
+    Export a single SVG to a PNG based on the user's renderer choice.
     """
 
     if renderer == 'inkscape':
@@ -55,7 +55,7 @@ def convert_webp(png_in, webp_out):
 
 def convert_avif(png_in, avif_out):
     """
-    Converts a PNG at `png_in` to a Lossless AVIF at `avif_out`.
+    Converts a single PNG at `png_in` to a Lossless AVIF at `avif_out`.
     Will raise an exception if trying to invoke the converter failed.
     """
     cmd = ['avif', '-e', os.path.abspath(png_in), '-o', os.path.abspath(avif_out), '--lossless']
@@ -72,7 +72,7 @@ def convert_avif(png_in, avif_out):
 
 def convert_flif(png_in, flif_out):
     """
-    Converts a PNG at `png_in` to a FLIF at `flif_out`.
+    Converts a single PNG at `png_in` to a FLIF at `flif_out`.
     Will raise an exception if trying to invoke the converter failed.
     """
     cmd = ['flif', '-e', '--overwrite', '-Q100', os.path.abspath(png_in), os.path.abspath(flif_out)]
@@ -89,7 +89,7 @@ def convert_flif(png_in, flif_out):
 
 def optimise_svg(svg_in, svgo_out):
     """
-    Optimises an SVG at `svg_in` to `svgo_out`.
+    Optimises a single SVG at `svg_in` to `svgo_out`.
     Will raise an exception if trying to invoke the optimiser failed.
     """
     cmd = ['svgcleaner', os.path.abspath(svg_in), os.path.abspath(svgo_out), '--remove-metadata=no', '--quiet']
@@ -106,7 +106,7 @@ def optimise_svg(svg_in, svgo_out):
 
 def crush_png(png_in, pngc_out):
     """
-    Crushes a PNG at `png_in` to `png_out`.
+    Crushes a single PNG at `png_in` to `png_out`.
     Will raise an exception if trying to invoke the optimiser failed.
     """
     cmd = ['oxipng', os.path.abspath(png_in), '--out', os.path.abspath(pngc_out), '--quiet']
@@ -117,3 +117,36 @@ def crush_png(png_in, pngc_out):
         raise Exception('Invoking the PNG crusher (oxipng) failed: ' + str(e))
     if r:
         raise Exception('The PNG crusher returned the following: ' + str(r))
+
+
+
+def batch_add_exif_metadata(paths, metadata, max_batch=1000):
+    """
+    Adds EXIF license metadata to an image file in batches.
+    (This is done in batches because exiftool is far more performant
+    this way than if it was done invidually)
+
+    'paths' is a list of paths of image files to have EXIF
+    metadata applied to them.
+
+    'max_batch' is how many input images you can feed in one command
+    because some operating systems have different restrictions.
+    """
+
+    cmd = ['exiftool']
+
+    for tag, val in metadata.items():
+        cmd.append('-{}={}'.format(tag, val))
+
+    cmd.append('-overwrite_original')
+    remaining = list(paths)
+
+    while remaining:
+        batch, remaining = remaining[:max_batch], remaining[max_batch:]
+        try:
+            r = subprocess.run(cmd + batch,
+                               stdout=subprocess.DEVNULL).returncode
+        except Exception as e:
+            raise Exception('Invoking the EXIF metadata embedding tool (exiftool) failed: ' + str(e))
+        if r:
+            raise Exception('exiftool returned error code: ' + str(r))
