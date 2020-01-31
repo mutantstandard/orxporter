@@ -60,12 +60,7 @@ class ExportThread:
         final_path = dest_paths.format_path(path, emoji, f)
 
         # try to make the directory for this particular export batch.
-        try:
-            dirname = os.path.dirname(final_path)
-            if dirname:
-                os.makedirs(dirname, exist_ok=True)
-        except IOError:
-            raise Exception('Could not create directory: ' + dirname)
+        dest_paths.make_dir_structure_for_file(final_path)
 
 
         # svg format doesn't involve a resolution so it can go straight to export.
