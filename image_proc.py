@@ -53,13 +53,9 @@ def render_svg(svg_in, png_out, renderer, size):
 
 
 
-
-
-
 def convert_webp(png_in, webp_out):
     """
     Converts a PNG at `png_in` to a Lossless WebP at `webp_out`.
-
     Will raise an exception if trying to invoke the converter failed.
     """
     cmd_webp = ['cwebp', '-lossless', '-quiet', os.path.abspath(png_in), '-o', os.path.abspath(webp_out)]
@@ -74,12 +70,9 @@ def convert_webp(png_in, webp_out):
 
 
 
-
-
 def convert_avif(png_in, avif_out):
     """
     Converts a PNG at `png_in` to a Lossless AVIF at `avif_out`.
-
     Will raise an exception if trying to invoke the converter failed.
     """
     cmd_avif = ['avif', '-e', os.path.abspath(png_in), '-o', os.path.abspath(avif_out), '--lossless']
@@ -97,7 +90,6 @@ def convert_avif(png_in, avif_out):
 def convert_flif(png_in, flif_out):
     """
     Converts a PNG at `png_in` to a FLIF at `flif_out`.
-
     Will raise an exception if trying to invoke the converter failed.
     """
     cmd_flif = ['flif', '-e', '--overwrite', '-Q100', os.path.abspath(png_in), os.path.abspath(flif_out)]

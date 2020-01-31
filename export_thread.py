@@ -5,7 +5,7 @@ import subprocess
 import threading
 
 from exception import FilterException
-from dest_paths import format_path
+import dest_paths
 import export_task
 import svg
 import log
@@ -49,17 +49,13 @@ class ExportThread:
         """
         self.thread.join()
 
-    def msg(self, s, color=37, indent=0):
-        log.out(s, color, indent, self.name)
-
-
-
 
     def export_emoji(self, emoji, emoji_svg, f, path, license):
         """
         Runs a single export batch.
         """
-        final_path = format_path(path, emoji, f)
+
+        final_path = dest_paths.format_path(path, emoji, f)
 
         # try to make the directory for this particular export batch.
         try:
@@ -70,42 +66,39 @@ class ExportThread:
             raise Exception('Could not create directory: ' + dirname)
 
 
-        # run a format-specific export task on the emoji.
+        # svg format doesn't involve a resolution so it can go straight to export.
         if f == 'svg':
             export_task.to_svg(emoji_svg, final_path, license.get('svg'))
 
-
-
-        elif f.startswith('png-'):
-            try:
-                size = int(f[4:])
-            except ValueError:
-                raise ValueError(f"The end ('{f[4:]}') of a format you gave ('{f}') isn't a number. It must be a number.")
-            export_task.to_raster(emoji_svg, final_path, self.renderer, "png", size, self.name)
-
-        elif f.startswith('flif-'):
-            try:
-                size = int(f[5:])
-            except ValueError:
-                raise ValueError(f"The end ('{f[5:]}') of a format you gave ('{f}') isn't a number. It must be a number.")
-            export_task.to_raster(emoji_svg, final_path, self.renderer, "flif", size, self.name)
-
-        elif f.startswith('webp-'):
-            try:
-                size = int(f[5:])
-            except ValueError:
-                raise ValueError(f"The end ('{f[5:]}') of a format you gave ('{f}') isn't a number. It must be a number.")
-            export_task.to_raster(emoji_svg, final_path, self.renderer, "webp", size, self.name)
-
-        elif f.startswith('avif-'):
-            try:
-                size = int(f[5:])
-            except ValueError:
-                raise ValueError(f"The end ('{f[5:]}') of a format you gave ('{f}') isn't a number. It must be a number.")
-            export_task.to_raster(emoji_svg, final_path, self.renderer, "avif", size, self.name)
-
         else:
-            raise ValueError('Invalid format: ' + f)
+            # any format other than svg is a raster, therefore it needs
+            # to have a number separated by a dash.
+            raster_format = f.split("-")
+            try:
+                size = int(raster_format[1])
+            except ValueError:
+                self.err = Exception(f"""A format you gave ('{f}') isn't correct. All formats
+                                    that aren't svg must have a number separated by a dash.
+                                    (ie 'png-32', 'webp-128')""")
+
+            # now the size has been retrieved, try image
+            # conversion based on the format.
+            if raster_format[0] == "png":
+                export_task.to_raster(emoji_svg, final_path, self.renderer, "png", size, self.name)
+
+            elif raster_format[0] == "webp":
+                export_task.to_raster(emoji_svg, final_path, self.renderer, "webp", size, self.name)
+
+            elif raster_format[0] == "flif":
+                export_task.to_raster(emoji_svg, final_path, self.renderer, "flif", size, self.name)
+
+            elif raster_format[0] == "avif":
+                export_task.to_raster(emoji_svg, final_path, self.renderer, "avif", size, self.name)
+
+            else:
+                self.err = Exception(f"""A format you gave ('{f}') uses a file format
+                                ('{raster_format[0]}') that orxporter
+                                doesn't support.""")
 
 
 
@@ -123,14 +116,17 @@ class ExportThread:
             while not self.kill_flag:
 
                 # try to get an item from the queue.
+                # break the loop if nothing is left.
                 try:
                     i, emoji = self.queue.get_nowait()
                 except queue.Empty:
                     break
 
                 # compose the file path of the emoji.
-                format_path(self.path, emoji, 'svg')
+                dest_paths.format_path(self.path, emoji, 'svg')
 
+                # check if the src attribute is in the emoji.
+                # if so, make a proper path out of it.
                 if 'src' not in emoji:
                     raise ValueError('Missing src attribute')
 

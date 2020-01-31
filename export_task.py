@@ -44,8 +44,8 @@ def to_raster(emoji_svg, out_path, renderer, format, size, name):
     if format == "png":
         # single-step process
         image_proc.render_svg(tmp_svg_path, out_path, renderer, size)
-    else:
 
+    else:
         # multi-step process
         image_proc.render_svg(tmp_svg_path, tmp_png_path, renderer, size)
 
