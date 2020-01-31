@@ -3,13 +3,16 @@ import os
 import pathlib
 import subprocess
 
+import files
 import svg
 import image_proc
 
-def to_svg(emoji_svg, out_path, license=None):
+def to_svg(emoji_svg, out_path, name, license=None, optimise=False):
     """
     SVG exporting function. Doesn't create temporary files.
     Will append license <metadata> if requested.
+
+    Can optimise the output (ie, output to svgo) if requested.
     """
     if license:
         final_svg = svg.add_license(emoji_svg, license)
@@ -17,14 +20,13 @@ def to_svg(emoji_svg, out_path, license=None):
         final_svg = emoji_svg
 
     # write SVG out to file
-    try:
-        out = open(out_path, 'w')
-        out.write(final_svg)
-        out.close()
-    except Exception as e:
-        raise Exception(f'Could not write SVG to file: {e}')
-
-
+    if not optimise: # (svg)
+        files.try_write(final_svg, out_path, "final SVG")
+    else: # (svgo)
+        tmp_svg_path = '.tmp' + name + '.svg'
+        files.try_write(final_svg, tmp_svg_path, "temporary SVG")
+        image_proc.optimise_svg(tmp_svg_path, out_path)
+        os.remove(tmp_svg_path)
 
 
 
@@ -38,15 +40,15 @@ def to_raster(emoji_svg, out_path, renderer, format, size, name):
     tmp_png_path = '.tmp' + name + '.png'
 
     # try to write a temporary SVG.
-    image_proc.write_temp_svg(emoji_svg, tmp_svg_path)
+    files.try_write(emoji_svg, tmp_svg_path, "temporary SVG")
 
 
     if format == "png":
-        # single-step process
+        # one-step process
         image_proc.render_svg(tmp_svg_path, out_path, renderer, size)
 
     else:
-        # multi-step process
+        # two-step process
         image_proc.render_svg(tmp_svg_path, tmp_png_path, renderer, size)
 
         if format == "webp":

@@ -1,21 +1,28 @@
 # Formats
 
-### Out of the box support:
-
+### Vector
 - `svg` SVG
+- `svgo` Optimised SVG (requires svgcleaner)
+
+*(check the [readme](../../readme.md) for all the information on dependencies)*
+
+#### `svgo` Optimised SVG
+Optimised SVG is the same format as SVG, but it's losslessly compressed to create a smaller file size (in Mutant Standard tests, optimised SVGs are 30-40% smaller). It requires an extra processing stage, and it needs the dependency listed. Check the [svgcleaner](https://github.com/RazrFalcon/svgcleaner) repo to see the documentation for it so you can see what it does to the SVG files.
+
+orxporter uses svgcleaner with the following settings:
+
+`svgcleaner <in file> <out file> --remove-metadata=no --quiet`
+
+
+### Raster
 - `png` PNG
-
-### Requires extra software to install:
-
 - `webp` Lossless WebP (requires cwebp)
 - `avif` Lossless AVIF (requires go-avif)
 - `flif` FLIF (requires flif)
 
 *(check the [readme](../../readme.md) for all the information on dependencies)*
 
-Crushed PNGs and Optimised SVGs are the same formats as PNG and SVG, but their data is arranged in such a way to create a smaller file size, they require an extra processing stage, and they need the dependencies listed.
-
-When choosing raster images (any format but `svg`), you have to add a size as well. you do this by adding a hyphen followed by the square size in pixels.
+When choosing raster images, you have to add a size as well. you do this by adding a hyphen followed by the square size in pixels.
 
 eg.
 
