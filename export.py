@@ -48,7 +48,7 @@ def export(m, filtered_emoji, input_path, formats, path, src_size,
     # --------------------------------------------------------------------------
     # declare some specs of this export.
 
-    log.out("Exporting emoji...", 36)
+    log.out(f"Exporting {len(exporting_emoji)} emoji...", 36)
     log.out(f"- {', '.join(formats)}") # print formats
     log.out(f"- to '{path}'") # print out path
 
