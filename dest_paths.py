@@ -66,6 +66,8 @@ def format_path(path, emoji, format):
         res = res + '.svg'
     elif format.startswith('png-'):
         res = res + '.png'
+    elif format.startswith('pngc-'):
+        res = res + '.png'
     elif format.startswith('flif-'):
         res = res + '.flif'
     elif format.startswith('webp-'):

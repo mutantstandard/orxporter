@@ -51,7 +51,9 @@ def to_raster(emoji_svg, out_path, renderer, format, size, name):
         # two-step process
         image_proc.render_svg(tmp_svg_path, tmp_png_path, renderer, size)
 
-        if format == "webp":
+        if format == "pngc":
+            image_proc.crush_png(tmp_png_path, out_path)
+        elif format == "webp":
             image_proc.convert_webp(tmp_png_path, out_path)
         elif format == "avif":
             image_proc.convert_avif(tmp_png_path, out_path)

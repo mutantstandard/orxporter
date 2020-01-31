@@ -129,7 +129,8 @@ def export(m, filtered_emoji, input_path, formats, path, src_size,
         png_files = []
         for e in exporting_emoji:
             for f in formats:
-                if f.startswith('png-'):
+                # png, pngc or avif
+                if f.startswith('png') or f.startswith('avif-'):
                     try:
                         png_files.append(format_path(path, e, f))
                     except FilterException:

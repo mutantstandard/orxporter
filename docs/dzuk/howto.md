@@ -60,6 +60,12 @@ Using this means that you're just exporting JSON for this command, you can't use
 
 ----
 
+# [Metadata](metadata.md)
+
+forc can embed SVG or EXIF metadata into your exported emoji sets.
+
+---
+
 # Extra flags
 
 ## Force Text Descriptions (`--force-desc`)
