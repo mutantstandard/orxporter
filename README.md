@@ -32,9 +32,10 @@ Mutant Standard's [code of conduct](docs/code_of_conduct.md).
 
 - Declarative language for defining semantics of emoji set
 - Color mapping (recoloring)
-- Outputting emoji both as shortcode-named files (ie. 'ice_cream') and unicode codepoint-named files (ie. '1f368').
-- SVG, PNG, Lossless WebP, Lossless AVIF and FLIF exports
-- Supports multiple SVG renderers: rendersvg, inkscape and imagemagick
+- Outputting emoji both as shortcode-named files (ie. 'ice_cream') and unicode codepoint-named files (ie. '1f368')
+- Export to SVG, PNG, Lossless WebP, Lossless AVIF and FLIF
+- Optional lossless crushing of SVG and PNG files
+- Supports multiple SVG renderers (rendersvg, Inkscape and ImageMagick)
 - Output options including emoji filtering, customisable export directory
   structure and filenaming
 - JSON output of emoji set metadata
@@ -51,6 +52,8 @@ Mutant Standard's [code of conduct](docs/code_of_conduct.md).
     - Inkscape
     - ImageMagick
 - exiftool (Optional; for embedding EXIF license metadata)
+- [svgcleaner](https://github.com/RazrFalcon/svgcleaner) (Optional; for Optimised SVG output)
+- [oxipng](https://github.com/shssoichiro/oxipng) (Optional; for Crushed PNG output)
 - [FLIF](https://github.com/FLIF-hub/FLIF) (Optional; for FLIF output)
 - [libwebp](https://developers.google.com/speed/webp/docs/precompiled) (Optional; for Lossless WebP output)
 - [go-avif](https://github.com/Kagami/go-avif) (Optional; for AVIF output) (Experimental; does not currently produce truly lossless images. We're trying to figure out why that is.)

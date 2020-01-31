@@ -5,7 +5,8 @@ import subprocess
 import threading
 
 from exception import FilterException
-from paths import format_path
+import dest_paths
+import export_task
 import svg
 import log
 
@@ -25,7 +26,7 @@ class ExportThread:
         self.path = path
         self.renderer = renderer
         self.err = None
-        # this essentially tells self.run() to stop running if it is
+        # this essentially tells self.run() to stop running if it is True
         self.kill_flag = False
         # the actual thread part of this thread
         self.thread = threading.Thread(target=self.run)
@@ -48,239 +49,13 @@ class ExportThread:
         """
         self.thread.join()
 
-    def msg(self, s, color=37, indent=0):
-        log.out(s, color, indent, self.name)
-
-
-
-    def export_svg(self, emoji_svg, path, license=None):
-        """
-        SVG exporting function
-        """
-        if license:
-            final_svg = svg.add_license(emoji_svg, license)
-        else:
-            final_svg = emoji_svg
-
-        # write SVG out to file
-        try:
-            out = open(path, 'w')
-            out.write(final_svg)
-            out.close()
-        except Exception:
-            raise Exception('Could not write to file: ' + path)
-
-    def export_png(self, emoji_svg, size, path):
-
-        # saving SVG to a temporary file
-        tmp_name = '.tmp' + self.name + '.svg'
-        try:
-            f = open(tmp_name, 'w')
-            f.write(emoji_svg)
-            f.close()
-        except IOError:
-            raise Exception('Could not write to temporary file: ' + tmp_name)
-
-        # export the SVG to a PNG based on the user's renderer
-        if self.renderer == 'inkscape':
-            cmd = ['inkscape', os.path.abspath(tmp_name),
-                   '--export-png=' + os.path.abspath(path),
-                   '-h', str(size), '-w', str(size)]
-        elif self.renderer == 'rendersvg':
-            cmd = ['rendersvg', '-w', str(size), '-h', str(size),
-                    os.path.abspath(tmp_name), os.path.abspath(path)]
-        elif self.renderer == 'imagemagick':
-            cmd = ['convert', '-background', 'none', '-density', str(size / 32 * 128),
-                   '-resize', str(size) + 'x' + str(size), os.path.abspath(tmp_name), os.path.abspath(path)]
-        else:
-            raise AssertionError
-        try:
-            r = subprocess.run(cmd, stdout=subprocess.DEVNULL).returncode
-        except Exception as e:
-            raise Exception('Rasteriser invocation failed: ' + str(e))
-        if r:
-            raise Exception('Rasteriser returned error code: ' + str(r))
-
-        # delete temporary files
-        os.remove(tmp_name)
-
-    def export_flif(self, emoji_svg, size, path):
-        """
-        FLIF Exporting function. Creates temporary PNGs first before converting to WebP.
-        """
-
-        tmp_svg_name = '.tmp' + self.name + '.svg'
-        tmp_png_name = '.tmp' + self.name + '.png'
-
-
-        # try to write temporary SVG
-        try:
-            f = open(tmp_svg_name, 'w')
-            f.write(emoji_svg)
-            f.close()
-
-        except IOError:
-            raise Exception('Could not write to temporary file: ' + tmp_svg_name)
-
-
-        # export the SVG to a temporary PNG based on the user's renderer
-        if self.renderer == 'inkscape':
-            cmd_png = ['inkscape', os.path.abspath(tmp_svg_name),
-                   '--export-png=' + os.path.abspath(tmp_png_name),
-                   '-h', str(size), '-w', str(size)]
-        elif self.renderer == 'rendersvg':
-            cmd_png = ['rendersvg', '-w', str(size), '-h', str(size),
-                    os.path.abspath(tmp_svg_name), os.path.abspath(tmp_png_name)]
-        elif self.renderer == 'imagemagick':
-            cmd_png = ['convert', '-background', 'none', '-density', str(size / 32 * 128),
-                   '-resize', str(size) + 'x' + str(size), os.path.abspath(tmp_svg_name), os.path.abspath(tmp_png_name)]
-        else:
-            raise AssertionError
-
-        try:
-            r = subprocess.run(cmd_png, stdout=subprocess.DEVNULL).returncode
-        except Exception as e:
-            raise Exception('PNG rasteriser invocation failed: ' + str(e))
-        if r:
-            raise Exception('PNG rasteriser returned error code: ' + str(r))
-
-
-        # try to export FLIF
-        cmd_flif = ['flif', '-e', '--overwrite', '-Q100', os.path.abspath(tmp_png_name), os.path.abspath(path)]
-
-        try:
-            r = subprocess.run(cmd_flif, stdout=subprocess.DEVNULL).returncode
-        except Exception as e:
-            raise Exception('FLIF converter invocation failed: ' + str(e))
-        if r:
-            raise Exception('FLIF converter returned error code: ' + str(r))
-
-
-
-        # delete temporary files
-        os.remove(tmp_svg_name)
-        os.remove(tmp_png_name)
-
-    def export_webp(self, emoji_svg, size, path):
-        """
-        WebP Exporting function. Creates temporary PNGs first before converting to WebP.
-        """
-
-        tmp_svg_name = '.tmp' + self.name + '.svg'
-        tmp_png_name = '.tmp' + self.name + '.png'
-
-
-        # try to write a temporary SVG
-        try:
-            f = open(tmp_svg_name, 'w')
-            f.write(emoji_svg)
-            f.close()
-
-        except IOError:
-            raise Exception('Could not write to temporary file: ' + tmp_svg_name)
-
-
-        # export the SVG to a temporary PNG based on the user's renderer
-        if self.renderer == 'inkscape':
-            cmd_png = ['inkscape', os.path.abspath(tmp_svg_name),
-                   '--export-png=' + os.path.abspath(tmp_png_name),
-                   '-h', str(size), '-w', str(size)]
-        elif self.renderer == 'rendersvg':
-            cmd_png = ['rendersvg', '-w', str(size), '-h', str(size),
-                    os.path.abspath(tmp_svg_name), os.path.abspath(tmp_png_name)]
-        elif self.renderer == 'imagemagick':
-            cmd_png = ['convert', '-background', 'none', '-density', str(size / 32 * 128),
-                   '-resize', str(size) + 'x' + str(size), os.path.abspath(tmp_svg_name), os.path.abspath(tmp_png_name)]
-        else:
-            raise AssertionError
-
-
-        try:
-            r = subprocess.run(cmd_png, stdout=subprocess.DEVNULL).returncode
-        except Exception as e:
-            raise Exception('PNG rasteriser invocation failed: ' + str(e))
-        if r:
-            raise Exception('PNG rasteriser returned error code: ' + str(r))
-
-
-        # try to export WebP
-        cmd_webp = ['cwebp', '-lossless', '-quiet', os.path.abspath(tmp_png_name), '-o', os.path.abspath(path)]
-
-        try:
-            r = subprocess.run(cmd_webp, stdout=subprocess.DEVNULL).returncode
-        except Exception as e:
-            raise Exception('WebP converter invocation failed: ' + str(e))
-        if r:
-            raise Exception('WebP converter returned error code: ' + str(r))
-
-
-
-        # delete temporary files
-        os.remove(tmp_svg_name)
-        os.remove(tmp_png_name)
-
-    def export_avif(self, emoji_svg, size, path):
-        """
-        Lossless AVIF Exporting function. Creates temporary PNGs first before converting to AVIF.
-        """
-
-        tmp_svg_name = '.tmp' + self.name + '.svg'
-        tmp_png_name = '.tmp' + self.name + '.png'
-
-
-        # try to write a temporary SVG
-        try:
-            f = open(tmp_svg_name, 'w')
-            f.write(emoji_svg)
-            f.close()
-
-        except IOError:
-            raise Exception('Could not write to temporary file: ' + tmp_svg_name)
-
-
-        # export the SVG to a temporary PNG based on the user's renderer
-        if self.renderer == 'inkscape':
-            cmd_png = ['inkscape', os.path.abspath(tmp_svg_name),
-                   '--export-png=' + os.path.abspath(tmp_png_name),
-                   '-h', str(size), '-w', str(size)]
-        elif self.renderer == 'rendersvg':
-            cmd_png = ['rendersvg', '-w', str(size), '-h', str(size),
-                    os.path.abspath(tmp_svg_name), os.path.abspath(tmp_png_name)]
-        elif self.renderer == 'imagemagick':
-            cmd_png = ['convert', '-background', 'none', '-density', str(size / 32 * 128),
-                   '-resize', str(size) + 'x' + str(size), os.path.abspath(tmp_svg_name), os.path.abspath(tmp_png_name)]
-        else:
-            raise AssertionError
-
-
-        try:
-            r = subprocess.run(cmd_png, stdout=subprocess.DEVNULL).returncode
-        except Exception as e:
-            raise Exception('PNG rasteriser invocation failed: ' + str(e))
-        if r:
-            raise Exception('PNG rasteriser returned error code: ' + str(r))
-
-
-        # try to export AVIF
-        cmd_avif = ['avif', '-e', os.path.abspath(tmp_png_name), '-o', os.path.abspath(path), '--lossless']
-
-        try:
-            r = subprocess.run(cmd_avif, stdout=subprocess.DEVNULL).returncode
-        except Exception as e:
-            raise Exception('AVIF converter invocation failed: ' + str(e))
-        if r:
-            raise Exception('AVIF converter returned error code: ' + str(r))
-
-
-        # delete temporary files
-        os.remove(tmp_svg_name)
-        os.remove(tmp_png_name)
 
     def export_emoji(self, emoji, emoji_svg, f, path, license):
         """
         Runs a single export batch.
         """
-        final_path = format_path(path, emoji, f)
+
+        final_path = dest_paths.format_path(path, emoji, f)
 
         # try to make the directory for this particular export batch.
         try:
@@ -291,41 +66,44 @@ class ExportThread:
             raise Exception('Could not create directory: ' + dirname)
 
 
-        # run a format-specific export task on the emoji.
+        # svg format doesn't involve a resolution so it can go straight to export.
         if f == 'svg':
-            self.export_svg(emoji_svg, final_path, license.get('svg'))
-
-        elif f.startswith('png-'):
-            try:
-                size = int(f[4:])
-            except ValueError:
-                raise ValueError(f"The end ('{f[4:]}') of a format you gave ('{f}') isn't a number. It must be a number.")
-            self.export_png(emoji_svg, size, final_path)
-
-        elif f.startswith('flif-'):
-            try:
-                size = int(f[5:])
-            except ValueError:
-                raise ValueError(f"The end ('{f[5:]}') of a format you gave ('{f}') isn't a number. It must be a number.")
-            self.export_flif(emoji_svg, size, final_path)
-
-        elif f.startswith('webp-'):
-            try:
-                size = int(f[5:])
-            except ValueError:
-                raise ValueError(f"The end ('{f[5:]}') of a format you gave ('{f}') isn't a number. It must be a number.")
-            self.export_webp(emoji_svg, size, final_path)
-
-
-        elif f.startswith('avif-'):
-            try:
-                size = int(f[5:])
-            except ValueError:
-                raise ValueError(f"The end ('{f[5:]}') of a format you gave ('{f}') isn't a number. It must be a number.")
-            self.export_avif(emoji_svg, size, final_path)
+            export_task.to_svg(emoji_svg, final_path, self.name, license.get('svg'), optimise=False)
+        elif f == 'svgo':
+            export_task.to_svg(emoji_svg, final_path, self.name, license.get('svg'), optimise=True)
 
         else:
-            raise ValueError('Invalid format: ' + f)
+            # any format other than svg is a raster, therefore it needs
+            # to have a number separated by a dash.
+            raster_format = f.split("-")
+            try:
+                size = int(raster_format[1])
+            except ValueError:
+                self.err = Exception(f"""A format you gave ('{f}') isn't correct. All formats
+                                    that aren't svg must have a number separated by a dash.
+                                    (ie 'png-32', 'webp-128')""")
+
+            # now the size has been retrieved, try image
+            # conversion based on the format.
+            if raster_format[0] == "png":
+                export_task.to_raster(emoji_svg, final_path, self.renderer, "png", size, self.name)
+
+            elif raster_format[0] == "pngc":
+                export_task.to_raster(emoji_svg, final_path, self.renderer, "pngc", size, self.name)
+
+            elif raster_format[0] == "webp":
+                export_task.to_raster(emoji_svg, final_path, self.renderer, "webp", size, self.name)
+
+            elif raster_format[0] == "flif":
+                export_task.to_raster(emoji_svg, final_path, self.renderer, "flif", size, self.name)
+
+            elif raster_format[0] == "avif":
+                export_task.to_raster(emoji_svg, final_path, self.renderer, "avif", size, self.name)
+
+            else:
+                self.err = Exception(f"""A format you gave ('{f}') uses a file format
+                                ('{raster_format[0]}') that orxporter
+                                doesn't support.""")
 
 
 
@@ -343,14 +121,17 @@ class ExportThread:
             while not self.kill_flag:
 
                 # try to get an item from the queue.
+                # break the loop if nothing is left.
                 try:
                     i, emoji = self.queue.get_nowait()
                 except queue.Empty:
                     break
 
                 # compose the file path of the emoji.
-                format_path(self.path, emoji, 'svg')
+                dest_paths.format_path(self.path, emoji, 'svg')
 
+                # check if the src attribute is in the emoji.
+                # if so, make a proper path out of it.
                 if 'src' not in emoji:
                     raise ValueError('Missing src attribute')
 
