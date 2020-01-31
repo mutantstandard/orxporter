@@ -8,6 +8,7 @@ from exception import FilterException
 import dest_paths
 import export_task
 import svg
+import util
 import log
 
 class ExportThread:
@@ -148,9 +149,7 @@ class ExportThread:
 
                 # convert colormaps (if applicable)
                 if 'color' in emoji:
-                    cmap = self.m.colormaps[emoji['color']]
-                    pfrom = self.m.palettes[cmap['src']]
-                    pto = self.m.palettes[cmap['dst']]
+                    pfrom, pto = util.get_color_palettes(emoji, self.m)
                     emoji_svg = svg.translate_color(emoji_svg, pfrom, pto)
 
                 # for each format in the emoji, export it as that
