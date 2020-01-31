@@ -48,6 +48,35 @@ def export(m, filtered_emoji, input_path, formats, path, src_size,
     # --------------------------------------------------------------------------
     # declare some specs of this export.
 
+    export_step(exporting_emoji, num_threads, m, input_path, formats, path,
+                renderer, license_enabled)
+
+
+
+
+    # exif license pass
+    # (currently only just applies to PNGs)
+    # --------------------------------------------------------------------------
+    if ('exif' in m.license) and license_enabled:
+        exif_compatible_images = []
+
+        for e in exporting_emoji:
+            for f in formats:
+                if f.split("-")[0] in ["png", "pngc", "avif"]:
+
+                    try:
+                        exif_compatible_images.append(format_path(path, e, f))
+                    except FilterException:
+                        if verbose:
+                            log.out(f"- Emoji filtered from metadata: {e['short']}", 34)
+                        continue
+
+        if exif_compatible_images:
+            log.out(f'Adding EXIF metadata to all compatible raster files...', 36)
+            image_proc.batch_add_exif_metadata(exif_compatible_images, m.license.get('exif'), max_batch)
+
+
+def export_step(exporting_emoji, num_threads, m, input_path, formats, path, renderer, license_enabled):
     log.out(f"Exporting {len(exporting_emoji)} emoji...", 36)
     log.out(f"- {', '.join(formats)}") # print formats
     log.out(f"- to '{path}'") # print out path
@@ -124,27 +153,3 @@ def export(m, filtered_emoji, input_path, formats, path, src_size,
 
     log.export_task_count = 0
     log.filtered_export_task_count = 0
-
-
-
-
-    # exif license pass
-    # (currently only just applies to PNGs)
-    # --------------------------------------------------------------------------
-    if ('exif' in m.license) and license_enabled:
-        exif_compatible_images = []
-
-        for e in exporting_emoji:
-            for f in formats:
-                if f.split("-")[0] in ["png", "pngc", "avif"]:
-
-                    try:
-                        exif_compatible_images.append(format_path(path, e, f))
-                    except FilterException:
-                        if verbose:
-                            log.out(f"- Emoji filtered from metadata: {e['short']}", 34)
-                        continue
-
-        if exif_compatible_images:
-            log.out(f'Adding EXIF metadata to all compatible raster files...', 36)
-            image_proc.batch_add_exif_metadata(exif_compatible_images, m.license.get('exif'), max_batch)
