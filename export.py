@@ -16,7 +16,7 @@ import log
 
 
 def export(m, filtered_emoji, input_path, formats, path, src_size,
-           num_threads, renderer, max_batch, verbose):
+           num_threads, renderer, max_batch, verbose, include_license):
     """
     Runs the entire orxporter process, includes preliminary checking and
     validation of emoji metadata and running the tasks associated with exporting.
@@ -68,7 +68,7 @@ def export(m, filtered_emoji, input_path, formats, path, src_size,
         threads = []
         for i in range(num_threads):
             threads.append(ExportThread(emoji_queue, str(i), len(exporting_emoji),
-                                        m, input_path, formats, path, renderer))
+                                        m, input_path, formats, path, renderer, include_license))
 
 
         # keeps checking if the export queue is done.
@@ -129,7 +129,7 @@ def export(m, filtered_emoji, input_path, formats, path, src_size,
     # exif license pass
     # (currently only just applies to PNGs)
     # --------------------------------------------------------------------------
-    if 'exif' in m.license:
+    if ('exif' in m.license) and include_license:
         exif_compatible_images = []
 
         for e in exporting_emoji:

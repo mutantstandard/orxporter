@@ -121,7 +121,7 @@ def main():
     verbose = False
     try:
         opts, _ = getopt.getopt(sys.argv[1:],
-                                'hm:i:o:f:F:ce:j:J:q:t:r:b:p:l:',
+                                'hm:i:o:f:F:ce:j:J:q:t:r:b:p:l',
                                 ['help', 'force-desc', 'verbose'])
 
 
@@ -145,7 +145,7 @@ def main():
                 output_naming = arg
             elif opt == '-r':
                 renderer = arg
-            elif opt == 'l':
+            elif opt == '-l':
                 license = False
             elif opt == '-p':
                 params_path = arg
@@ -253,7 +253,7 @@ def main():
 
             export.export(m, filtered_emoji, input_path, output_formats,
                           os.path.join(output_path, output_naming), src_size,
-                          num_threads, renderer, max_batch, verbose)
+                          num_threads, renderer, max_batch, verbose, license)
 
 
 
