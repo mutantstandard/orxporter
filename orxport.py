@@ -11,6 +11,7 @@ import log
 
 import orx.manifest
 import orx.params
+from cache import Cache
 
 VERSION = '0.3.0'
 
@@ -77,6 +78,9 @@ IMAGE BUILD:
 
 -t      Number of threads working on export tasks (default: {DEF_NUM_THREADS})
 
+-C      Cache directory
+        Uses the argument as the directory for the export cache.
+
 
 JSON BUILD:
 ----------------------------------------------------
@@ -118,10 +122,11 @@ def main():
     num_threads = DEF_NUM_THREADS
     force_desc = False
     max_batch = DEF_MAX_BATCH
+    cache = False
     verbose = False
     try:
         opts, _ = getopt.getopt(sys.argv[1:],
-                                'hm:i:o:f:F:ce:j:J:q:t:r:b:p:l',
+                                'hm:i:o:f:F:ce:j:J:q:t:r:b:p:lC:',
                                 ['help', 'force-desc', 'verbose'])
 
 
@@ -153,6 +158,9 @@ def main():
                 num_threads = int(arg)
                 if num_threads <= 0:
                     raise ValueError
+            elif opt == '-C':
+                cache = Cache(cache_dir=arg)
+
 
             # JSON
             elif opt == '-j':
