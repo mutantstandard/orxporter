@@ -17,7 +17,7 @@ class ExportThread:
     exporting tasks from the export queue.
     """
     def __init__(self, queue, name, total, m, input_path, formats, path,
-                 renderer, license_enabled):
+                 renderer, license_enabled, cache):
         self.queue = queue
         self.name = name
         self.total = total
@@ -25,6 +25,7 @@ class ExportThread:
         self.input_path = input_path
         self.formats = formats
         self.path = path
+        self.cache = cache
         self.renderer = renderer
         self.license_enabled = license_enabled
         self.err = None
@@ -149,7 +150,14 @@ class ExportThread:
 
                 # for each format in the emoji, export it as that
                 for f in self.formats:
-                    self.export_emoji(emoji, emoji_svg, f, self.path, self.m.license)
+                    final_path = dest_paths.format_path(self.path, emoji, f)
+                    if self.cache and f in emoji.get('cached_formats', []):
+                        self.cache.load_from_cache(emoji, f, final_path)
+                    else:
+                        self.export_emoji(emoji, emoji_svg, f, self.path,
+                                          self.m.license)
+                        if self.cache:
+                            self.cache.save_to_cache(emoji, f, final_path)
 
                 # tell the progress bar that this task has been completed.
                 log.export_task_count += 1

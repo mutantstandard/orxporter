@@ -261,7 +261,8 @@ def main():
 
             export.export(m, filtered_emoji, input_path, output_formats,
                           os.path.join(output_path, output_naming), src_size,
-                          num_threads, renderer, max_batch, verbose, license_enabled)
+                          num_threads, renderer, max_batch, verbose,
+                          license_enabled, cache)
 
 
 
