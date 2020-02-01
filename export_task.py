@@ -7,14 +7,14 @@ import files
 import svg
 import image_proc
 
-def to_svg(emoji_svg, out_path, name, license=None, include_license=True, optimise=False):
+def to_svg(emoji_svg, out_path, name, license=None, license_enabled=True, optimise=False):
     """
     SVG exporting function. Doesn't create temporary files.
     Will append license <metadata> if requested.
 
     Can optimise the output (ie, output to svgo) if requested.
     """
-    if include_license:
+    if license_enabled:
         final_svg = svg.add_license(emoji_svg, license)
     else:
         final_svg = emoji_svg

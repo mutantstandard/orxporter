@@ -16,7 +16,7 @@ class ExportThread:
     exporting tasks from the export queue.
     """
     def __init__(self, queue, name, total, m, input_path, formats, path,
-                 renderer, include_license):
+                 renderer, license_enabled):
         self.queue = queue
         self.name = name
         self.total = total
@@ -25,7 +25,7 @@ class ExportThread:
         self.formats = formats
         self.path = path
         self.renderer = renderer
-        self.include_license = include_license
+        self.license_enabled = license_enabled
         self.err = None
         # this essentially tells self.run() to stop running if it is True
         self.kill_flag = False
@@ -67,11 +67,11 @@ class ExportThread:
             raise Exception('Could not create directory: ' + dirname)
 
 
-        # svg format doesn't involve a resolution so it can go straight to export.    
+        # svg format doesn't involve a resolution so it can go straight to export.
         if f == 'svg':
-            export_task.to_svg(emoji_svg, final_path, self.name, license.get('svg'), self.include_license, optimise=False)
+            export_task.to_svg(emoji_svg, final_path, self.name, license.get('svg'), self.license_enabled, optimise=False)
         elif f == 'svgo':
-            export_task.to_svg(emoji_svg, final_path, self.name, license.get('svg'), self.include_license, optimise=True)
+            export_task.to_svg(emoji_svg, final_path, self.name, license.get('svg'), self.license_enabled, optimise=True)
 
         else:
             # any format other than svg is a raster, therefore it needs

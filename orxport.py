@@ -22,7 +22,7 @@ DEF_OUTPUT = 'out'
 
 DEF_OUTPUT_NAMING = '%f/%s'
 DEF_OUTPUT_FORMATS = ['svg']
-DEF_LICENSE = True
+DEF_LICENSE_ENABLED = True
 DEF_PARAMS = 'parameters.orx'
 
 DEF_NUM_THREADS = 1
@@ -54,7 +54,7 @@ IMAGE BUILD:
 -F      Format (default: {DEF_OUTPUT_FORMATS[0]})
         comma separated with no spaces (ie. 'svg,png-64,flif-128')
         - svg (SVG)
-        - svgo (Optimised SVG)
+        - svgo (Optimised SVG, may have imperfect results)
         - png-SIZE (PNG)
         - pngc-SIZE (Crushed PNG)
         - flif-SIZE (FLIF)
@@ -107,7 +107,7 @@ def main():
     output_naming = DEF_OUTPUT_NAMING
     output_formats = DEF_OUTPUT_FORMATS
     renderer = DEF_RENDERER
-    license = DEF_LICENSE
+    license_enabled = DEF_LICENSE_ENABLED
     params_path = None
 
     emoji_filter = []
@@ -146,7 +146,7 @@ def main():
             elif opt == '-r':
                 renderer = arg
             elif opt == '-l':
-                license = False
+                license_enabled = False
             elif opt == '-p':
                 params_path = arg
             elif opt == '-t':
@@ -242,7 +242,7 @@ def main():
                 # convert the non-parameter flags into an orx expression to be turned into a parameters object.
                 log.out(f'Compiling image export parameters...', 36)
                 license_text=""
-                if license == True:
+                if license_enabled == True:
                     license_text = "yes"
                 else:
                     license_text = "no"
@@ -253,7 +253,7 @@ def main():
 
             export.export(m, filtered_emoji, input_path, output_formats,
                           os.path.join(output_path, output_naming), src_size,
-                          num_threads, renderer, max_batch, verbose, license)
+                          num_threads, renderer, max_batch, verbose, license_enabled)
 
 
 
@@ -267,7 +267,7 @@ def main():
     # Where all the exceptions eventually go~
     except Exception as e:
         log.out(f'x∆∆x {e}\n', 31)
-        raise e  ######################## TEMP, for developer stuff
+        raise e  # TEMP: for developer stuff
         sys.exit(1)
 
     # yay! finished!
