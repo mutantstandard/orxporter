@@ -151,9 +151,11 @@ class ExportThread:
                 # for each format in the emoji, export it as that
                 for f in self.formats:
                     final_path = dest_paths.format_path(self.path, emoji, f)
-                    if self.cache and f in emoji.get('cached_formats', []):
-                        self.cache.load_from_cache(emoji, f, final_path)
-                    else:
+                    cache_hit = False
+                    if self.cache:
+                        cache_hit = self.cache.load_from_cache(emoji, f,
+                                                               final_path)
+                    if not cache_hit:
                         self.export_emoji(emoji, emoji_svg, f, self.path,
                                           self.m.license)
                         if self.cache:

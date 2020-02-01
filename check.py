@@ -85,9 +85,6 @@ def emoji(m, filtered_emoji, input_path, formats, path, src_size,
                 cached_emoji.append(e)
             else:
                 if cached_formats:
-                    # save which formats are in cache for later
-                    # a meta-cache, so to speak
-                    e['cached_formats'] = cached_formats
                     partial_cached_emoji_count += 1
                 exporting_emoji.append(e)
         else:
