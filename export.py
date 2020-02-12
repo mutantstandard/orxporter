@@ -1,3 +1,4 @@
+import itertools
 import os
 import queue
 import time
@@ -6,7 +7,7 @@ import sys
 import check
 from exception import FilterException
 from export_thread import ExportThread
-from dest_paths import format_path
+from dest_paths import format_path, make_dir_structure_for_file
 import image_proc
 import log
 
@@ -16,7 +17,7 @@ import log
 
 
 def export(m, filtered_emoji, input_path, formats, path, src_size,
-           num_threads, renderer, max_batch, verbose, license_enabled):
+           num_threads, renderer, max_batch, verbose, license_enabled, cache):
     """
     Runs the entire orxporter process, includes preliminary checking and
     validation of emoji metadata and running the tasks associated with exporting.
@@ -26,9 +27,11 @@ def export(m, filtered_emoji, input_path, formats, path, src_size,
     # --------------------------------------------------------------------------
     log.out('Checking emoji...', 36)
     check_result = check.emoji(m, filtered_emoji, input_path, formats, path, src_size,
-               num_threads, renderer, max_batch, verbose)
+               num_threads, renderer, max_batch, cache, verbose)
 
     exporting_emoji = check_result["exporting_emoji"]
+    cached_emoji = check_result["cached_emoji"]
+    partial_cached_emoji_count = check_result["partial_cached_emoji_count"]
     skipped_emoji_count = check_result["skipped_emoji_count"]
 
     if skipped_emoji_count > 0:
@@ -36,11 +39,16 @@ def export(m, filtered_emoji, input_path, formats, path, src_size,
 
         if not verbose:
             log.out(f"- use the --verbose flag to see what those emoji are and why they were skipped.", 34)
+    if cached_emoji:
+        log.out(f"- {len(cached_emoji)} emoji will be reused from cache.", 32)
+    if partial_cached_emoji_count:
+        log.out(f"- {partial_cached_emoji_count} emoji will be partially "
+                "reused from cache.", 32)
     log.out('- done!', 32)
 
 
     # If there's no emoji to export, tell the program to quit.
-    if len(exporting_emoji) == 0:
+    if len(exporting_emoji) == 0 and len(cached_emoji) == 0:
         raise SystemExit('>∆∆< It looks like you have no emoji to export!')
 
 
@@ -48,7 +56,49 @@ def export(m, filtered_emoji, input_path, formats, path, src_size,
     # --------------------------------------------------------------------------
     # declare some specs of this export.
 
-    log.out("Exporting emoji...", 36)
+    if exporting_emoji:
+        export_step(exporting_emoji, num_threads, m, input_path, formats, path,
+                    renderer, license_enabled, cache)
+
+
+
+    # Copy files from cache
+    # --------------------------------------------------------------------------
+    if cached_emoji:
+        log.out(f"Copying {len(cached_emoji)} emoji from cache...", 36)
+
+        for e in cached_emoji:
+            for f in formats:
+                final_path = format_path(path, e, f)
+                make_dir_structure_for_file(final_path)
+                cache.load_from_cache(e, f, final_path)
+
+        log.out(f"- done!", 32)
+
+    # exif license pass
+    # (currently only just applies to PNGs)
+    # --------------------------------------------------------------------------
+    if ('exif' in m.license) and license_enabled:
+        exif_compatible_images = []
+
+        for e in itertools.chain(exporting_emoji, cached_emoji):
+            for f in formats:
+                if f.split("-")[0] in ["png", "pngc", "avif"]:
+
+                    try:
+                        exif_compatible_images.append(format_path(path, e, f))
+                    except FilterException:
+                        if verbose:
+                            log.out(f"- Emoji filtered from metadata: {e['short']}", 34)
+                        continue
+
+        if exif_compatible_images:
+            log.out(f'Adding EXIF metadata to all compatible raster files...', 36)
+            image_proc.batch_add_exif_metadata(exif_compatible_images, m.license.get('exif'), max_batch)
+
+
+def export_step(exporting_emoji, num_threads, m, input_path, formats, path, renderer, license_enabled, cache):
+    log.out(f"Exporting {len(exporting_emoji)} emoji...", 36)
     log.out(f"- {', '.join(formats)}") # print formats
     log.out(f"- to '{path}'") # print out path
 
@@ -69,7 +119,8 @@ def export(m, filtered_emoji, input_path, formats, path, src_size,
         threads = []
         for i in range(num_threads):
             threads.append(ExportThread(emoji_queue, str(i), len(exporting_emoji),
-                                        m, input_path, formats, path, renderer, license_enabled))
+                                        m, input_path, formats, path, renderer,
+                                        license_enabled, cache))
 
 
         # keeps checking if the export queue is done.
@@ -124,27 +175,3 @@ def export(m, filtered_emoji, input_path, formats, path, src_size,
 
     log.export_task_count = 0
     log.filtered_export_task_count = 0
-
-
-
-
-    # exif license pass
-    # (currently only just applies to PNGs)
-    # --------------------------------------------------------------------------
-    if ('exif' in m.license) and license_enabled:
-        exif_compatible_images = []
-
-        for e in exporting_emoji:
-            for f in formats:
-                if f.split("-")[0] in ["png", "pngc", "avif"]:
-
-                    try:
-                        exif_compatible_images.append(format_path(path, e, f))
-                    except FilterException:
-                        if verbose:
-                            log.out(f"- Emoji filtered from metadata: {e['short']}", 34)
-                        continue
-
-        if exif_compatible_images:
-            log.out(f'Adding EXIF metadata to all compatible raster files...', 36)
-            image_proc.batch_add_exif_metadata(exif_compatible_images, m.license.get('exif'), max_batch)

@@ -4,20 +4,42 @@ def translate_color(svg, pfrom, pto):
     """
     Translates colours from a source file's original colours into new colours.
     """
+    res, _ = _translate_color(svg, pfrom, pto)
+    return res
 
+def translated_colors(svg, pfrom, pto):
+    """
+    Return a dictionary of (entry: to_colour) for the colours that were
+    translated in svg
+    """
+    _, changed = _translate_color(svg, pfrom, pto)
+    return changed
+
+def _translate_color(svg, pfrom, pto):
+    """
+    Translates colours on the svg file from "pfrom" to "pto", reporting also
+    which colours changed.
+    """
     # looks for incidences of one colour, compares it and replaces it.
     res = svg
+    changed = {}
     for centry, ccol in pfrom.items():
         cr = ccol + ';'
         cro = pto.get(centry)
         if not cro:
             continue
         cro += ';'
-        res = re.sub(cr, cro, res, flags=re.IGNORECASE)
+        res, count = re.subn(cr, cro, res, flags=re.IGNORECASE)
         if (cr[1], cr[3], cr[5]) == (cr[2], cr[4], cr[6]):
             cr = cr[0] + cr[1] + cr[3] + cr[5] + ';'
-            res = re.sub(cr, cro, res, flags=re.IGNORECASE)
-    return res
+            res, count2 = re.sub(cr, cro, res, flags=re.IGNORECASE)
+            count += count
+
+        # Record changes
+        if count > 0:
+            changed[centry] = cro
+
+    return (res, changed)
 
 def add_license(svg, license_data):
     """

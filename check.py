@@ -6,7 +6,7 @@ import svg
 import log
 
 def emoji(m, filtered_emoji, input_path, formats, path, src_size,
-           num_threads, renderer, max_batch, verbose):
+           num_threads, renderer, max_batch, cache, verbose):
     """
     Checks all emoji in a very light validation as well as checking if emoji
     aren't filtered out by user choices.
@@ -29,6 +29,8 @@ def emoji(m, filtered_emoji, input_path, formats, path, src_size,
     """
 
     exporting_emoji = []
+    cached_emoji = []
+    partial_cached_emoji_count = 0
     skipped_emoji_count = 0
 
     for i, e in enumerate(filtered_emoji):
@@ -71,9 +73,26 @@ def emoji(m, filtered_emoji, input_path, formats, path, src_size,
                                     str(img_size[0]) + 'x' + str(img_size[1])
                                     ))
 
-        # add the emoji to exporting_emoji if it's passed all the tests.
-        exporting_emoji.append(e)
+        if cache:
+            # set the cache key in the emoji object for later reference
+            emoji_cache_key = cache.get_cache_key(e, m, emoji_svg)
+            e['cache_key'] = emoji_cache_key
+
+            # check if the emoji is in cache
+            cache_status = {f: cache.get_cache(e, f) for f in formats}
+            cached_formats = [f for (f, p) in cache_status.items() if p]
+            if len(cached_formats) == len(formats):
+                cached_emoji.append(e)
+            else:
+                if cached_formats:
+                    partial_cached_emoji_count += 1
+                exporting_emoji.append(e)
+        else:
+            # add the emoji to exporting_emoji if it's passed all the tests.
+            exporting_emoji.append(e)
 
     return { "exporting_emoji" : exporting_emoji
            , "skipped_emoji_count" : skipped_emoji_count
+           , "cached_emoji": cached_emoji
+           , "partial_cached_emoji_count": partial_cached_emoji_count
            }

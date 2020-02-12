@@ -1,3 +1,4 @@
+import os
 import pathlib
 import re
 
@@ -86,3 +87,11 @@ def format_path(path, emoji, format):
         res = res.replace(match, repl)
 
     return res
+
+def make_dir_structure_for_file(path):
+    try:
+        dirname = os.path.dirname(path)
+        if dirname:
+            os.makedirs(dirname, exist_ok=True)
+    except IOError:
+        raise Exception('Could not create directory: ' + dirname)

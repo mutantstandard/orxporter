@@ -8,6 +8,7 @@ from exception import FilterException
 import dest_paths
 import export_task
 import svg
+import util
 import log
 
 class ExportThread:
@@ -16,7 +17,7 @@ class ExportThread:
     exporting tasks from the export queue.
     """
     def __init__(self, queue, name, total, m, input_path, formats, path,
-                 renderer, license_enabled):
+                 renderer, license_enabled, cache):
         self.queue = queue
         self.name = name
         self.total = total
@@ -24,6 +25,7 @@ class ExportThread:
         self.input_path = input_path
         self.formats = formats
         self.path = path
+        self.cache = cache
         self.renderer = renderer
         self.license_enabled = license_enabled
         self.err = None
@@ -59,12 +61,7 @@ class ExportThread:
         final_path = dest_paths.format_path(path, emoji, f)
 
         # try to make the directory for this particular export batch.
-        try:
-            dirname = os.path.dirname(final_path)
-            if dirname:
-                os.makedirs(dirname, exist_ok=True)
-        except IOError:
-            raise Exception('Could not create directory: ' + dirname)
+        dest_paths.make_dir_structure_for_file(final_path)
 
 
         # svg format doesn't involve a resolution so it can go straight to export.
@@ -148,14 +145,21 @@ class ExportThread:
 
                 # convert colormaps (if applicable)
                 if 'color' in emoji:
-                    cmap = self.m.colormaps[emoji['color']]
-                    pfrom = self.m.palettes[cmap['src']]
-                    pto = self.m.palettes[cmap['dst']]
+                    pfrom, pto = util.get_color_palettes(emoji, self.m)
                     emoji_svg = svg.translate_color(emoji_svg, pfrom, pto)
 
                 # for each format in the emoji, export it as that
                 for f in self.formats:
-                    self.export_emoji(emoji, emoji_svg, f, self.path, self.m.license)
+                    final_path = dest_paths.format_path(self.path, emoji, f)
+                    cache_hit = False
+                    if self.cache:
+                        cache_hit = self.cache.load_from_cache(emoji, f,
+                                                               final_path)
+                    if not cache_hit:
+                        self.export_emoji(emoji, emoji_svg, f, self.path,
+                                          self.m.license)
+                        if self.cache:
+                            self.cache.save_to_cache(emoji, f, final_path)
 
                 # tell the progress bar that this task has been completed.
                 log.export_task_count += 1
