@@ -1,9 +1,5 @@
 ![Orxporter logo with 'orxporter' next to it, in white against a lime green background.](orxporter_logo.png)
 
-Emoji exporter used for Mutant Standard emoji set
-
-# Introduction
-
 orxporter is a rich toolkit for organising and exporting an SVG-based emoji set.
 It has a system for storing emoji metadata and making large batch export operations
 with that metadata, including multi-format and multi-resolution batch rendering,
@@ -29,16 +25,17 @@ Mutant Standard's [code of conduct](docs/code_of_conduct.md).
 
 # Features
 
-- Declarative language for defining semantics of emoji set
-- Color mapping (recoloring)
+- A custom declarative language for defining your emoji semantics and metadata
+- Color remapping
 - Outputting emoji both as shortcode-named files (ie. 'ice_cream') and unicode codepoint-named files (ie. '1f368')
 - Export to SVG, PNG, Lossless WebP, Lossless AVIF and FLIF
 - Optional lossless crushing of SVG and PNG files
 - Supports multiple SVG renderers (rendersvg, Inkscape and ImageMagick)
-- Output options including emoji filtering, customisable export directory
-  structure and filenaming
+- Output options including emoji filtering, export directory
+  structure and filenames
 - JSON output of emoji set metadata
 - SVG and EXIF licensing metadata embedding
+- Optional caching to save time on re-exporting
 - Multithreading
 
 
@@ -76,7 +73,8 @@ A longer guide with simpler language for those who are less techincally inclined
 
 # Contributors
 
-* AndrewMontagne - imagemagick support
+* @AndrewMontagne - imagemagick support
+* @shello - caching
 
 # License
 

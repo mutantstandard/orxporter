@@ -14,6 +14,7 @@ Here are the command line options:
   files are meant to be self-contained, this is relative to the manifest
   filepath (default: **in**)
 - **-o PATH** -- specifies output directory path; this is relative to the
+- **-C PATH** -- (optional) specifies a cache path to save time on repeat exports
   current directory (default: **out**)
 - **-f PATH_EXPR** -- specifies output filenaming for emoji; the following
   formatting codes are supported: **%c** for colormap, **%d** for source
