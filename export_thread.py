@@ -153,6 +153,7 @@ class ExportThread:
                     final_path = dest_paths.format_path(self.path, emoji, f)
                     cache_hit = False
                     if self.cache:
+                        dest_paths.make_dir_structure_for_file(final_path)
                         cache_hit = self.cache.load_from_cache(emoji, f,
                                                                final_path)
                     if not cache_hit:
