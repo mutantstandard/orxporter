@@ -80,12 +80,21 @@ def export(m, filtered_emoji, input_path, formats, path, src_size,
     if cached_emoji:
         log.out(f"Copying {len(cached_emoji)} emoji from cache...", 36)
 
-        for e in cached_emoji:
-            for f in formats:
-                final_path = format_path(path, e, f)
-                make_dir_structure_for_file(final_path)
-                cache.load_from_cache(e, f, final_path)
+        bar = log.get_progress_bar(max=len(cached_emoji))
 
+        try:
+            for e in cached_emoji:
+                bar.next()
+                for f in formats:
+                    final_path = format_path(path, e, f)
+                    make_dir_structure_for_file(final_path)
+                    cache.load_from_cache(e, f, final_path)
+        except (KeyboardInterrupt, SystemExit):
+            # Make sure the bar is properly set if oxporter is told to exit
+            bar.finish()
+
+
+        bar.finish()
         log.out(f"- done!", 32)
 
 
@@ -139,11 +148,11 @@ def export_step(exporting_emoji, num_threads, m, input_path, formats, path, rend
 
 
         # keeps checking if the export queue is done.
-        log.bar.max = len(exporting_emoji)
+        bar = log.get_progress_bar(max=len(exporting_emoji))
         while True:
             done = emoji_queue.empty()
 
-            log.bar.goto(log.export_task_count)
+            bar.goto(log.export_task_count)
 
             # if the thread has an error, properly terminate it
             # and then raise an error.
@@ -167,14 +176,14 @@ def export_step(exporting_emoji, num_threads, m, input_path, formats, path, rend
             t.join()
 
 
-        log.bar.goto(log.export_task_count)
-        log.bar.finish()
+        bar.goto(log.export_task_count)
+        bar.finish()
 
 
     except (KeyboardInterrupt, SystemExit):
         # make sure all those threads are tidied before exiting the program.
         # also make sure the bar is finished so it doesnt eat the cursor.
-        log.bar.finish()
+        bar.finish()
         log.out(f'Stopping threads and tidying up...', 93)
         if threads:
             for t in threads:
