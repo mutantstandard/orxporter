@@ -52,8 +52,9 @@ def export(m, filtered_emoji, input_path, formats, path, src_size,
 
     if partial_cached_emoji_count:
         log.out(f"->[partial] {partial_cached_emoji_count} emoji will be partly reused from cache.", 34)
-
-    log.out(f"->[export]  {len(exporting_emoji) - partial_cached_emoji_count} emoji will be fully exported.", 34)
+        log.out(f"->[export]  {len(exporting_emoji) - partial_cached_emoji_count} emoji will be fully exported.", 34)
+    else:
+        log.out(f"->[export]  {len(exporting_emoji) - partial_cached_emoji_count} emoji will be exported.", 34)
 
 
     # If there's no emoji to export, tell the program to quit.
