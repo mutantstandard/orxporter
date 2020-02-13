@@ -82,12 +82,17 @@ def export(m, filtered_emoji, input_path, formats, path, src_size,
 
         bar = log.get_progress_bar(max=len(cached_emoji))
 
-        for e in cached_emoji:
-            bar.next()
-            for f in formats:
-                final_path = format_path(path, e, f)
-                make_dir_structure_for_file(final_path)
-                cache.load_from_cache(e, f, final_path)
+        try:
+            for e in cached_emoji:
+                bar.next()
+                for f in formats:
+                    final_path = format_path(path, e, f)
+                    make_dir_structure_for_file(final_path)
+                    cache.load_from_cache(e, f, final_path)
+        except (KeyboardInterrupt, SystemExit):
+            # Make sure the bar is properly set if oxporter is told to exit
+            bar.finish()
+
 
         bar.finish()
         log.out(f"- done!", 32)
