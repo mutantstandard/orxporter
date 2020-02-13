@@ -34,22 +34,34 @@ def export(m, filtered_emoji, input_path, formats, path, src_size,
     partial_cached_emoji_count = check_result["partial_cached_emoji_count"]
     skipped_emoji_count = check_result["skipped_emoji_count"]
 
-    if skipped_emoji_count > 0:
-        log.out(f"- {skipped_emoji_count} emoji have been skipped, leaving {len(exporting_emoji)} emoji to export.", 34)
 
+    # report back how the export is going to go
+    # --------------------------------------------------------------------------
+    if skipped_emoji_count and verbose:
+        log.out(f"", 34) # make a new line to break it up
+
+    log.out(f"Output plan:", 34)
+
+    if skipped_emoji_count:
+        log.out(f"->[skip]    {skipped_emoji_count} emoji will be skipped.", 34)
         if not verbose:
-            log.out(f"- use the --verbose flag to see what those emoji are and why they were skipped.", 34)
-    if cached_emoji:
-        log.out(f"- {len(cached_emoji)} emoji will be reused from cache.", 32)
+            log.out(f"            (use the --verbose flag to see what those emoji are and why they are being skipped.)", 34)
+
+    if cached_emoji or partial_cached_emoji_count:
+        log.out(f"->[cache]   {len(cached_emoji)} emoji will be reused from cache.", 34)
+
     if partial_cached_emoji_count:
-        log.out(f"- {partial_cached_emoji_count} emoji will be partially "
-                "reused from cache.", 32)
-    log.out('- done!', 32)
+        log.out(f"->[partial] {partial_cached_emoji_count} emoji will be partly reused from cache.", 34)
+
+    log.out(f"->[export]  {len(exporting_emoji) - partial_cached_emoji_count} emoji will be fully exported.", 34)
 
 
     # If there's no emoji to export, tell the program to quit.
+    # --------------------------------------------------------------------------
     if len(exporting_emoji) == 0 and len(cached_emoji) == 0:
         raise SystemExit('>∆∆< It looks like you have no emoji to export!')
+
+
 
 
     # export emoji
@@ -75,6 +87,7 @@ def export(m, filtered_emoji, input_path, formats, path, src_size,
 
         log.out(f"- done!", 32)
 
+
     # exif license pass
     # (currently only just applies to PNGs)
     # --------------------------------------------------------------------------
@@ -97,15 +110,16 @@ def export(m, filtered_emoji, input_path, formats, path, src_size,
             image_proc.batch_add_exif_metadata(exif_compatible_images, m.license.get('exif'), max_batch)
 
 
+
+
+
 def export_step(exporting_emoji, num_threads, m, input_path, formats, path, renderer, license_enabled, cache):
     log.out(f"Exporting {len(exporting_emoji)} emoji...", 36)
-    log.out(f"- {', '.join(formats)}") # print formats
-    log.out(f"- to '{path}'") # print out path
 
     if num_threads > 1:
-        log.out(f"- {num_threads} threads")
+        log.out(f"-> {num_threads} threads")
     else:
-        log.out(f"- {num_threads} thread")
+        log.out(f"-> {num_threads} thread")
 
     try:
         # start a Queue object for emoji export
@@ -137,7 +151,7 @@ def export_step(exporting_emoji, num_threads, m, input_path, formats, path, rend
                     for u in threads:
                         u.kill()
                         u.join()
-                        
+
                     raise ValueError(f'Thread {t.name} failed: {t.err}')
 
             if done:
@@ -169,9 +183,9 @@ def export_step(exporting_emoji, num_threads, m, input_path, formats, path, rend
         raise
 
 
-    log.out('- done!', 32)
+    log.out('done!', 32)
     if log.filtered_export_task_count > 0:
-        log.out(f"- {log.filtered_export_task_count} emoji have been implicitly or explicitly filtered out of this export task.", 34)
+        log.out(f"-> {log.filtered_export_task_count} emoji have been implicitly or explicitly filtered out of this export task.", 34)
 
     log.export_task_count = 0
     log.filtered_export_task_count = 0

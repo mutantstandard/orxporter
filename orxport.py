@@ -215,13 +215,13 @@ def main():
         log.out(f'Loading manifest file...', 36)
         m = orx.manifest.Manifest(os.path.dirname(manifest_path),
                               os.path.basename(manifest_path))
-        log.out(f'- {len(m.emoji)} emoji defined.', 32)
+        log.out(f'-> {len(m.emoji)} emoji defined.')
 
         # filter emoji (if any filter is present)
         filtered_emoji = [e for e in m.emoji if emoji.match(e, emoji_filter)]
         if emoji_filter:
             if filtered_emoji: # if more than 0
-                log.out(f'- {len(filtered_emoji)} / {len(m.emoji)} emoji match the filter you gave.', 34)
+                log.out(f'-> {len(filtered_emoji)} / {len(m.emoji)} emoji match the filter you gave.', 34)
             else:
                 raise ValueError(f"Your filter ('{emoji_filter_text}') returned no results.")
 
@@ -257,10 +257,14 @@ def main():
                 makeshift_params = f"dest  structure = {output_naming}   format = {' '.join(output_formats)}   license = {license_text}"
                 p = orx.params.Parameters(string = makeshift_params)
 
-            log.out(f'- {len(p.dests)} destination(s) defined.', 32)
+            path = os.path.join(output_path, output_naming)
+
+            log.out(f'{len(p.dests)} destination(s) defined.', 32)
+            log.out(f"-> {', '.join(output_formats)}") # print formats
+            log.out(f"-> to '{path}'") # print out path
 
             export.export(m, filtered_emoji, input_path, output_formats,
-                          os.path.join(output_path, output_naming), src_size,
+                          path, src_size,
                           num_threads, renderer, max_batch, verbose,
                           license_enabled, cache)
 
