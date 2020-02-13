@@ -108,7 +108,46 @@ final/something/png-32/hand.png
 
 ```
 ----
+## Export format by itself (`%i`)
 
+Inserts the [image format name](image_formats.md) without size. (ie. `png`, `svg`, `flif`, etc.)
+
+```
+# manifest example
+emoji   short = hand  src = blah/blah/hand.svg
+
+# out folder
+final
+
+# directory format example
+final/something/%i/%s
+
+# output (assuming it's a PNG)
+final/something/png/hand.png
+
+```
+---
+
+## Export size (`%z`)
+
+Inserts the [size declared in the image format](image_formats.md) (ie. `32`, `128`, `512`, etc.)
+If it's an SVG (which has no size), it will return '0'.
+
+```
+# manifest example
+emoji   short = hand  src = blah/blah/hand.svg
+
+# out folder
+final
+
+# directory format example
+final/%i/%z/%s
+
+# output (assuming it's a PNG at 128px)
+final/png/128/hand.png
+
+```
+---
 ## Shortcode (`%s`)
 
 Inserts the emoji's shortcode.

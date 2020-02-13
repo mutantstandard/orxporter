@@ -14,7 +14,7 @@ orxporter uses svgcleaner with the following command:
 `svgcleaner <in file> <out file> --remove-metadata=no --quiet`
 
 In Mutant Standard tests, optimised SVGs are 30-40% smaller than normal SVGs.
-However, svgcleaner is not perfect and can create some unexpected inconsistencies from the original version, so if you use this, you should check your input for flaws.
+However, svgcleaner is not perfect and can create some unexpected inconsistencies from the original version, so if you use this, you should check your output for possible inconsistencies.
 
 
 ### Raster

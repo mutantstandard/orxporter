@@ -76,6 +76,8 @@ A longer guide with simpler language for those who are less techincally inclined
 * @AndrewMontagne - imagemagick support
 * @shello - caching
 
+[Old changelog from 0.1.0 to 0.2.0](docs/old_changelog.md)
+
 # License
 
 orxporter is licensed under the [Cooperative Non-Violent License (CNPL) v4](license.txt).

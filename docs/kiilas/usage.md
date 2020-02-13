@@ -18,7 +18,8 @@ Here are the command line options:
   current directory (default: **out**)
 - **-f PATH_EXPR** -- specifies output filenaming for emoji; the following
   formatting codes are supported: **%c** for colormap, **%d** for source
-  image's directory within input directory, **%f** for export format used,
+  image's directory within input directory, **%f** for export format used, **%i**
+  for image format without size, **%z** for image size without format (will return 0 for SVGs),
   **%s** for shortcode, **%u** for unicode sequence, **%(property_name)** for
   emoji's property; (default: **%f/%s**)
 - **-F FORMAT[,FORMAT...]** -- specifies output formats; the following

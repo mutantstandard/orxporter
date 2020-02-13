@@ -30,9 +30,27 @@ def format_resolve(code, emoji, format):
             raise ValueError('Cannot resolve %d - no emoji source file defined')
         return str(pathlib.Path(emoji['src']).parent)
 
-    # (%f) export format (png, webp, jpx, etc.)
+
+
+
+    # (%f) export format (png-64, webp-128, etc.)
     if code == 'f':
         return format
+
+    # (%z) export size (64, 128, 512, etc.)
+    # will return 0 (as a string) if it's SVG.
+    if code == 'z':
+        if format.split("-")[0] in ["svg", "svgo"]: # if there's no size...
+            return "0"
+        else:
+            return format.split("-")[1]
+
+    # (%i) image format, without size (png, webp, avif, etc.)
+    if code == 'i':
+        return format.split("-")[0]
+
+
+
 
     # (%s) the emoji's shortcode
     if code == 's':
@@ -47,6 +65,7 @@ def format_resolve(code, emoji, format):
         if '!' in emoji['code']:
             raise FilterException('Cannot resolve %u (unicode codepoint is explicitly undefined )')
         return util.uni_to_hex_filename(emoji['code'])
+
 
     raise ValueError('Cannot resolve format code: ' + code)
 
