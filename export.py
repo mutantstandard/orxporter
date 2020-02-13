@@ -139,11 +139,11 @@ def export_step(exporting_emoji, num_threads, m, input_path, formats, path, rend
 
 
         # keeps checking if the export queue is done.
-        log.bar.max = len(exporting_emoji)
+        bar = log.get_progress_bar(max=len(exporting_emoji))
         while True:
             done = emoji_queue.empty()
 
-            log.bar.goto(log.export_task_count)
+            bar.goto(log.export_task_count)
 
             # if the thread has an error, properly terminate it
             # and then raise an error.
@@ -167,14 +167,14 @@ def export_step(exporting_emoji, num_threads, m, input_path, formats, path, rend
             t.join()
 
 
-        log.bar.goto(log.export_task_count)
-        log.bar.finish()
+        bar.goto(log.export_task_count)
+        bar.finish()
 
 
     except (KeyboardInterrupt, SystemExit):
         # make sure all those threads are tidied before exiting the program.
         # also make sure the bar is finished so it doesnt eat the cursor.
-        log.bar.finish()
+        bar.finish()
         log.out(f'Stopping threads and tidying up...', 93)
         if threads:
             for t in threads:

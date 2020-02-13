@@ -13,6 +13,13 @@ def out(s='', color=37, indent=0, thread_name=None):
     for line in s.split('\n'):
         out_line(line, color, indent, thread_name)
 
+def get_progress_bar(**kwargs):
+    bar = IncrementalBar(**kwargs)
+    bar.suffix = "%(index)d / %(max)d (%(elapsed_td)s)"
+
+    return bar
+
+
 use_color = True
 show_threads = True
 thread_color = 34
@@ -21,5 +28,3 @@ thread_color = 34
 # stuff for progress bars
 export_task_count = 0
 filtered_export_task_count = 0
-bar = IncrementalBar()
-bar.suffix = "%(index)d / %(max)d (%(elapsed_td)s)"
