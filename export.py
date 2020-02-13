@@ -80,12 +80,16 @@ def export(m, filtered_emoji, input_path, formats, path, src_size,
     if cached_emoji:
         log.out(f"Copying {len(cached_emoji)} emoji from cache...", 36)
 
+        bar = log.get_progress_bar(max=len(cached_emoji))
+
         for e in cached_emoji:
+            bar.next()
             for f in formats:
                 final_path = format_path(path, e, f)
                 make_dir_structure_for_file(final_path)
                 cache.load_from_cache(e, f, final_path)
 
+        bar.finish()
         log.out(f"- done!", 32)
 
 
