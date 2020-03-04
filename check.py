@@ -75,8 +75,8 @@ def emoji(m, filtered_emoji, input_path, formats, path, src_size,
 
         if cache:
             # set the cache key in the emoji object for later reference
-            emoji_cache_key = cache.get_cache_key(e, m, emoji_svg)
-            e['cache_key'] = emoji_cache_key
+            emoji_cache_keys = cache.get_cache_keys(e, m, emoji_svg)
+            e['cache_keys'] = emoji_cache_keys
 
             # check if the emoji is in cache
             cache_status = {f: cache.get_cache(e, f) for f in formats}

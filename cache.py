@@ -16,6 +16,7 @@ class Cache:
     files are named by their key, which is generated from:
       - the source file of the emoji;
       - the colour modifiers applied to the emoji;
+      - the license, being applied to the files, if present;
 
     This defines how the emoji looks, and makes it such that a change in either
     the source or the manifest palette will not reuse the file in cache.
@@ -49,16 +50,29 @@ class Cache:
         return True
 
     @staticmethod
-    def get_cache_key(emoji, manifest, emoji_src):
+    def generate_cache_key_from_parts(key_parts):
         """
-        Get the cache key for a given emoji.
+        Calculate a unique hash from the given key parts, building the data to
+        feed to the algorithm from the repr() encoded as UTF-8.
+        This should be stable as long as the inputs are the same, as we're
+        using data structures with an order guarantee.
+        """
+        raw_key = bytes(repr(key_parts), 'utf-8')
+        return hashlib.sha256(raw_key).hexdigest()
+
+    @staticmethod
+    def get_cache_keys(emoji, manifest, emoji_src, license_enabled):
+        """
+        Get the cache keys for a given emoji, base and for each license format
+        if license_enabled is set.
 
         This needs to take into account multiple parts:
             - SVG source file: Allows tracking changes to the source
             - Colour modifiers, if applicable: Tracks changes in the manifest
+            - License contents, only for each of the license formats
         """
-        if 'cache_key' in emoji:
-            return emoji['cache_key']
+        if 'cache_keys' in emoji:
+            return emoji['cache_keys']
 
         src = emoji_src
         if isinstance(src, collections.abc.ByteString):
@@ -75,31 +89,70 @@ class Cache:
             colors = sorted(changed.items())
 
         # Collect the parts
-        key_parts = (
+        key_parts_base = (
             ('src_hash', src_hash),
             ('colors', colors),
         )
 
-        # Calculate a unique hash from the parts, building the data to feed
-        # to the algorithm from the repr() encoded as UTF-8.
-        # This should be stable as long as the inputs are the same, as we're
-        # using data structures with an order guarantee.
-        raw_key = bytes(repr(key_parts), 'utf-8')
-        key = hashlib.sha256(raw_key).hexdigest()
+        key_base = Cache.generate_cache_key_from_parts(key_parts_base)
+        key_licenses = None
 
-        return key
+        if license_enabled:
+            key_licenses = {}
+            for license in manifest.license:
+                # Obtain the license to add to the key parts
+                license_content = bytes(repr(manifest.license[license]),
+                                        'utf-8')
+                key_parts = key_parts_base + (('license', license_content), )
 
-    def build_emoji_cache_path(self, emoji, f):
+                key = Cache.generate_cache_key_from_parts(key_parts)
+                key_licenses[license] = key
+
+        keys = {
+            'base': key_base,
+            'licenses': key_licenses,
+        }
+
+        return keys
+
+    def build_emoji_cache_path(self, emoji, f, license_enabled):
         """
-        Build the full path to the cache emoji file (regardless of presence).
-        This requires the 'cache_key' field of the emoji object that is passed
+        Build the full path to the cache emoji file (regardless of existence).
+        If `license_enabled` is `True` the path for the given format with
+        license is built and returned.
+        This requires the 'cache_keys' field of the emoji object that is passed
         to be present.
+        If `license_enabled` is `True`, then the license type for the given
+        format is used to build the path; if the format `f` does not support a
+        license `None` is returned instead.
         """
-        if 'cache_key' not in emoji:
+        if 'cache_keys' not in emoji or 'base' not in emoji['cache_keys']:
             raise RuntimeError("Emoji '{}' does not have a cache key "
                                "set!".format(emoji['short']))
-        dir_path = self.build_cache_dir_by_format(f)
-        return os.path.join(dir_path, emoji['cache_key'])
+
+        cache_key = None
+
+        if license_enabled:
+            if 'licenses' not in emoji['cache_keys']:
+                raise RuntimeError(f"Emoji '{emoji['short']}' does not have a "
+                                   "cache key set for licenses.")
+
+            license_type = util.get_license_type_for_format(f)
+            if license_type:
+                if license_type in emoji['cache_keys']['licenses']:
+                    cache_key = emoji['cache_keys']['licenses'][license_type]
+                else:
+                    raise RuntimeError(f"License type '{license_type}' cache "
+                                       f"key not present for emoji "
+                                       f"'{emoji['short']}'.")
+        else:
+            cache_key = emoji['cache_keys']['base']
+
+        if cache_key:
+            dir_path = self.build_cache_dir_by_format(f)
+            return os.path.join(dir_path, cache_key)
+        else:
+            return None
 
     def build_cache_dir_by_format(self, f):
         """
@@ -127,23 +180,40 @@ class Cache:
 
         return dir_path
 
-    def get_cache(self, emoji, f):
+    def get_cache(self, emoji, f, license_enabled):
         """
-        Get the path to an existing emoji in a given format f that is in cache.
+        Get the path to an existing emoji in a given format `f` that is in
+        cache, or `None` if the cache file does not exist.
+        If `license_enabled` is `False`, the cache file for a non-licensed
+        export of the format `f` is looked up.
+        If `license_enabled` is `True`, the cache file for a licensed export of
+        the format `f` is looked up; if `f` does not support a license, `None`
+        is returned.
         """
-        cache_file = self.build_emoji_cache_path(emoji, f)
-        if os.path.exists(cache_file):
+        cache_file = self.build_emoji_cache_path(emoji, f, license_enabled)
+        if cache_file and os.path.exists(cache_file):
             return cache_file
 
-        return False
+        return None
 
-    def save_to_cache(self, emoji, f, export_path):
-        """Copy an exported path to the cache directory."""
+    def save_to_cache(self, emoji, f, export_path, license_enabled):
+        """
+        Copy an exported path to the cache directory.
+        If `license_enabled` is `False`, the `export_path` will be copied to a
+        cache key for a base export of the format.
+        If `license_enabled` is `True`, the `export_path` will be copied to a
+        cache key for a licensed form of the format `f`; if the format `f` does
+        not support a license but `license_enabled` is set, `False` is
+        returned.
+        """
         if not os.path.exists(export_path):
             raise RuntimeError("Could not find exported emoji '{}' at "
                                "'{}'".format(emoji['short'], export_path))
 
-        cache_file = self.build_emoji_cache_path(emoji, f)
+        cache_file = self.build_emoji_cache_path(emoji, f, license_enabled)
+
+        if cache_file is None:
+            return False
 
         try:
             shutil.copy(export_path, cache_file)
@@ -154,12 +224,19 @@ class Cache:
 
         return True
 
-    def load_from_cache(self, emoji, f, export_path):
-        """Copy an emoji from cache to its final path."""
+    def load_from_cache(self, emoji, f, export_path, license_enabled):
+        """
+        Copy an emoji from cache to its final path, `export_path`.
+        If `license_enabled` is `False`, the cache for a non-licensed format
+        `f` is looked up, and copied if it exists.
+        If `license_enabled` is `True`, the cache for a licensed format `f` is
+        looked up and copied if it exists; if `f` does not support a license,
+        `False` is returned.
+        """
         if not self.cache_dir:
             return False
 
-        cache_file = self.get_cache(emoji, f)
+        cache_file = self.get_cache(emoji, f, license_enabled)
         if not cache_file:
             return False
 
