@@ -10,6 +10,7 @@ from export_thread import ExportThread
 from dest_paths import format_path, make_dir_structure_for_file
 import image_proc
 import log
+from util import get_formats_for_license_type
 
 
 
@@ -106,7 +107,7 @@ def export(m, filtered_emoji, input_path, formats, path, src_size,
 
         for e in itertools.chain(exporting_emoji, cached_emoji):
             for f in formats:
-                if f.split("-")[0] in ["png", "pngc", "avif"]:
+                if f.split("-")[0] in get_formats_for_license_type('exif'):
 
                     try:
                         exif_compatible_images.append(format_path(path, e, f))

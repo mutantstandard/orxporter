@@ -66,9 +66,11 @@ class ExportThread:
 
         # svg format doesn't involve a resolution so it can go straight to export.
         if f == 'svg':
-            export_task.to_svg(emoji_svg, final_path, self.name, license.get('svg'), self.license_enabled, optimise=False)
+            svg_license = license.get(util.get_license_type_for_format(f))
+            export_task.to_svg(emoji_svg, final_path, self.name, svg_license, self.license_enabled, optimise=False)
         elif f == 'svgo':
-            export_task.to_svg(emoji_svg, final_path, self.name, license.get('svg'), self.license_enabled, optimise=True)
+            svg_license = license.get(util.get_license_type_for_format(f))
+            export_task.to_svg(emoji_svg, final_path, self.name, svg_license, self.license_enabled, optimise=True)
 
         else:
             # any format other than svg is a raster, therefore it needs
