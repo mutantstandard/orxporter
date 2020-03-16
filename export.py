@@ -112,10 +112,11 @@ def export(m, filtered_emoji, input_path, formats, path, src_size,
     # --------------------------------------------------------------------------
     if ('exif' in m.license) and license_enabled:
         exif_compatible_images = []
+        exif_supported_formats = get_formats_for_license_type('exif')
 
         for e, fs in itertools.chain(exporting_emoji, cached_emoji['exports']):
             for f in fs:
-                if f.split("-")[0] in get_formats_for_license_type('exif'):
+                if f.split("-")[0] in exif_supported_formats:
 
                     try:
                         final_path = format_path(path, e, f)
