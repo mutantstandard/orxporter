@@ -92,6 +92,7 @@ def export(m, filtered_emoji, input_path, formats, path, src_size,
         except (KeyboardInterrupt, SystemExit):
             # Make sure the bar is properly set if oxporter is told to exit
             bar.finish()
+            raise
 
 
         bar.finish()
