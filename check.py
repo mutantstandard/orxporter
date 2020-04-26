@@ -6,7 +6,7 @@ import svg
 import log
 
 def emoji(m, filtered_emoji, input_path, formats, path, src_size,
-           num_threads, renderer, max_batch, cache, verbose):
+           num_threads, renderer, max_batch, cache, license_enabled, verbose):
     """
     Checks all emoji in a very light validation as well as checking if emoji
     aren't filtered out by user choices.
@@ -29,8 +29,11 @@ def emoji(m, filtered_emoji, input_path, formats, path, src_size,
     """
 
     exporting_emoji = []
-    cached_emoji = []
-    partial_cached_emoji_count = 0
+    cached_emoji = {
+        'exports': [],
+        'licensed_exports': []
+    }
+    cached_emoji_count = 0  # Required to give a correct count without overlap
     skipped_emoji_count = 0
 
     for i, e in enumerate(filtered_emoji):
@@ -74,25 +77,54 @@ def emoji(m, filtered_emoji, input_path, formats, path, src_size,
                                     ))
 
         if cache:
-            # set the cache key in the emoji object for later reference
-            emoji_cache_key = cache.get_cache_key(e, m, emoji_svg)
-            e['cache_key'] = emoji_cache_key
+            # prime the cache keys in the emoji for later
+            emoji_cache_keys = cache.get_cache_keys(e, m, emoji_svg,
+                                                    license_enabled)
+            e['cache_keys'] = emoji_cache_keys
 
             # check if the emoji is in cache
-            cache_status = {f: cache.get_cache(e, f) for f in formats}
-            cached_formats = [f for (f, p) in cache_status.items() if p]
-            if len(cached_formats) == len(formats):
-                cached_emoji.append(e)
-            else:
-                if cached_formats:
-                    partial_cached_emoji_count += 1
-                exporting_emoji.append(e)
+            formats_status = {
+                'licensed_export': [],
+                'export': [],
+                'no_cache': []
+            }
+            for f in formats:
+                status = None
+
+                # Attempt to find a licensed export in cache
+                if license_enabled:
+                    status = cache.get_cache(e, f, license_enabled)
+                    if status:
+                        formats_status['licensed_export'].append(f)
+
+                # Attempt to find a non-licensed export in cache
+                if status is None:
+                    status = cache.get_cache(e, f, license_enabled=False)
+                    if status:
+                        formats_status['export'].append(f)
+                    else:
+                        formats_status['no_cache'].append(f)
+
+            # Assign the formats to their cache status and export bins
+            if formats_status['licensed_export']:
+                cached_emoji['licensed_exports'].append((e, formats_status['licensed_export']))
+
+            if formats_status['export']:
+                cached_emoji['exports'].append((e, formats_status['export']))
+
+            if formats_status['export'] or formats_status['licensed_export']:
+                cached_emoji_count += 1
+
+            if formats_status['no_cache']:
+                exporting_emoji.append((e, formats_status['no_cache']))
+
         else:
             # add the emoji to exporting_emoji if it's passed all the tests.
-            exporting_emoji.append(e)
+            # Cache is not enabled; pass all formats to exporting.
+            exporting_emoji.append((e, formats))
 
     return { "exporting_emoji" : exporting_emoji
            , "skipped_emoji_count" : skipped_emoji_count
            , "cached_emoji": cached_emoji
-           , "partial_cached_emoji_count": partial_cached_emoji_count
+           , "cached_emoji_count": cached_emoji_count
            }

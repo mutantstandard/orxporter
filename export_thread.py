@@ -16,16 +16,14 @@ class ExportThread:
     A class representing and managing a single thread that executes
     exporting tasks from the export queue.
     """
-    def __init__(self, queue, name, total, m, input_path, formats, path,
-                 renderer, license_enabled, cache):
+    def __init__(self, queue, name, total, m, input_path, path,
+                 renderer, license_enabled):
         self.queue = queue
         self.name = name
         self.total = total
         self.m = m
         self.input_path = input_path
-        self.formats = formats
         self.path = path
-        self.cache = cache
         self.renderer = renderer
         self.license_enabled = license_enabled
         self.err = None
@@ -66,9 +64,11 @@ class ExportThread:
 
         # svg format doesn't involve a resolution so it can go straight to export.
         if f == 'svg':
-            export_task.to_svg(emoji_svg, final_path, self.name, license.get('svg'), self.license_enabled, optimise=False)
+            svg_license = license.get(util.get_license_type_for_format(f))
+            export_task.to_svg(emoji_svg, final_path, self.name, svg_license, self.license_enabled, optimise=False)
         elif f == 'svgo':
-            export_task.to_svg(emoji_svg, final_path, self.name, license.get('svg'), self.license_enabled, optimise=True)
+            svg_license = license.get(util.get_license_type_for_format(f))
+            export_task.to_svg(emoji_svg, final_path, self.name, svg_license, self.license_enabled, optimise=True)
 
         else:
             # any format other than svg is a raster, therefore it needs
@@ -121,7 +121,7 @@ class ExportThread:
                 # try to get an item from the queue.
                 # break the loop if nothing is left.
                 try:
-                    i, emoji = self.queue.get_nowait()
+                    i, (emoji, formats) = self.queue.get_nowait()
                 except queue.Empty:
                     break
 
@@ -149,18 +149,9 @@ class ExportThread:
                     emoji_svg = svg.translate_color(emoji_svg, pfrom, pto)
 
                 # for each format in the emoji, export it as that
-                for f in self.formats:
-                    final_path = dest_paths.format_path(self.path, emoji, f)
-                    cache_hit = False
-                    if self.cache:
-                        dest_paths.make_dir_structure_for_file(final_path)
-                        cache_hit = self.cache.load_from_cache(emoji, f,
-                                                               final_path)
-                    if not cache_hit:
-                        self.export_emoji(emoji, emoji_svg, f, self.path,
+                for f in formats:
+                    self.export_emoji(emoji, emoji_svg, f, self.path,
                                           self.m.license)
-                        if self.cache:
-                            self.cache.save_to_cache(emoji, f, final_path)
 
                 # tell the progress bar that this task has been completed.
                 log.export_task_count += 1

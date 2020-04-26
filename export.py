@@ -10,6 +10,7 @@ from export_thread import ExportThread
 from dest_paths import format_path, make_dir_structure_for_file
 import image_proc
 import log
+from util import get_formats_for_license_type
 
 
 
@@ -27,11 +28,11 @@ def export(m, filtered_emoji, input_path, formats, path, src_size,
     # --------------------------------------------------------------------------
     log.out('Checking emoji...', 36)
     check_result = check.emoji(m, filtered_emoji, input_path, formats, path, src_size,
-               num_threads, renderer, max_batch, cache, verbose)
+               num_threads, renderer, max_batch, cache, license_enabled, verbose)
 
     exporting_emoji = check_result["exporting_emoji"]
     cached_emoji = check_result["cached_emoji"]
-    partial_cached_emoji_count = check_result["partial_cached_emoji_count"]
+    cached_emoji_count = check_result["cached_emoji_count"]
     skipped_emoji_count = check_result["skipped_emoji_count"]
 
 
@@ -47,19 +48,18 @@ def export(m, filtered_emoji, input_path, formats, path, src_size,
         if not verbose:
             log.out(f"            (use the --verbose flag to see what those emoji are and why they are being skipped.)", 34)
 
-    if cached_emoji or partial_cached_emoji_count:
-        log.out(f"->[cache]   {len(cached_emoji)} emoji will be reused from cache.", 34)
+    if cached_emoji_count:
+        log.out(f"->[cache]   {cached_emoji_count} emoji will be reused from cache.", 34)
+        if verbose:
+            log.out(f"->[cache]      {len(cached_emoji['licensed_exports'])} licensed exports.", 34)
+            log.out(f"->[cache]      {len(cached_emoji['exports'])} non-licensed exports.", 34)
 
-    if partial_cached_emoji_count:
-        log.out(f"->[partial] {partial_cached_emoji_count} emoji will be partly reused from cache.", 34)
-        log.out(f"->[export]  {len(exporting_emoji) - partial_cached_emoji_count} emoji will be fully exported.", 34)
-    else:
-        log.out(f"->[export]  {len(exporting_emoji) - partial_cached_emoji_count} emoji will be exported.", 34)
+    log.out(f"->[export]  {len(exporting_emoji)} emoji will be exported.", 34)
 
 
     # If there's no emoji to export, tell the program to quit.
     # --------------------------------------------------------------------------
-    if len(exporting_emoji) == 0 and len(cached_emoji) == 0:
+    if len(exporting_emoji) == 0 and cached_emoji_count == 0:
         raise SystemExit('>∆∆< It looks like you have no emoji to export!')
 
 
@@ -70,25 +70,34 @@ def export(m, filtered_emoji, input_path, formats, path, src_size,
     # declare some specs of this export.
 
     if exporting_emoji:
-        export_step(exporting_emoji, num_threads, m, input_path, formats, path,
+        export_step(exporting_emoji, num_threads, m, input_path, path,
                     renderer, license_enabled, cache)
 
 
 
     # Copy files from cache
     # --------------------------------------------------------------------------
-    if cached_emoji:
-        log.out(f"Copying {len(cached_emoji)} emoji from cache...", 36)
+    if cached_emoji_count > 0:
+        log.out(f"Copying {cached_emoji_count} emoji from cache...", 36)
 
-        bar = log.get_progress_bar(max=len(cached_emoji))
+        bar = log.get_progress_bar(max=cached_emoji_count)
 
         try:
-            for e in cached_emoji:
+            # Copy the exports (without license)
+            for e, fs in cached_emoji['exports']:
                 bar.next()
-                for f in formats:
+                for f in fs:
                     final_path = format_path(path, e, f)
                     make_dir_structure_for_file(final_path)
-                    cache.load_from_cache(e, f, final_path)
+                    cache.load_from_cache(e, f, final_path, False)
+
+            # Copy the licensed exports (populated if license_enabled is True)
+            for e, fs in cached_emoji['licensed_exports']:
+                bar.next()
+                for f in fs:
+                    final_path = format_path(path, e, f)
+                    make_dir_structure_for_file(final_path)
+                    cache.load_from_cache(e, f, final_path, True)
         except (KeyboardInterrupt, SystemExit):
             # Make sure the bar is properly set if oxporter is told to exit
             bar.finish()
@@ -104,13 +113,15 @@ def export(m, filtered_emoji, input_path, formats, path, src_size,
     # --------------------------------------------------------------------------
     if ('exif' in m.license) and license_enabled:
         exif_compatible_images = []
+        exif_supported_formats = get_formats_for_license_type('exif')
 
-        for e in itertools.chain(exporting_emoji, cached_emoji):
-            for f in formats:
-                if f.split("-")[0] in ["png", "pngc", "avif"]:
+        for e, fs in itertools.chain(exporting_emoji, cached_emoji['exports']):
+            for f in fs:
+                if f.split("-")[0] in exif_supported_formats:
 
                     try:
-                        exif_compatible_images.append(format_path(path, e, f))
+                        final_path = format_path(path, e, f)
+                        exif_compatible_images.append((final_path, e, f))
                     except FilterException:
                         if verbose:
                             log.out(f"- Emoji filtered from metadata: {e['short']}", 34)
@@ -118,13 +129,21 @@ def export(m, filtered_emoji, input_path, formats, path, src_size,
 
         if exif_compatible_images:
             log.out(f'Adding EXIF metadata to all compatible raster files...', 36)
-            image_proc.batch_add_exif_metadata(exif_compatible_images, m.license.get('exif'), max_batch)
+            images_list = (i for i, _, _ in exif_compatible_images)
+            image_proc.batch_add_exif_metadata(images_list, m.license.get('exif'), max_batch)
+
+            # Copy exported emoji to cache
+            if cache:
+                log.out(f"Copying {len(exif_compatible_images)} licensed "
+                        "images to cache...", 36)
+                for final_path, e, f in exif_compatible_images:
+                    if not cache.save_to_cache(e, f, final_path, license_enabled=True):
+                        raise RuntimeError(f"Unable to save '{e['short']}' in "
+                                           f"{f} with license to cache.")
 
 
 
-
-
-def export_step(exporting_emoji, num_threads, m, input_path, formats, path, renderer, license_enabled, cache):
+def export_step(exporting_emoji, num_threads, m, input_path, path, renderer, license_enabled, cache):
     log.out(f"Exporting {len(exporting_emoji)} emoji...", 36)
 
     if num_threads > 1:
@@ -136,7 +155,7 @@ def export_step(exporting_emoji, num_threads, m, input_path, formats, path, rend
         # start a Queue object for emoji export
         emoji_queue = queue.Queue()
 
-        # put the [filtered] emoji (plus the index, cuz enumerate()) into the queue.
+        # put the [filtered] emoji+formats (plus the index, cuz enumerate()) into the queue.
         for entry in enumerate(exporting_emoji):
             emoji_queue.put(entry)
 
@@ -144,8 +163,8 @@ def export_step(exporting_emoji, num_threads, m, input_path, formats, path, rend
         threads = []
         for i in range(num_threads):
             threads.append(ExportThread(emoji_queue, str(i), len(exporting_emoji),
-                                        m, input_path, formats, path, renderer,
-                                        license_enabled, cache))
+                                        m, input_path, path, renderer,
+                                        license_enabled))
 
 
         # keeps checking if the export queue is done.
@@ -192,6 +211,18 @@ def export_step(exporting_emoji, num_threads, m, input_path, formats, path, rend
                 t.join()
 
         raise
+
+    # Copy exported emoji to cache
+    if cache:
+        log.out(f'Copying {len(exporting_emoji)} exported emoji to '
+                'cache...', 36)
+        for emoji, fs in exporting_emoji:
+            for f in fs:
+                export_path = format_path(path, emoji, f)
+                has_license = f in ('svg', 'svgo')
+                if not cache.save_to_cache(emoji, f, export_path, has_license):
+                    raise RuntimeError(f"Unable to save '{emoji['short']}' in "
+                                       f"{f} to cache.")
 
 
     log.out('done!', 32)
