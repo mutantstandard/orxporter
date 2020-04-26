@@ -57,7 +57,7 @@ def export(m, filtered_emoji, input_path, formats, path, src_size,
     log.out(f"->[export]  {len(exporting_emoji)} emoji will be exported.", 34)
 
 
-    # If there's no emoji to export, tell the program to quit.
+    # If there's no emoji to export or copy from cache, tell the program to quit.
     # --------------------------------------------------------------------------
     if len(exporting_emoji) == 0 and cached_emoji_count == 0:
         raise SystemExit('>∆∆< It looks like you have no emoji to export!')

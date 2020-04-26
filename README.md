@@ -6,22 +6,7 @@ with that metadata, including multi-format and multi-resolution batch rendering,
 automated recolouring tools, unicode and shortcode filename export, EXIF metadata
 embedding, JSON metadata export and more.
 
-
-# Disclaimer
-
-Orxporter was created as a rewrite of scripts used to automate some of the
-workflow for Mutant Standard. Its main purpose remains to be the primary build
-tool for Mutant Standard packages, and so its features are mainly focused on a
-single use case.
-
-That said, there has been interest in this tool, as it allows custom builds
-or modifications of Mutant Standard packages, and is generic enough to work
-for similar projects.
-
-We welcome suggestions, feature requests and collaboration in order to make
-orxporter more useful for independent emoji creators and end-users. We follow
-Mutant Standard's [code of conduct](docs/code_of_conduct.md).
-
+---
 
 # Features
 
@@ -38,7 +23,7 @@ Mutant Standard's [code of conduct](docs/code_of_conduct.md).
 - Optional caching to save time on re-exporting
 - Multithreading
 
-
+---
 
 # Prerequisites
 
@@ -59,6 +44,8 @@ Install the compatible `progress` package by running the following in your shell
 
 `pip install -r requirements.txt`
 
+---
+
 # How to use
 
 There are two guides for using orxporter:
@@ -71,12 +58,34 @@ A more concise and technical brief of how to use orxporter.
 
 A longer guide with simpler language for those who are less techincally inclined. (Still requires that you know how CLIs and some other things work though)
 
+---
+
 # Contributors
 
 * @AndrewMontagne - imagemagick support
 * @shello - caching
 
 [Old changelog from 0.1.0 to 0.2.0](docs/old_changelog.md)
+
+
+---
+
+# Disclaimer
+
+Orxporter was created as a rewrite of scripts used to automate some of the
+workflow for Mutant Standard. Its main purpose remains to be the primary build
+tool for Mutant Standard packages, and so its features are mainly focused on a
+single use case.
+
+That said, there has been interest in this tool, as it allows custom builds
+or modifications of Mutant Standard packages, and is generic enough to work
+for similar projects.
+
+We welcome suggestions, feature requests and collaboration in order to make
+orxporter more useful for independent emoji creators and end-users. We follow
+Mutant Standard's [code of conduct](docs/code_of_conduct.md).
+
+---
 
 # License
 
