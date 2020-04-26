@@ -182,7 +182,7 @@ def export_step(exporting_emoji, num_threads, m, input_path, path, renderer, lic
                         u.kill()
                         u.join()
 
-                    raise ValueError(f'Thread {t.name} failed: {t.err}')
+                    raise ValueError(f'Thread {t.name} failed: {t.err}') from t.err
 
             if done:
                 break
