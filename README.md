@@ -50,7 +50,9 @@ You can also export your emoji set to fonts by using Orxporter in conjunction wi
 
 Install the compatible `progress` package by running the following in your shell:
 
-`pip install -r requirements.txt`
+```
+pip install -r requirements.txt
+```
 
 ## Image prerequisites
 Orxporter depends on other software to produce most image export types.
@@ -73,11 +75,17 @@ To export in certain formats, you will need other software installed:
 | exiftool | Needed for EXIF metadata embedding |
 | [svgcleaner](https://github.com/RazrFalcon/svgcleaner) | Needed for Optimised SVG (`svgo`) output. |
 | [oxipng](https://github.com/shssoichiro/oxipng) | Needed for Crushed PNG (`pngc`) output. |
-| [libwebp](https://developers.google.com/speed/webp/docs/precompiled) | Needed for Lossless WebP (`webp`) output. |
+| [webp](https://developers.google.com/speed/webp/docs/precompiled) | Needed for Lossless WebP (`webp`) output. |
 | [FLIF](https://github.com/FLIF-hub/FLIF) | Needed for FLIF (`flif`) output. |
-| [go-avif](https://github.com/Kagami/go-avif) | Needed for Lossless AVIF (`avif`) output. (Experimental; does not currently produce truly lossless images. We're trying to figure out why that is.) |
+| [go-avif](https://github.com/Kagami/go-avif) | Needed for Lossless AVIF (`avif`) output. Requires `libaom`. (Experimental; does not currently produce truly lossless images. We're trying to figure out why that is.) |
 
-Most of the above (except from `libwebp` and `go-avif`) can be installed on macOS with [Homebrew](https://brew.sh/).)
+Most of the above can be installed on macOS with [Homebrew](https://brew.sh/):
+
+```
+brew install exiftool svgcleaner oxipng webp flif
+```
+
+`go-avif` needs to be installed via `go get`, it requires libaom to work.
 
 ---
 
