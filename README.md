@@ -1,4 +1,4 @@
-![Orxporter logo with 'Orxporter' next to it, in white against a lime green background.](Orxporter_logo.png)
+![Orxporter logo with 'Orxporter' next to it, in white against a lime green background.](orxporter_logo.png)
 
 Orxporter is a rich toolkit for organising and exporting an SVG-based emoji set.
 It has a system for storing emoji metadata and making large batch export operations
