@@ -1,6 +1,6 @@
 # orx
 
-Because emoji sets can involve hundreds or thousands of images, we needed a format to contain emoji metadata in a way that doesn't create too much whitespace and was really quick to type. Unfortunately existing formats like JSON and YAML were not suitable for this. So Orxporter uses it's own format.
+Because emoji sets can involve hundreds or thousands of images, we needed a format to contain emoji data in a way that doesn't create too much whitespace and was really quick to type. Existing formats like JSON and YAML were not really made for this task, so Orxporter uses it's own format.
 
 
 ## Structure of an orx file
@@ -97,9 +97,7 @@ list_of_hex = #1f3f3 #200d #1f308
 
 ---
 
-## Shared expressions
-
-The instruction keywords mostly are unique to whether you are writing a manifest or a parameters file. So you should read the docs for those too.
+## Common instruction keywords
 
 There are two consistent instruction keywords across any type of orx file:
 

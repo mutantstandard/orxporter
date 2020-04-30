@@ -1,21 +1,19 @@
-# Metadata (Licenses)
+# Metadata
 
 Orxporter can embed metadata into your resulting emoji. This is useful if you want to put author or license information into your work for public distribution.
 
-You add metadata to your manifests using the orx keyword `license`, as shown below:
+You add metadata to your manifests using the [orx](orx.md) keyword `license`, as shown below:
 
 ```
 license svg = license/svg.xml		exif = license/exif.json
 ```
 
-Metadata is automatically embedded in your resulting images, but if you want to leave it out...
-
-- Use the flag `-l` if you're using the [simple exporting method](image_easy,md).
-- Use `license = no` in your Parameters file if you're using the [advanced exporting method](image_advanced),
+Metadata is automatically embedded in your resulting images if you've put
+metadata in your manifest, but if you want to leave it out, use the `-l` flag.
 
 Metadata embedding is only done with certain formats:
 
-- EXIF metadata can be embedded in PNG and AVIF files.
+- EXIF metadata can be embedded in PNG files.
 - SVG metadata can be embedded in SVG files.
 
 ---

@@ -8,7 +8,7 @@ with that metadata.
 
 # Features
 
-- A custom declarative language for defining your emoji semantics and metadata.
+- A [custom declarative language](docs/dzuk/orx.md) for defining your emoji semantics and metadata.
 - Color remapping that automates the production of color-modifiable emoji.
 - The ability to export emoji both as shortcode-named files (ie. 'ice_cream') and unicode codepoint-named files (ie. '1f368')
 - Supports multiple SVG renderers (rendersvg, Inkscape and ImageMagick)
