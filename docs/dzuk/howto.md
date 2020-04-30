@@ -26,14 +26,6 @@ Documentation on manifests coming soon.
 Set a conditions for what emoji in your input will actually get exported. Useful if you just want to export a slice of what you've got in your input and manifest.
 
 
-
-## Cache (`-C`) (optional)
-
-Set a directory as a cache. When a cache is set, Orxporter will store a keyed copy of all of your exported emoji there, so when you export again, Orxporter will only export the images that have changed or are in formats that it hasn't exported before, saving you time.
-
-(Make sure you point to the same cache directory when re-exporting with a different command or script!)
-
-
 ---
 
 # Image output
@@ -68,7 +60,14 @@ Depending on what you have installed on your computer, you can choose:
 
 *(check the [readme](../../readme.md) for all the information on dependencies)*
 
-Based on our experiences, we highly recommend rendersvg (unless you need fancy SVG support like filters) because it is much faster than the others. (It's also much tidier to use on macOS.)
+Based on our experiences, we highly recommend rendersvg (unless you need fancy SVG support like filters) because it is much faster than the others.
+
+
+## Cache (`-C`) (optional)
+
+Set a directory as a cache. When a cache is set, Orxporter will store a keyed copy of all of your exported emoji there, so when you export again, Orxporter will only export the images that have changed or are in formats that it hasn't exported before, saving you a lot of time on repeat exports or publishing emoji set updates.
+
+(Make sure you point to the same cache directory when re-exporting with a different command or script!)
 
 ## Export without metadata embedding (`-l`) (optional)
 
