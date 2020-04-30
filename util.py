@@ -31,4 +31,4 @@ def get_license_type_for_format(f):
 
 def get_formats_for_license_type(t):
     """Get the export formats for a given license type."""
-    return (f for f, ft in _license_format_map.items() if ft == t)
+    return tuple(f for f, ft in _license_format_map.items() if ft == t)

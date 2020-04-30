@@ -128,14 +128,14 @@ def export(m, filtered_emoji, input_path, formats, path, src_size,
                         continue
 
         if exif_compatible_images:
-            log.out(f'Adding EXIF metadata to all compatible raster files...', 36)
+            log.out(f'Adding EXIF metadata to {len(exif_compatible_images)} compatible raster files...', 36)
             images_list = (i for i, _, _ in exif_compatible_images)
             image_proc.batch_add_exif_metadata(images_list, m.license.get('exif'), max_batch)
 
             # Copy exported emoji to cache
             if cache:
                 log.out(f"Copying {len(exif_compatible_images)} licensed "
-                        "images to cache...", 36)
+                        "raster files to cache...", 36)
                 for final_path, e, f in exif_compatible_images:
                     if not cache.save_to_cache(e, f, final_path, license_enabled=True):
                         raise RuntimeError(f"Unable to save '{e['short']}' in "
