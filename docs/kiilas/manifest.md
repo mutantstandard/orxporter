@@ -8,7 +8,7 @@ Orxporter manifest defines semantics of an emoji set. This does not include
 output settings, in order to allow the same manifest to be reused to create
 packages in different formats or with different directory structures.
 
-Because a set can contain thousands of emoji, orxporter uses a custom lightweight data serialisation format to contain your emoji metadata.
+Because a set can contain thousands of emoji, Orxporter uses a custom lightweight data serialisation format to contain your emoji metadata.
 
 
 Syntax
@@ -57,7 +57,7 @@ value of the previously defined variable **cmaps_all**. In order to
 disambiguate syntax, it is possible to wrap the variable name in parentheses.
 
 Please note that "variable" is a misnomer because they're actually constant. In
-fact, if you try to redefine a variable, orxporter will rightfully protest.
+fact, if you try to redefine a variable, Orxporter will rightfully protest.
 
 This is how a variable is defined:
 
@@ -135,7 +135,7 @@ following arguments:
 * _dst_     -- target palette
 * _short_    -- shortcode
 * _code_ -- unicode sequence; use **!undefined** to explicitly omit assigning
-a value, otherwise orxporter will assume it was unintentional and throw an error
+a value, otherwise Orxporter will assume it was unintentional and throw an error
 whenever a value is expected
 
 ```
@@ -146,7 +146,7 @@ colormap v1
     code = !undefined
 ```
 
-When recoloring, orxporter will detect the presence of colors from the source
+When recoloring, Orxporter will detect the presence of colors from the source
 palette, and replace them with corresponding colors from the target palette.
 
 Note that Mutant Standard currently uses **key** palette for its source
@@ -193,7 +193,7 @@ colormap [...] code = !
 ```
 
 To explicitly undefine a unicode sequence value for an emoji, pass
-**!undefined**. This will tell orxporter to omit this emoji (instead of
+**!undefined**. This will tell Orxporter to omit this emoji (instead of
 throwing an error) when exporting unicode-named files:
 
 ```

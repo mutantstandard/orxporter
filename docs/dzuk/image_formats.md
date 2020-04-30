@@ -9,7 +9,7 @@
 #### `svgo` Optimised SVG
 Optimised SVG is the same format as SVG, but it's losslessly compressed to create a smaller file size. It requires an extra processing stage (which is very cheap on CPU), and it needs the dependency listed. Check the [svgcleaner](https://github.com/RazrFalcon/svgcleaner) repo to see the documentation for it so you can see what it does to the SVG files.
 
-orxporter uses svgcleaner with the following command:
+Orxporter uses svgcleaner with the following command:
 
 `svgcleaner <in file> <out file> --remove-metadata=no --quiet`
 
@@ -40,7 +40,7 @@ png-60
 #### `pngc` Crushed PNG
 Crushed PNG is the same format as PNG, but it's losslessly compressed to create a smaller file size. It requires an extra processing stage (which can be quite expensive on CPU at very large sizes like 512px), and it needs the dependency listed. Check the [oxipng](https://github.com/shssoichiro/oxipng) repo to see the documentation for it so you can see what it does to the PNG files.
 
-orxporter uses oxipng with the following command:
+Orxporter uses oxipng with the following command:
 
 `oxipng <in file> --out, <out file> --quiet`
 

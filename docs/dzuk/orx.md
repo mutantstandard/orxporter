@@ -1,6 +1,6 @@
 # orx
 
-Because emoji sets can involve hundreds or thousands of images, we needed a format to contain emoji metadata in a way that doesn't create too much whitespace and was really quick to type. Unfortunately existing formats like JSON and YAML were not suitable for this. So orxporter uses it's own format.
+Because emoji sets can involve hundreds or thousands of images, we needed a format to contain emoji metadata in a way that doesn't create too much whitespace and was really quick to type. Unfortunately existing formats like JSON and YAML were not suitable for this. So Orxporter uses it's own format.
 
 
 ## Structure of an orx file
@@ -72,7 +72,7 @@ Comments are single-line only and are marked with '#':
 ---
 ## Values
 
-Variable types are pretty implicit in orxporter - unless it's a custom parameter, a particular type will be expected.
+Variable types are pretty implicit in Orxporter - unless it's a custom parameter, a particular type will be expected.
 
 ```
 

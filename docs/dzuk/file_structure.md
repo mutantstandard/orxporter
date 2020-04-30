@@ -38,7 +38,7 @@ If you include a property that is optional, like `code` (via `%u`), or `cat` (vi
 
 Inserts the name of the emoji's colormap at the time of export.
 
-Keep in mind that at export time, orxporter duplicates an emoji with multiple colormap into individualised versions with each colour. So if an emoji has multiple colors, this expression will expand into as many colours it's been assigned.
+Keep in mind that at export time, Orxporter duplicates an emoji with multiple colormap into individualised versions with each colour. So if an emoji has multiple colors, this expression will expand into as many colours it's been assigned.
 
 ```
 

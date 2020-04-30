@@ -1,7 +1,7 @@
 # Usage
 
 
-By default, orxporter assumes the manifest is in **./manifest**, the input
+By default, Orxporter assumes the manifest is in **./manifest**, the input
 directory is the **in** subdirectory of wherever the manifest is, and the
 output directory is **out**. Default action is to export the entire emoji set
 as shortcode-named SVG files.
