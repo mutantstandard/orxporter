@@ -192,7 +192,7 @@ codepoint/png-32/270b.png
 
 ## Custom property **%(property_name)**
 
-Inserts another property that the emoji might.
+Inserts a the value for a specific property. Useful for properties that the default arguments don't cover or for leveraging your own custom properties.
 
 ```
 # manifest example
