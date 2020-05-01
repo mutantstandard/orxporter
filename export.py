@@ -213,15 +213,25 @@ def export_step(exporting_emoji, num_threads, m, input_path, path, renderer, lic
 
     # Copy exported emoji to cache
     if cache:
-        log.out(f'Copying {len(exporting_emoji)} exported emoji to '
-                'cache...', 36)
+        # Calculate the real set of exported emoji to cache
+        exports_to_cache = []
         for emoji, fs in exporting_emoji:
-            for f in fs:
-                export_path = format_path(path, emoji, f)
-                has_license = f in ('svg', 'svgo')
-                if not cache.save_to_cache(emoji, f, export_path, has_license):
-                    raise RuntimeError(f"Unable to save '{emoji['short']}' in "
-                                       f"{f} to cache.")
+            cacheable_fs = cache.filter_cacheable_formats(fs, license_enabled)
+            if cacheable_fs:
+                exports_to_cache.append((emoji, cacheable_fs))
+
+        # Save cacheable exports in cache
+        if exports_to_cache:
+            log.out(f'Copying {len(exports_to_cache)} exported emoji to '
+                    'cache...', 36)
+            for emoji, fs in exports_to_cache:
+                for f in fs:
+                    # SVG and SVGO have a license added during export, so this
+                    # flag passed to save_to_cache needs to be adjusted
+                    has_license = f in ('svg', 'svgo') and license_enabled
+
+                    export_path = format_path(path, emoji, f)
+                    cache.save_to_cache(emoji, f, export_path, has_license)
 
 
     log.out('done!', 32)

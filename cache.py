@@ -24,6 +24,9 @@ class Cache:
 
     cache_dir = None
 
+    # Formats for which a non-licensed version should never be cached
+    skip_export_cache_formats = set(('svg', 'svgo'))
+
     def __init__(self, cache_dir):
         """
         Initiate an export cache instance. Requires a directory path (which may
@@ -131,6 +134,9 @@ class Cache:
                                "set!".format(emoji['short']))
 
         cache_key = None
+
+        if not license_enabled and f in self.skip_export_cache_formats:
+            return None
 
         if license_enabled:
             if 'licenses' not in emoji['cache_keys']:
@@ -247,3 +253,16 @@ class Cache:
                                "{}".format(emoji['short'], cache_file,
                                            str(exc)))
         return True
+
+    @classmethod
+    def filter_cacheable_formats(cls, fs, license_enabled):
+        """
+        Obtain the formats from `fs` that are cacheable given the status of the
+        license.
+        """
+        cacheable_fs = fs
+
+        if not license_enabled:  # Exports
+            cacheable_fs = tuple(set(fs) - cls.skip_export_cache_formats)
+
+        return cacheable_fs
