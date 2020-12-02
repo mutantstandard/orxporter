@@ -33,7 +33,7 @@ def _translate_color(svg, pfrom, pto):
         if (cr[1], cr[3], cr[5]) == (cr[2], cr[4], cr[6]):
             cr = cr[0] + cr[1] + cr[3] + cr[5] + ';'
             res, count2 = re.sub(cr, cro, res, flags=re.IGNORECASE)
-            count += count
+            count += count2
 
         # Record changes
         if count > 0:
