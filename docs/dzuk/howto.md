@@ -56,11 +56,11 @@ Depending on what you have installed on your computer, you can choose:
 
 - `inkscape` (requires inkscape)
 - `imagemagick` (requires ImageMagick)
-- `rendersvg` (requires rendersvg)
+- `resvg` (requires resvg)
 
 *(check the [readme](../../readme.md) for all the information on dependencies)*
 
-Based on our experiences, we highly recommend rendersvg (unless you need fancy SVG support like filters) because it is much faster than the others.
+Based on our experiences, we highly recommend resvg (unless you need fancy SVG support like filters) because it is much faster than the others.
 
 
 ## Cache (`-C`) (optional)

@@ -15,7 +15,7 @@ from cache import Cache
 
 VERSION = '0.3.0'
 
-RENDERERS = ['inkscape', 'rendersvg', 'imagemagick']
+RENDERERS = ['inkscape', 'resvg', 'imagemagick']
 
 DEF_INPUT = 'in'
 DEF_MANIFEST = 'manifest.orx'
@@ -66,7 +66,7 @@ IMAGE BUILD:
         See the documentation for how this works.
 
 -r      SVG renderer (default: {DEF_RENDERER})
-        - rendersvg
+        - resvg
         - imagemagick
         - inkscape
 

@@ -11,11 +11,11 @@ def render_svg(svg_in, png_out, renderer, size):
 
     if renderer == 'inkscape':
         cmd = ['inkscape', os.path.abspath(svg_in),
-               '--export-png=' + os.path.abspath(png_out),
+               '--export-filename=' + os.path.abspath(png_out),
                '-h', str(size), '-w', str(size)]
 
-    elif renderer == 'rendersvg':
-        cmd = ['rendersvg', '-w', str(size), '-h', str(size),
+    elif renderer == 'resvg':
+        cmd = ['resvg', '-w', str(size), '-h', str(size),
                 os.path.abspath(svg_in), os.path.abspath(png_out)]
 
     elif renderer == 'imagemagick':

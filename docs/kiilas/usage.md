@@ -40,7 +40,7 @@ Here are the command line options:
 - **-t NUM** -- number of worker threads (default: **1**)
 - **--force-desc** -- ensure all emoji have description (**desc** property)
 - **-r RENDERER** -- selects rasteriser to use; the following rasterisers are
-  supported: **inkscape**, **rendersvg**, **imagemagick**; **rendersvg** is
+  supported: **inkscape**, **resvg**, **imagemagick**; **resvg** is
   recommended if speed is important; (default: **inkscape**)
 - **-b NUM** -- maximum number of file arguments per exiftool call; larger
   numbers may accelerate metadata insertion but fail if the OS doesn't support
