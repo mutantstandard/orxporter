@@ -21,6 +21,7 @@ However, svgcleaner is not perfect and can create some unexpected inconsistencie
 - `png` PNG
 - `pngc` Crushed PNG (requires oxipng)
 - `webp` Lossless WebP (requires cwebp)
+- `jxl` Lossless JPEG XL (requires [libjxl](https://github.com/libjxl/libjxl))
 - `avif` Lossless AVIF (requires go-avif)
 - `flif` FLIF (requires flif)
 
@@ -32,6 +33,7 @@ eg.
 
 ```
 flif-32
+jxl-64
 avif-128
 webp-512
 png-60

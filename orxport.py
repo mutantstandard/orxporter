@@ -15,7 +15,7 @@ from cache import Cache
 
 VERSION = '0.3.0'
 
-RENDERERS = ['inkscape', 'rendersvg', 'imagemagick']
+RENDERERS = ['inkscape', 'resvg', 'imagemagick']
 
 DEF_INPUT = 'in'
 DEF_MANIFEST = 'manifest.orx'
@@ -53,12 +53,13 @@ INPUT:
 IMAGE BUILD:
 ----------------------------------------------------
 -F      Format (default: {DEF_OUTPUT_FORMATS[0]})
-        comma separated with no spaces (ie. 'svg,png-64,flif-128')
+        comma separated with no spaces (ie. 'svg,png-64,jxl-128')
         - svg (SVG)
         - svgo (Optimised SVG, may have imperfect results)
         - png-SIZE (PNG)
         - pngc-SIZE (Crushed PNG)
         - flif-SIZE (FLIF)
+        - jxl-SIZE (Lossless JPEG XL)
         - webp-SIZE (Lossless WebP)
         - avif-SIZE (Lossless AVIF)
 
@@ -66,7 +67,7 @@ IMAGE BUILD:
         See the documentation for how this works.
 
 -r      SVG renderer (default: {DEF_RENDERER})
-        - rendersvg
+        - resvg
         - imagemagick
         - inkscape
 

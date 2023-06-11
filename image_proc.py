@@ -11,11 +11,11 @@ def render_svg(svg_in, png_out, renderer, size):
 
     if renderer == 'inkscape':
         cmd = ['inkscape', os.path.abspath(svg_in),
-               '--export-png=' + os.path.abspath(png_out),
+               '--export-filename=' + os.path.abspath(png_out),
                '-h', str(size), '-w', str(size)]
 
-    elif renderer == 'rendersvg':
-        cmd = ['rendersvg', '-w', str(size), '-h', str(size),
+    elif renderer == 'resvg':
+        cmd = ['resvg', '-w', str(size), '-h', str(size),
                 os.path.abspath(svg_in), os.path.abspath(png_out)]
 
     elif renderer == 'imagemagick':
@@ -49,6 +49,25 @@ def convert_webp(png_in, webp_out):
         raise Exception('Invoking the WebP converter (cwebp) failed: ' + str(e))
     if r:
         raise Exception('The WebP converter returned the following: ' + str(r))
+
+
+
+
+def convert_jxl(png_in, jxl_out):
+    """
+    Converts a single PNG at 'png_in' to a lossless JPEG XL at 'jxl_out'.
+    Will raise an exception if trying to invoke the converter failed.
+    """
+
+    cmd = ['cjxl', os.path.abspath(png_in), os.path.abspath(jxl_out), '-q', '100', '-e', '9']
+
+    # jxl is noisy. gotta put stderr into DEVNULL as well.
+    try:
+        r = subprocess.run(cmd, stdout=subprocess.DEVNULL, stderr=subprocess.DEVNULL).returncode
+    except Exception as e:
+        raise Exception('Invoking the JXL converter (cjxl) failed: ' + str(e))
+    if r:
+        raise Exception('The JXL converter returned the following: ' + str(r))
 
 
 

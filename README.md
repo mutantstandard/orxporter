@@ -11,7 +11,7 @@ with that metadata.
 - A [custom declarative language](docs/dzuk/orx.md) for defining your emoji semantics and metadata.
 - Color remapping that automates the production of color-modifiable emoji.
 - The ability to export emoji both as shortcode-named files (ie. 'ice_cream') and unicode codepoint-named files (ie. '1f368')
-- Supports multiple SVG renderers (rendersvg, Inkscape and ImageMagick)
+- Supports multiple SVG renderers (resvg, Inkscape and ImageMagick)
 - Powerful output options including filtering, custom export directory structures and filename modifications.
 - Optional cache system so you can save a lot of time on repeat exports.
 - Multithreaded exports.
@@ -31,6 +31,7 @@ Orxporter can export emoji sets to the following formats:
 | `png`  | PNG                                  | EXIF |
 | `pngc` | Crushed PNG                          | EXIF |
 | `webp` | Lossless WebP                        | not supported |
+| `jxl`  | Lossless JPEG XL                     | not supported |
 | `avif` | Lossless AVIF (Experimental; does not currently produce truly lossless images. We're trying to figure out why that is.) | not supported |
 | `flif` | FLIF                                 | not supported |
 
@@ -44,7 +45,7 @@ You can also export your emoji set to fonts by using Orxporter in conjunction wi
 
 # Prerequisites
 
-## Main prerequisites
+## Running orxporter
 - Python 3.6+
 - [progress](https://github.com/verigak/progress)
 
@@ -54,15 +55,15 @@ Install the compatible `progress` package by running the following in your shell
 pip install -r requirements.txt
 ```
 
-## Image prerequisites
-Orxporter depends on other software to produce most image export types.
+## Making the images
+Orxporter depends on other software to produce everything that's not SVG.
 
 ### SVG rasterisers
 One SVG rasteriser is required for Orxporter to export to raster formats (every other format other than `svg` and `svgo`):
 
 | software | purpose |
 | :--    | :-- |
-| [rendersvg](https://github.com/RazrFalcon/resvg/tree/master/tools/rendersvg) | (`-r rendersvg`). **We recommend this one if you don't have complicated SVG elements.** |
+| [resvg](https://github.com/RazrFalcon/resvg) | (`-r resvg`). **We recommend this one if you don't have complicated SVG elements.** |
 | Inkscape | (`-r inkscape`). Not recommended for macOS users. |
 | ImageMagick  | (`-r imagemagick`). |
 
@@ -76,14 +77,10 @@ To export in certain formats, you will need other software installed:
 | [svgcleaner](https://github.com/RazrFalcon/svgcleaner) | Needed for Optimised SVG (`svgo`) output. |
 | [oxipng](https://github.com/shssoichiro/oxipng) | Needed for Crushed PNG (`pngc`) output. |
 | [webp](https://developers.google.com/speed/webp/docs/precompiled) | Needed for Lossless WebP (`webp`) output. |
+| [libjxl](https://github.com/libjxl/libjxl) | Needed for Lossless JPEG XL (`jxl`) output. |
 | [FLIF](https://github.com/FLIF-hub/FLIF) | Needed for FLIF (`flif`) output. |
 | [go-avif](https://github.com/Kagami/go-avif) | Needed for Lossless AVIF (`avif`) output. Requires `libaom`. (Experimental; does not currently produce truly lossless images. We're trying to figure out why that is.) |
 
-Most of the above can be installed on macOS with [Homebrew](https://brew.sh/):
-
-```
-brew install exiftool svgcleaner oxipng webp flif
-```
 
 `go-avif` needs to be installed via `go get`, it requires libaom to work.
 
@@ -107,8 +104,10 @@ The original guide, which is more concise and technical brief of how to use Orxp
 
 # Contributors
 
+* @kiilas - Much of Orxporter to begin with, created the foundations of the program.
 * @AndrewMontagne - imagemagick support
 * @shello - caching, lots of fixes and stuff
+* @dzuk-mutant - documentation, cleanup, feature additions and changes
 
 [Old changelog from 0.1.0 to 0.2.0](docs/old_changelog.md)
 

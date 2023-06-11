@@ -55,6 +55,8 @@ def to_raster(emoji_svg, out_path, renderer, format, size, name):
             image_proc.crush_png(tmp_png_path, out_path)
         elif format == "webp":
             image_proc.convert_webp(tmp_png_path, out_path)
+        elif format == "jxl":
+            image_proc.convert_jxl(tmp_png_path, out_path)
         elif format == "avif":
             image_proc.convert_avif(tmp_png_path, out_path)
         elif format == "flif":

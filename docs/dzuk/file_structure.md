@@ -5,7 +5,7 @@ Orxporter lets you use various points of data to format your emoji image output.
 
 In this, you denote (in UNIX style, basically, with forward slashes ('/') instead of Windows' backslashes ('\\') ) the path relative to your chosen output folder to where your emoji are.
 
-You can use any of these for filenames as well as folders, but it's generally recommended to only use `%u` or `%s` for that.
+You can use any of these for filenames as well as folders, but it's generally recommended to only use `%u` or `%s` for filenames.
 
 ```
 # manifest example

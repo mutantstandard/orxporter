@@ -92,6 +92,9 @@ class ExportThread:
             elif raster_format[0] == "webp":
                 export_task.to_raster(emoji_svg, final_path, self.renderer, "webp", size, self.name)
 
+            elif raster_format[0] == "jxl":
+                export_task.to_raster(emoji_svg, final_path, self.renderer, "jxl", size, self.name)
+
             elif raster_format[0] == "flif":
                 export_task.to_raster(emoji_svg, final_path, self.renderer, "flif", size, self.name)
 
