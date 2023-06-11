@@ -55,11 +55,14 @@ property=val1[,val2...]**
   __property=*__ to match emoji with the property being defined (regardless of
   value), or **property=!** to match emoji with the property being undefined
 
----
+
+
+----------------------------------------------
+
+
 
 # Image output
 
-The arguments and flags to use for image output:
 
 
 ## Output (`-o`)
@@ -78,7 +81,13 @@ This is a way of fiddling with the way that your output files are named and what
 [Check out this doc](file_structure.md) for the kinds of things you can do.
 
 
-----
+
+
+
+----------------------------------------------
+
+
+
 
 
 # Image rendering and formats
@@ -109,7 +118,13 @@ Depending on what you have installed on your computer, you can choose:
 Based on our experiences, unless you need fancy SVG support like filters we highly recommend resvg because it is so much faster than the others.
 
 
-----
+
+
+
+----------------------------------------------
+
+
+
 
 
 # Performance
@@ -127,16 +142,17 @@ Set a directory as a cache. When a cache is set, Orxporter will store a keyed co
 
 ## Threads (`-t`) (optional)
 
-Run export operations into multiple concurrent threads. If you have a multi-threaded CPU (basically any CPU nowadays), it will greatly improve performance.
+Run Orxporter's export operations into multiple concurrent threads. If you have a multi-threaded CPU (basically any CPU nowadays), it will greatly improve performance.
 
-If you don't use this flag, Orxporter will default to 1 thread.
+If you don't use this flag, Orxporter will only use 1 thread.
 
 
 -----
 
 # Data output
 
-The argument to use for JSON metadata output:
+Outputting metadata alongside the images can be really helpful for things like making emoji pickers and adding text descriptions into your applications.
+
 
 ## JSON export (`-j`/`-J`) (optional)
 
