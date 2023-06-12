@@ -95,15 +95,16 @@ The original guide, which is more concise and technical brief of how to use Orxp
 
 ---
 
-# Contributors
+# Contributors and thanks
 
-* @kiilas - Much of Orxporter to begin with, created the foundations of the program.
+* @kiilas - Created the foundations of the program and the orx manifest language.
 * @AndrewMontagne - imagemagick support
 * @shello - caching, lots of fixes and stuff
-* @dzuk-mutant - documentation, cleanup, feature additions and changes
+* @dzuk-mutant - documentation, code cleanup, feature additions and changes
 
 [Old changelog from 0.1.0 to 0.2.0](docs/old_changelog.md)
 
+Thanks to the JPEG XL community with giving me some tips on adding encoder flags to improve output!
 
 ---
 

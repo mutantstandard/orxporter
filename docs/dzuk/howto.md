@@ -14,9 +14,9 @@ Here are all of the arguments:
 
 
 
-# Input
+## Input
 
-## Input (`-i`)
+### Input (`-i`)
 
 The folder where the source images are located.
 
@@ -24,48 +24,52 @@ The folder where the source images are located.
 -i input/folder/here
 ```
 
-## Manifest (`-m`)
+### Manifest (`-m`)
 
-A file where you set all of your emoji metadata.
+A manifest file is one or a series of files (depending on how you split them up) that declare everything about your emoji sets - the emoji in them, what the emoji are, specifying colormaps for batch recolouring, categories for emoji pickers and what license metadata to use.
 
-Documentation on manifests coming soon.
+Manifests are written in a custom declarative language called orx.
 
-[How to use SVG and EXIF metadata in your manifest (optional)](metadata.md).
+- [How orx files work](orx.md)
+- Declaring emoji (TBA)
+- Declaring and using colormaps (TBA)
+- [How to use SVG and EXIF metadata in your manifest (optional)](metadata.md).
 
 
 ```
 -m manifest.orx
 ```
 
-## Filter (`-e`) (optional)
+### Filter (`-e`) (optional)
 
 Set a conditions for what emoji in your collection will actually get exported. Useful if you just want to export a slice of what you've got in your input and manifest.
 
 Multiple filters can be used to narrow selection down but each requires a separate `-e` option.
 
-Filters are specified as:
+Filter conditions run on data declared in your Manifest.
 
 ```
-property=val1[,val2...]**
+# only emoji from the category 'food_drink_herbs'
+-e cat=food_drink_herbs
+
+# only emoji from the categories 'food_drink_herbs' or 'symbols'.
+-e cat=food_drink_herbs,symbols
+
+# only emoji that don't have codepoints ('!' = undefined)
+-e code=!
+
+# only emoji that are in the 'food_drink_herbs' category AND don't have codepoints
+-e cat=food_drink_herbs -e code=!
 
 ```
 
 
-  to match emoji with the property having the value (or one of listed values),
-  __property=*__ to match emoji with the property being defined (regardless of
-  value), or **property=!** to match emoji with the property being undefined
+
+## Image output
 
 
 
-----------------------------------------------
-
-
-
-# Image output
-
-
-
-## Output (`-o`)
+### Output (`-o`)
 
 Where forc outputs to a base level. Use the `-f` flag (mentioned below) for how to further organise outputs by generating directories.
 
@@ -74,7 +78,7 @@ Where forc outputs to a base level. Use the `-f` flag (mentioned below) for how 
 ```
 
 
-## Directory and filename structure (`-f`) (optional)
+### Directory and filename structure (`-f`) (optional)
 
 This is a way of fiddling with the way that your output files are named and what folder structure they will be stored in.
 
@@ -90,9 +94,9 @@ This is a way of fiddling with the way that your output files are named and what
 
 
 
-# Image rendering and formats
+## Image rendering and formats
 
-## Formats (`-F`)
+### Formats (`-F`)
 
 [Check out this doc](image_formats.md) for a list of the supported formats and how to type them.
 
@@ -103,7 +107,7 @@ You can put multiple formats in this flag in a comma-separated list like this:
 ````
 
 
-## Renderer (`-r`) (optional)
+### Renderer (`-r`) (optional)
 
 This is how your SVGs will be rasterised. In the backend of Orxporter this means making PNGs, but this isn't just for PNG exports, but all other raster formats as they run a PNG in the export first, and then convert that PNG to the desired format. 
 
@@ -127,10 +131,10 @@ Based on our experiences, unless you need fancy SVG support like filters we high
 
 
 
-# Performance
+## Performance
 
 
-## Cache (`-C`) (optional)
+### Cache (`-C`) (optional)
 
 Set a directory as a cache. When a cache is set, Orxporter will store a keyed copy of all of your exported emoji there, so when you export again, Orxporter will only export the images that have changed or are in formats that it hasn't exported before, saving you a lot of time on repeat exports or publishing emoji set updates.
 
@@ -140,7 +144,7 @@ Set a directory as a cache. When a cache is set, Orxporter will store a keyed co
 -C cache/goes/here
 ```
 
-## Threads (`-t`) (optional)
+### Threads (`-t`) (optional)
 
 Run Orxporter's export operations into multiple concurrent threads. If you have a multi-threaded CPU (basically any CPU nowadays), it will greatly improve performance.
 
@@ -149,12 +153,12 @@ If you don't use this flag, Orxporter will only use 1 thread.
 
 -----
 
-# Data output
+## Data output
 
 Outputting metadata alongside the images can be really helpful for things like making emoji pickers and adding text descriptions into your applications.
 
 
-## JSON export (`-j`/`-J`) (optional)
+### JSON export (`-j`/`-J`) (optional)
 
 Compile the metadata you've set in .orx files into a JSON file for web and other applications.
 
@@ -169,22 +173,22 @@ Using this means that you're just exporting JSON for this command, you can't use
 ----
 
 
-# Extra flags
+## Extra flags
 
 
-#### Force Text Descriptions (`--force-desc`)
+### Force Text Descriptions (`--force-desc`)
 
 Makes Orxporter complain if there are any emoji with missing text descriptions.
 
 
-## Export without metadata embedding (`-l`) (optional)
+### Export without metadata embedding (`-l`) (optional)
 
 If you have [specified metadata for embedding in your manifest](metadata.md), metadata
 will be automatically embedded in compatible image outputs.
 Using this flag will stop Orxporter from doing that.
 
 
-#### Check SVG image size (`-q`) (optional)
+### Check SVG image size (`-q`) (optional)
 
 Check the size of your input SVGs' `viewBox` attribute to make sure there are no input emoji with the wrong size. This can be quite helpful if the way you make emoji can create little mistakes like this that can fall through in production.
 
