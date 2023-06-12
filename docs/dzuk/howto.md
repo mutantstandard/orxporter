@@ -120,13 +120,9 @@ Depending on what you have installed on your computer, you can choose:
 
 | software | flag in Orxporter | notes |
 | :--    | :-- | :-- |
-| [resvg](https://github.com/RazrFalcon/resvg) | (`-r resvg`) | **We recommend this one if you don't have complicated SVG elements.** |
+| [resvg](https://github.com/RazrFalcon/resvg) | (`-r resvg`) | I recommend this one if you don't have complicated SVG elements like filters. It's much faster than the others. |
 | Inkscape | (`-r inkscape`) | Not recommended for macOS users. |
 | ImageMagick  | (`-r imagemagick`) | |
-
-*(check the [readme](../readme.md) for all the information on dependencies)*
-
-Based on our experiences, unless you need fancy SVG support like filters we highly recommend resvg because it is so much faster than the others.
 
 
 
@@ -204,4 +200,4 @@ Using this flag will stop Orxporter from doing that.
 
 Check the size of your input SVGs' `viewBox` attribute to make sure there are no input emoji with the wrong size. This can be quite helpful if the way you make emoji can create little mistakes like this that can fall through in production.
 
-This won't work if your input SVGs don't have this attribute.
+This won't work if your input SVGs don't have a `viewBox` attribute.
