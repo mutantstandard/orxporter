@@ -13,7 +13,7 @@ import orx.manifest
 import orx.params
 from cache import Cache
 
-VERSION = '0.3.0'
+VERSION = '0.5.0'
 
 RENDERERS = ['inkscape', 'resvg', 'imagemagick']
 
@@ -43,7 +43,7 @@ HELP:
 Also look at /docs for full documentation.
 
 
-INPUT:
+INPUT AND OUTPUT:
 ----------------------------------------------------
 -i      Input images (default: {DEF_INPUT})
 -m      Manifest file (default: {DEF_MANIFEST})
@@ -85,7 +85,7 @@ JSON BUILD:
 -j <FILE>               export JSON replica of directory structure
 -J <FILE>               export JSON metadata for mutstd website
 
-Using JSON flags will override any image build flags.
+Using JSON flags will override any image build flags, so run image and JSON builds separately.
 
 
 OTHER OPTIONS:

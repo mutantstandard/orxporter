@@ -172,7 +172,7 @@ Compile the metadata you've set in .orx files into a JSON file for web and other
 
 Filters done with `-e` still apply to this export.
 
-Using this means that you're just exporting JSON for this command, you can't use the image-related stuff here.
+UsIf you use this flag, it will override any image-related flags, so if you want to export an image set and accompanying JSON, you have to do them in separate commands.
 
 - `-j`: JSON file with a flat structure.
 - `-J`: JSON with a specific format expected by the Mutant Standard website (and maybe yours too if you like!)
