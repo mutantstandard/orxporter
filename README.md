@@ -27,13 +27,10 @@ Orxporter can export emoji sets to the following formats:
 | Orxporter format code | format | license embedding |
 | :--    | :--                                  | :--- |
 | `svg`  | SVG                                  | SVG <metadata> |
-| `svgo` | Optimised SVG (Experimental; can change the appearance of certain SVG images)         | not supported |
 | `png`  | PNG                                  | EXIF |
 | `pngc` | Crushed PNG                          | EXIF |
 | `webp` | Lossless WebP                        | not supported |
 | `jxl`  | Lossless JPEG XL                     | not supported |
-| `avif` | Lossless AVIF (Experimental; does not currently produce truly lossless images. We're trying to figure out why that is.) | not supported |
-| `flif` | FLIF                                 | not supported |
 
 Certain compatible formats (noted above) can support SVG or EXIF metadata embedding.
 
@@ -59,7 +56,7 @@ pip install -r requirements.txt
 Orxporter depends on other software to produce everything that's not SVG.
 
 ### SVG rasterisers
-One SVG rasteriser is required for Orxporter to export to raster formats (every other format other than `svg` and `svgo`):
+One SVG rasteriser is required for Orxporter to export to raster formats.
 
 | software | purpose |
 | :--    | :-- |
@@ -74,17 +71,13 @@ To export in certain formats, you will need other software installed:
 | software | purpose |
 | :--    | :-- |
 | exiftool | Needed for EXIF metadata embedding |
-| [svgcleaner](https://github.com/RazrFalcon/svgcleaner) | Needed for Optimised SVG (`svgo`) output. |
 | [oxipng](https://github.com/shssoichiro/oxipng) | Needed for Crushed PNG (`pngc`) output. |
 | [webp](https://developers.google.com/speed/webp/docs/precompiled) | Needed for Lossless WebP (`webp`) output. |
 | [libjxl](https://github.com/libjxl/libjxl) | Needed for Lossless JPEG XL (`jxl`) output. |
-| [FLIF](https://github.com/FLIF-hub/FLIF) | Needed for FLIF (`flif`) output. |
-| [go-avif](https://github.com/Kagami/go-avif) | Needed for Lossless AVIF (`avif`) output. Requires `libaom`. (Experimental; does not currently produce truly lossless images. We're trying to figure out why that is.) |
 
 
-`go-avif` needs to be installed via `go get`, it requires libaom to work.
 
----
+---------------------------------------------------
 
 # How to use
 
@@ -92,7 +85,7 @@ There are two guides for using Orxporter:
 
 ### [Dzuk's how to guide](docs/dzuk/howto.md)
 
-An up to date, detailed guide with simpler language for those who are less techincally inclined. (Still requires that you know how CLIs and some other things work though.)
+A detailed guide with simpler language for those who are less techincally inclined. It's not fully featured yet though.
 
 ### [kiilas's usage guide](docs/kiilas/usage.md)
 

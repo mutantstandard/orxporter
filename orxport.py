@@ -55,13 +55,10 @@ IMAGE BUILD:
 -F      Format (default: {DEF_OUTPUT_FORMATS[0]})
         comma separated with no spaces (ie. 'svg,png-64,jxl-128')
         - svg (SVG)
-        - svgo (Optimised SVG, may have imperfect results)
         - png-SIZE (PNG)
         - pngc-SIZE (Crushed PNG)
-        - flif-SIZE (FLIF)
         - jxl-SIZE (Lossless JPEG XL)
         - webp-SIZE (Lossless WebP)
-        - avif-SIZE (Lossless AVIF)
 
 -f      Directory/filename naming system for output (default: {DEF_OUTPUT_NAMING})
         See the documentation for how this works.

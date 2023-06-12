@@ -18,10 +18,8 @@ def get_color_palettes(emoji, manifest):
 """Mapping of the license type, keyed by export format."""
 _license_format_map = {
     'svg': 'svg',
-    'svgo': 'svg',
     'png': 'exif',
     'pngc': 'exif',
-    'avif': 'exif',
 }
 
 def get_license_type_for_format(f):

@@ -91,7 +91,7 @@ This is really useful if you want to folder your image output into relevant cate
 
 ## Export format (`%f`)
 
-Inserts the [image format name](image_formats.md). (ie. `png-32`, `svg`, `flif-128`, etc.)
+Inserts the [image format name](image_formats.md). (ie. `png-32`, `svg`, `jxl-128`, etc.)
 
 ```
 # manifest example
@@ -110,7 +110,7 @@ final/something/png-32/hand.png
 ----
 ## Export format by itself (`%i`)
 
-Inserts the [image format name](image_formats.md) without size. (ie. `png`, `svg`, `flif`, etc.)
+Inserts the [image format name](image_formats.md) without size. (ie. `png`, `svg`, `jxl`, etc.)
 
 ```
 # manifest example

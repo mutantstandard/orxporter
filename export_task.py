@@ -11,8 +11,6 @@ def to_svg(emoji_svg, out_path, name, license=None, license_enabled=True, optimi
     """
     SVG exporting function. Doesn't create temporary files.
     Will append license <metadata> if requested.
-
-    Can optimise the output (ie, output to svgo) if requested.
     """
     if license_enabled:
         final_svg = svg.add_license(emoji_svg, license)
@@ -20,13 +18,7 @@ def to_svg(emoji_svg, out_path, name, license=None, license_enabled=True, optimi
         final_svg = emoji_svg
 
     # write SVG out to file
-    if not optimise: # (svg)
-        files.try_write(final_svg, out_path, "final SVG")
-    else: # (svgo)
-        tmp_svg_path = '.tmp' + name + '.svg'
-        files.try_write(final_svg, tmp_svg_path, "temporary SVG")
-        image_proc.optimise_svg(tmp_svg_path, out_path)
-        os.remove(tmp_svg_path)
+    files.try_write(final_svg, out_path, "final SVG")
 
 
 
@@ -57,10 +49,6 @@ def to_raster(emoji_svg, out_path, renderer, format, size, name):
             image_proc.convert_webp(tmp_png_path, out_path)
         elif format == "jxl":
             image_proc.convert_jxl(tmp_png_path, out_path)
-        elif format == "avif":
-            image_proc.convert_avif(tmp_png_path, out_path)
-        elif format == "flif":
-            image_proc.convert_flif(tmp_png_path, out_path)
         else:
             os.remove(tmp_svg_path)
             os.remove(tmp_png_path)

@@ -25,7 +25,7 @@ class Cache:
     cache_dir = None
 
     # Formats for which a non-licensed version should never be cached
-    skip_export_cache_formats = set(('svg', 'svgo'))
+    skip_export_cache_formats = set(('svg'))
 
     def __init__(self, cache_dir):
         """

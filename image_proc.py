@@ -71,41 +71,6 @@ def convert_jxl(png_in, jxl_out):
 
 
 
-
-def convert_avif(png_in, avif_out):
-    """
-    Converts a single PNG at `png_in` to a Lossless AVIF at `avif_out`.
-    Will raise an exception if trying to invoke the converter failed.
-    """
-    cmd = ['avif', '-e', os.path.abspath(png_in), '-o', os.path.abspath(avif_out), '--lossless']
-
-    try:
-        r = subprocess.run(cmd, stdout=subprocess.DEVNULL).returncode
-    except Exception as e:
-        raise Exception('Invoking the AVIF converter (avif) failed: ' + str(e))
-    if r:
-        raise Exception('The AVIF converter returned the following: ' + str(r))
-
-
-
-
-def convert_flif(png_in, flif_out):
-    """
-    Converts a single PNG at `png_in` to a FLIF at `flif_out`.
-    Will raise an exception if trying to invoke the converter failed.
-    """
-    cmd = ['flif', '-e', '--overwrite', '-Q100', os.path.abspath(png_in), os.path.abspath(flif_out)]
-
-    try:
-        r = subprocess.run(cmd, stdout=subprocess.DEVNULL).returncode
-    except Exception as e:
-        raise Exception('Invoking the FLIF converter (flif) failed: ' + str(e))
-    if r:
-        raise Exception('The FLIF converter returned the following: ' + str(r))
-
-
-
-
 def optimise_svg(svg_in, svgo_out):
     """
     Optimises a single SVG at `svg_in` to `svgo_out`.
@@ -119,7 +84,6 @@ def optimise_svg(svg_in, svgo_out):
         raise Exception('Invoking the SVG optimiser (svgcleaner) failed: ' + str(e))
     if r:
         raise Exception('The SVG optimiser returned the following: ' + str(r))
-
 
 
 

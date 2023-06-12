@@ -2,28 +2,12 @@
 
 ### Vector
 - `svg` SVG
-- `svgo` Optimised SVG (requires svgcleaner)
-
-*(check the [readme](../../readme.md) for all the information on dependencies)*
-
-#### `svgo` Optimised SVG
-Optimised SVG is the same format as SVG, but it's losslessly compressed to create a smaller file size. It requires an extra processing stage (which is very cheap on CPU), and it needs the dependency listed. Check the [svgcleaner](https://github.com/RazrFalcon/svgcleaner) repo to see the documentation for it so you can see what it does to the SVG files.
-
-Orxporter uses svgcleaner with the following command:
-
-`svgcleaner <in file> <out file> --remove-metadata=no --quiet`
-
-In Mutant Standard tests, optimised SVGs are 30-40% smaller than normal SVGs.
-However, svgcleaner is not perfect and can create some unexpected inconsistencies from the original version, so if you use this, you should check your output for possible inconsistencies.
-
 
 ### Raster
 - `png` PNG
 - `pngc` Crushed PNG (requires oxipng)
 - `webp` Lossless WebP (requires cwebp)
 - `jxl` Lossless JPEG XL (requires [libjxl](https://github.com/libjxl/libjxl))
-- `avif` Lossless AVIF (requires go-avif)
-- `flif` FLIF (requires flif)
 
 *(check the [readme](../../readme.md) for all the information on dependencies)*
 
@@ -32,9 +16,7 @@ When choosing raster images, you have to add a size as well. you do this by addi
 eg.
 
 ```
-flif-32
 jxl-64
-avif-128
 webp-512
 png-60
 ```
@@ -46,6 +28,4 @@ Orxporter uses oxipng with the following command:
 
 `oxipng <in file> --out, <out file> --quiet`
 
-In Mutant Standard tests, Crushed PNGs have a file size reduction of about 25% compared to normal PNGs, but only on larger sizes (128px upwards). At 32px, crushing PNGs only has an average file size reduction of 3%.
-
-Unlike Optimised SVGs, crushing PNGs is basically flawless in our experience.
+In tests with Mutant Standard emoji, Crushed PNGs have a file size reduction of between 40-70% (larger the reductions for larger file sizes), so if you're in a situation where you really need to care about file size, you should definitely use it over PNG.

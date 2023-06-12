@@ -258,7 +258,7 @@ The *svg* parameter must point to a file containing the desired string to be
 inserted inside each SVG file's *metadata* tag.
 
 The *exif* parameter must point to a JSON file containing a single object with
-the desired EXIF tags to be written to each PNG or AVIF file.
+the desired EXIF tags to be written to each PNG file.
 
 Text descriptions
 -----------------

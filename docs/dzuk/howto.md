@@ -99,7 +99,7 @@ This is a way of fiddling with the way that your output files are named and what
 You can put multiple formats in this flag in a comma-separated list like this:
 
 ````
--F svg-69,flif-420,png-666,png-128
+-F svg,jxl-420,png-666,webp-128
 ````
 
 

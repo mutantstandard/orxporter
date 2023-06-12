@@ -66,10 +66,6 @@ class ExportThread:
         if f == 'svg':
             svg_license = license.get(util.get_license_type_for_format(f))
             export_task.to_svg(emoji_svg, final_path, self.name, svg_license, self.license_enabled, optimise=False)
-        elif f == 'svgo':
-            svg_license = license.get(util.get_license_type_for_format(f))
-            export_task.to_svg(emoji_svg, final_path, self.name, svg_license, self.license_enabled, optimise=True)
-
         else:
             # any format other than svg is a raster, therefore it needs
             # to have a number separated by a dash.
@@ -94,12 +90,6 @@ class ExportThread:
 
             elif raster_format[0] == "jxl":
                 export_task.to_raster(emoji_svg, final_path, self.renderer, "jxl", size, self.name)
-
-            elif raster_format[0] == "flif":
-                export_task.to_raster(emoji_svg, final_path, self.renderer, "flif", size, self.name)
-
-            elif raster_format[0] == "avif":
-                export_task.to_raster(emoji_svg, final_path, self.renderer, "avif", size, self.name)
 
             else:
                 self.err = Exception(f"""A format you gave ('{f}') uses a file format

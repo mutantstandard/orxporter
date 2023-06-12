@@ -40,12 +40,12 @@ def format_resolve(code, emoji, format):
     # (%z) export size (64, 128, 512, etc.)
     # will return 0 (as a string) if it's SVG.
     if code == 'z':
-        if format.split("-")[0] in ["svg", "svgo"]: # if there's no size...
+        if format.split("-")[0] in ["svg"]: # if there's no size...
             return "0"
         else:
             return format.split("-")[1]
 
-    # (%i) image format, without size (png, webp, avif, etc.)
+    # (%i) image format, without size (png, webp, jxl, etc.)
     if code == 'i':
         return format.split("-")[0]
 
@@ -83,20 +83,14 @@ def format_path(path, emoji, format):
     # (also acts as a format check)
     if format == 'svg':
         res = res + '.svg'
-    elif format == 'svgo':
-        res = res + '.svg'
     elif format.startswith('png-'):
         res = res + '.png'
     elif format.startswith('pngc-'):
         res = res + '.png'
-    elif format.startswith('flif-'):
-        res = res + '.flif'
     elif format.startswith('webp-'):
         res = res + '.webp'
     elif format.startswith('jxl-'):
         res = res + '.jxl'
-    elif format.startswith('avif-'):
-        res = res + '.avif'
     else:
         raise ValueError('Invalid export format: ' + FilterException)
 
