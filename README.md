@@ -10,7 +10,7 @@ with that metadata.
 
 - A [custom declarative language](docs/dzuk/orx.md) for defining your emoji semantics and metadata.
 - Color remapping that automates the production of color-modifiable emoji.
-- The ability to export emoji both as shortcode-named files (ie. 'ice_cream') and unicode codepoint-named files (ie. '1f368')
+- The ability to export emoji both as shortcode-named files (ie. 'ice_cream') and unicode codepoint-named files (ie. '1f368') simultaneously.
 - Supports multiple SVG renderers (resvg, Inkscape and ImageMagick)
 - Powerful output options including filtering, custom export directory structures and filename modifications.
 - Optional cache system so you can save a lot of time on repeat exports.
@@ -58,11 +58,11 @@ Orxporter depends on other software to produce everything that's not SVG.
 ### SVG rasterisers
 One SVG rasteriser is required for Orxporter to export to raster formats.
 
-| software | purpose |
-| :--    | :-- |
-| [resvg](https://github.com/RazrFalcon/resvg) | (`-r resvg`). **We recommend this one if you don't have complicated SVG elements.** |
-| Inkscape | (`-r inkscape`). Not recommended for macOS users. |
-| ImageMagick  | (`-r imagemagick`). |
+| software | flag in Orxporter | notes |
+| :--    | :-- | :-- |
+| [resvg](https://github.com/RazrFalcon/resvg) | (`-r resvg`) | **We recommend this one if you don't have complicated SVG elements.** |
+| Inkscape | (`-r inkscape`) | Not recommended for macOS users. |
+| ImageMagick  | (`-r imagemagick`) | |
 
 
 ### Other format exporters

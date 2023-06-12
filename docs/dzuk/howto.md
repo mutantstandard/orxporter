@@ -13,24 +13,17 @@ eg.
 Here are all of the arguments:
 
 
-
-## Input
-
-### Input (`-i`)
-
-The folder where the source images are located.
-
-```
--i input/folder/here
-```
+## Defining your emoji
 
 ### Manifest (`-m`)
 
-A manifest file is one or a series of files (depending on how you split them up) that declare everything about your emoji sets - the emoji in them, what the emoji are, specifying colormaps for batch recolouring, categories for emoji pickers and what license metadata to use.
+Every emoji set in orxporter needs a Manifest. A Manifest file is one or a series of files (depending on how you split them up) that declare everything about your emoji sets - the emoji in them, what the emoji are, specifying colormaps for batch recolouring, categories for emoji pickers and what license metadata to use.
 
 Manifests are written in a custom declarative language called orx.
 
-- [How orx files work](orx.md)
+I've written some guides on how this works, but until I finish them all, I recommend checking the [Mutant Standard build files](https://github.com/mutantstandard/build) to get an idea of how they work in practice.
+
+- [How orx files work](../kiilas/manifest.md)
 - Declaring emoji (TBA)
 - Declaring and using colormaps (TBA)
 - [How to use SVG and EXIF metadata in your manifest (optional)](metadata.md).
@@ -38,6 +31,18 @@ Manifests are written in a custom declarative language called orx.
 
 ```
 -m manifest.orx
+```
+
+
+
+## Input
+
+### Input (`-i`)
+
+The folder where the source images are located, the base directory at which all manifest `src` parameters start from.
+
+```
+-i input/folder/here
 ```
 
 ### Filter (`-e`) (optional)
@@ -113,9 +118,11 @@ This is how your SVGs will be rasterised. In the backend of Orxporter this means
 
 Depending on what you have installed on your computer, you can choose:
 
-- `inkscape` (requires inkscape)
-- `imagemagick` (requires ImageMagick)
-- `resvg` (requires resvg)
+| software | flag in Orxporter | notes |
+| :--    | :-- | :-- |
+| [resvg](https://github.com/RazrFalcon/resvg) | (`-r resvg`) | **We recommend this one if you don't have complicated SVG elements.** |
+| Inkscape | (`-r inkscape`) | Not recommended for macOS users. |
+| ImageMagick  | (`-r imagemagick`) | |
 
 *(check the [readme](../readme.md) for all the information on dependencies)*
 
@@ -149,6 +156,11 @@ Set a directory as a cache. When a cache is set, Orxporter will store a keyed co
 Run Orxporter's export operations into multiple concurrent threads. If you have a multi-threaded CPU (basically any CPU nowadays), it will greatly improve performance.
 
 If you don't use this flag, Orxporter will only use 1 thread.
+
+
+```
+-t 8
+```
 
 
 -----
