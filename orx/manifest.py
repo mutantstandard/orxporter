@@ -169,7 +169,9 @@ class Manifest(Orx):
 
         if 'bundle' in res and color: 
             # replace the emoji bundle with the color bundle.
-            res['bundle'] = self.colormaps[color]['bundle']
+            # if the colormap doesn't have a bundle, do nothing.
+            if 'bundle' in self.colormaps[color]:
+                res['bundle'] = self.colormaps[color]['bundle']
             
 
         # assume the shortcode is the same as the root if there are no modifiers going on.
