@@ -57,6 +57,13 @@ def format_resolve(code, emoji, format):
         if 'short' not in emoji:
             raise ValueError('Cannot resolve %s - no shortcode')
         return emoji['short']
+    
+    
+    # (%s) the emoji's shortcode
+    if code == 'b':
+        if 'bundle' not in emoji:
+            raise ValueError('Cannot resolve %b - no bundle')
+        return emoji['bundle']
 
     # (%u) the emoji's unicode codepoint
     if code == 'u':

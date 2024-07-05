@@ -190,6 +190,27 @@ codepoint/png-32/270b.png
 
 ----
 
+## Bundle (`%b`)
+
+Inserts the bundle the emoji belongs to.
+
+```
+# manifest example
+emoji   short = hand  src = blah/blah/hand.svg  bundle = core   code = #270b
+
+# out folder
+codepoint
+
+# directory format example
+%b-%f/%u
+
+# output (assuming it's a PNG at 32px)
+core-codepoint/png-32/270b.png
+
+```
+
+----
+
 ## Custom property **%(property_name)**
 
 Inserts a the value for a specific property. Useful for properties that the default arguments don't cover or for leveraging your own custom properties.
