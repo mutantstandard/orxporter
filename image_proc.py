@@ -70,23 +70,6 @@ def convert_jxl(png_in, jxl_out):
         raise Exception('The JXL converter returned the following: ' + str(r))
 
 
-
-def optimise_svg(svg_in, svgo_out):
-    """
-    Optimises a single SVG at `svg_in` to `svgo_out`.
-    Will raise an exception if trying to invoke the optimiser failed.
-    """
-    cmd = ['svgcleaner', os.path.abspath(svg_in), os.path.abspath(svgo_out), '--remove-metadata=no', '--quiet']
-
-    try:
-        r = subprocess.run(cmd, stdout=subprocess.DEVNULL).returncode
-    except Exception as e:
-        raise Exception('Invoking the SVG optimiser (svgcleaner) failed: ' + str(e))
-    if r:
-        raise Exception('The SVG optimiser returned the following: ' + str(r))
-
-
-
 def crush_png(png_in, pngc_out):
     """
     Crushes a single PNG at `png_in` to `png_out`.
